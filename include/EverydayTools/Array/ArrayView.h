@@ -20,6 +20,19 @@ namespace edt
 		}
 
 		template<bool direct>
+		size_t AdvanceAddress(size_t address, size_t stride, size_t elements)
+		{
+			return address + stride * elements;
+		}
+
+		template<>
+		size_t AdvanceAddress<false>(size_t address, size_t stride, size_t elements)
+		{
+			assert(address >= stride * elements);
+			return address - stride * elements;
+		}
+
+		template<bool direct>
 		size_t IncrementAddress(size_t address, size_t stride)
 		{
 			return address + stride;
@@ -37,83 +50,83 @@ namespace edt
 		{
 			return IncrementAddress<!direct>(address, stride);
 		}
-
-		template<bool direct>
-		size_t AdvanceAddress(size_t address, size_t stride, size_t count)
-		{
-			return IncrementAddress<direct>(address, stride * count);
-		}
 	}
 
-	template<typename T, bool direct>
-	class Iterator
+	template<
+		typename T, bool direct,
+		template<typename, bool> typename Final>
+	class BaseRandomAccessIterator
 	{
 	public:
+		using TFinal = Final<T, direct>;
 		using value_type = T;
 		using reference = T&;
 		using pointer = T*;
 		using iterator_category = std::random_access_iterator_tag;
 		using difference_type = int;
 
-		Iterator(size_t address, size_t stride) :
-			m_address(address),
-			m_stride(stride)
-		{}
-		Iterator(const Iterator&) = default;
-
-		Iterator& operator=(const Iterator&) = default;
-
-		// Pre-increment
-		Iterator& operator++()
+		TFinal& operator++()
 		{
-			Increment();
-			return *this;
+			auto& _this = CastThis();
+			_this.Increment();
+			return _this;
 		}
 
-		// Pre-decrement
-		Iterator& operator--()
+		TFinal& operator--()
 		{
-			Decrement();
-			return *this;
+			auto& _this = CastThis();
+			_this.Decrement();
+			return _this;
 		}
 
-		// Postfix increment
-		Iterator operator++(int)
+		TFinal operator++(int)
 		{
-			Iterator tmp(*this);
+			TFinal tmp(*this);
 			operator++();
 			return tmp;
 		}
 
-		// Postfix decrement
-		Iterator operator--(int)
+		TFinal operator--(int)
 		{
-			Iterator tmp(*this);
+			TFinal tmp(*this);
 			operator--();
 			return tmp;
 		}
 
-		bool operator==(const Iterator& another) const
+		bool operator==(const TFinal& another) const
 		{
-			return
-				m_address == another.m_address &&
-				m_stride == another.m_stride;
+			return CastThis().TheSame(another);
 		}
 
-		bool operator!=(const Iterator& another) const
+		bool operator!=(const TFinal& another) const
 		{
 			return !(*this == another);
 		}
 
-		reference operator*()
+		reference operator*() const
 		{
-			return *array_view_details::AddressToPointer<T>(m_address);
+			return *CastThis().GetData();
 		}
 
-		pointer operator->()
+		pointer operator->() const
 		{
-			return *array_view_details::AddressToPointer<T>(m_address);
+			return CastThis().GetData();
 		}
+
+	private:
+		TFinal& CastThis() { return *static_cast<TFinal*>(this); }
+		const TFinal& CastThis() const { return *static_cast<const TFinal*>(this); }
+	};
+
+	template<typename T, bool direct>
+	class SparseRandomAccessIterator :
+		public BaseRandomAccessIterator<T, direct, SparseRandomAccessIterator>
+	{
+	public:
+		SparseRandomAccessIterator(size_t address, size_t stride) :
+			m_address(address),
+			m_stride(stride)
+		{}
 
 	protected:
 		void Increment()
@@ -126,7 +139,21 @@ namespace edt
 			m_address = array_view_details::DecrementAddress<direct>(m_address, m_stride);
 		}
 
+		pointer GetData() const
+		{
+			return array_view_details::AddressToPointer<T>(m_address);
+		}
+
+		bool TheSame(const SparseRandomAccessIterator& another) const
+		{
+			return
+				m_address == another.m_address &&
+				m_stride == another.m_stride;
+		}
+
 	private:
+		friend class BaseRandomAccessIterator<T, direct, ::edt::SparseRandomAccessIterator>;
+
 		size_t m_address;
 		size_t m_stride;
 	};
@@ -135,10 +162,22 @@ namespace edt
 	class ArrayView
 	{
 	public:
-		using iterator = Iterator<T, true>;
-		using const_iterator = Iterator<const T, true>;
-		using reverse_iterator = Iterator<T, false>;
-		using const_reverse_iterator = Iterator<const T, false>;
+		template<bool direct>
+		using TIterator = SparseRandomAccessIterator<T, direct>;
+
+		using iterator = TIterator<true>;
+		using const_iterator = iterator;
+		using reverse_iterator = TIterator<false>;
+		using const_reverse_iterator = reverse_iterator;
+
+		template<typename U, typename Enable =
+			std::enable_if_t<
+				std::is_same<std::decay_t<T>, std::decay_t<U>>::value &&
+				(std::is_const<T>::value || !(std::is_const<U>::value))
+			>>
+		ArrayView(const ArrayView<U>& another) :
+			ArrayView(another.GetData(), another.GetSize(), another.GetStride())
+		{}
 
 		ArrayView(T* ptr = nullptr, size_t size = 0, size_t stride = sizeof(T)) :
 			m_address(array_view_details::PointerToAddress(ptr)),
@@ -149,29 +188,52 @@ namespace edt
 			assert(size == 0 || ptr != nullptr);
 		}
 
-		decltype(auto) begin() { return begin<T, true>(); }
-		decltype(auto) end() { return end<T, true>(); }
-
-		decltype(auto) begin() const { return begin<const T, true>(); }
-		decltype(auto) end() const { return end<const T, true>(); }
-
-		decltype(auto) rbegin() { return begin<T, false>(); }
-		decltype(auto) rend() { return end<T, false>(); }
-
-		decltype(auto) rbegin() const { return begin<const T, false>(); }
-		decltype(auto) rend() const { return end<const T, false>(); }
-
-	private:
-		template<typename U, bool direct>
-		decltype(auto) begin()
+		size_t GetSize() const
 		{
-			return Iterator<U, direct>(BeginAddress<direct>(), m_stride);
+			return m_size;
 		}
 
-		template<typename U, bool direct>
-		decltype(auto) end()
+		size_t GetStride() const
 		{
-			return Iterator<U, direct>(EndAddress<direct>(), m_stride);
+			return m_stride;
+		}
+
+		T* GetData() const
+		{
+			return array_view_details::AddressToPointer<T>(m_address);
+		}
+
+		decltype(auto) begin() const
+		{
+			return begin<true>();
+		}
+
+		decltype(auto) end() const
+		{
+			return end<true>();
+		}
+
+		decltype(auto) rbegin() const
+		{
+			return begin<false>();
+		}
+
+		decltype(auto) rend() const
+		{
+			return end<false>();
+		}
+
+	private:
+		template<bool direct>
+		decltype(auto) begin() const
+		{
+			return TIterator<direct>(BeginAddress<direct>(), m_stride);
+		}
+
+		template<bool direct>
+		decltype(auto) end() const
+		{
+			return TIterator<direct>(EndAddress<direct>(), m_stride);
 		}
 
 		template<bool direct>
