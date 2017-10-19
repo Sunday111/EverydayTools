@@ -50,7 +50,14 @@ namespace edt
 		{
 			return IncrementAddress<!direct>(address, stride);
 		}
+
+		template<typename T, typename TMember>
+		decltype(auto) GetMemberValue(T& t, TMember member)
+		{
+			return (t.*member);
+		}
 	}
+
 
 	template<
 		typename T, bool direct,
@@ -203,6 +210,16 @@ namespace edt
 			return array_view_details::AddressToPointer<T>(m_address);
 		}
 
+		template<typename MemberPtr,
+			class = std::enable_if_t<std::is_member_object_pointer<MemberPtr>::value>>
+		decltype(auto) MakeMemberView(MemberPtr member) const
+		{
+			using namespace array_view_details;
+			using CleanMemberType = decltype(GetMemberValue(*GetData(), member));
+			using MemberType = std::remove_reference_t<CleanMemberType>;
+			return ArrayView<MemberType>(&GetMemberValue(*GetData(), member), GetSize(), GetStride());
+		}
+
 		decltype(auto) begin() const
 		{
 			return begin<true>();
@@ -266,5 +283,11 @@ namespace edt
 	ArrayView<T> MakeArrayView(T(&arr)[size])
 	{
 		return ArrayView<T>(arr, size);
+	}
+
+	template<typename T, typename Member, size_t size>
+	ArrayView<Member> MakeArrayView(T(&arr)[size], Member T::* member)
+	{
+		return ArrayView<Member>(&(*arr.*member), size, sizeof(T));
 	}
 }
