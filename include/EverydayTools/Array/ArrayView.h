@@ -8,51 +8,51 @@ namespace edt
 	namespace array_view_details
 	{
 		template<typename T>
-		size_t PointerToAddress(T* pointer)
+		inline size_t PointerToAddress(T* pointer)
 		{
 			return reinterpret_cast<size_t>(pointer);
 		}
 
 		template<typename T>
-		T* AddressToPointer(size_t address)
+		inline T* AddressToPointer(size_t address)
 		{
 			return reinterpret_cast<T*>(address);
 		}
 
 		template<bool direct>
-		size_t AdvanceAddress(size_t address, size_t stride, size_t elements)
+		inline size_t AdvanceAddress(size_t address, size_t stride, size_t elements)
 		{
 			return address + stride * elements;
 		}
 
 		template<>
-		size_t AdvanceAddress<false>(size_t address, size_t stride, size_t elements)
+		inline size_t AdvanceAddress<false>(size_t address, size_t stride, size_t elements)
 		{
 			assert(address >= stride * elements);
 			return address - stride * elements;
 		}
 
 		template<bool direct>
-		size_t IncrementAddress(size_t address, size_t stride)
+		inline size_t IncrementAddress(size_t address, size_t stride)
 		{
 			return address + stride;
 		}
 
 		template<>
-		size_t IncrementAddress<false>(size_t address, size_t stride)
+		inline size_t IncrementAddress<false>(size_t address, size_t stride)
 		{
 			assert(address > stride);
 			return address - stride;
 		}
 
 		template<bool direct>
-		size_t DecrementAddress(size_t address, size_t stride)
+		inline size_t DecrementAddress(size_t address, size_t stride)
 		{
 			return IncrementAddress<!direct>(address, stride);
 		}
 
 		template<typename T, typename TMember>
-		decltype(auto) GetMemberValue(T& t, TMember member)
+		inline decltype(auto) GetMemberValue(T& t, TMember member)
 		{
 			return (t.*member);
 		}
