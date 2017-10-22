@@ -7,6 +7,46 @@ namespace edt
 {
 	namespace array_view_details
 	{
+		template<typename T, bool direct>
+		struct IncrementHelper
+		{
+			static T* AdvancePointer(T* ptr, int offset)
+			{
+				return ptr + offset;
+			}
+
+			static T* IncrementPointer(T* ptr)
+			{
+				return ptr + 1;
+			}
+
+			static T* DecrementPointer(T* ptr)
+			{
+				return ptr - 1;
+			}
+		};
+
+		template<typename T>
+		struct IncrementHelper<T, false>
+		{
+			using Inverse = IncrementHelper<T, true>;
+
+			static T* AdvancePointer(T* ptr, int count)
+			{
+				return Inverse::AdvancePointer(ptr, -count);;
+			}
+
+			static T* IncrementPointer(T* ptr)
+			{
+				return Inverse::DecrementPointer(ptr);
+			}
+
+			static T* DecrementPointer(T* ptr)
+			{
+				return Inverse::IncrementPointer(ptr);
+			}
+		};
+
 		template<typename T>
 		inline size_t PointerToAddress(T* pointer)
 		{
@@ -45,6 +85,24 @@ namespace edt
 			return address - stride;
 		}
 
+		template<bool direct, typename T>
+		inline T* IncrementPointer(T* pointer)
+		{
+			return IncrementHelper<T, direct>::IncrementPointer(pointer);
+		}
+
+		template<bool direct, typename T>
+		inline T* DecrementPointer(T* pointer)
+		{
+			return IncrementHelper<T, direct>::DecrementPointer(pointer);
+		}
+
+		template<bool direct, typename T>
+		inline T* AdvancePointer(T* pointer, int count)
+		{
+			return IncrementHelper<T, direct>::AdvancePointer(pointer, count);
+		}
+
 		template<bool direct>
 		inline size_t DecrementAddress(size_t address, size_t stride)
 		{
@@ -56,8 +114,8 @@ namespace edt
 		{
 			return (t.*member);
 		}
-	}
 
+	}
 
 	template<
 		typename T, bool direct,
@@ -165,13 +223,88 @@ namespace edt
 		size_t m_stride;
 	};
 
-	template<typename T>
+	template<typename T, bool direct>
+	class DenseRandomAccessIterator :
+		public BaseRandomAccessIterator<T, direct, DenseRandomAccessIterator>
+	{
+	public:
+		DenseRandomAccessIterator(T* ptr) :
+			m_p(ptr)
+		{}
+
+	protected:
+		void Increment()
+		{
+			m_p = array_view_details::IncrementPointer<direct>(m_p);
+		}
+
+		void Decrement()
+		{
+			m_p = array_view_details::DecrementPointer<direct>(m_p);
+		}
+
+		pointer GetData() const
+		{
+			return m_p;
+		}
+
+		bool TheSame(const SparseRandomAccessIterator& another) const
+		{
+			return m_p == another.m_p;
+		}
+
+	private:
+		friend class BaseRandomAccessIterator<T, direct, ::edt::SparseRandomAccessIterator>;
+
+	private:
+		T* m_p;
+	};
+
+	template<typename T, template<typename T> typename Final>
 	class ArrayView
+	{
+		using TFinal = Final<T>;
+
+	public:
+		decltype(auto) begin() const
+		{
+			return Cast().Begin<true>();
+		}
+
+		decltype(auto) end() const
+		{
+			return Cast().End<true>();
+		}
+
+		decltype(auto) rbegin() const
+		{
+			return Cast().Begin<false>();
+		}
+
+		decltype(auto) rend() const
+		{
+			return Cast().End<false>();
+		}
+
+	private:
+		TFinal& Cast()
+		{
+			return *static_cast<TFinal*>(this);
+		}
+
+		const TFinal& Cast() const
+		{
+			return *static_cast<const TFinal*>(this);
+		}
+	};
+
+	template<typename T>
+	class SparseArrayView :
+		public ArrayView<T, SparseArrayView>
 	{
 	public:
 		template<bool direct>
 		using TIterator = SparseRandomAccessIterator<T, direct>;
-
 		using iterator = TIterator<true>;
 		using const_iterator = iterator;
 		using reverse_iterator = TIterator<false>;
@@ -182,11 +315,11 @@ namespace edt
 				std::is_same<std::decay_t<T>, std::decay_t<U>>::value &&
 				(std::is_const<T>::value || !(std::is_const<U>::value))
 			>>
-		ArrayView(const ArrayView<U>& another) :
-			ArrayView(another.GetData(), another.GetSize(), another.GetStride())
+		SparseArrayView(const SparseArrayView<U>& another) :
+			SparseArrayView(another.GetData(), another.GetSize(), another.GetStride())
 		{}
 
-		ArrayView(T* ptr = nullptr, size_t size = 0, size_t stride = sizeof(T)) :
+		SparseArrayView(T* ptr = nullptr, size_t size = 0, size_t stride = sizeof(T)) :
 			m_address(array_view_details::PointerToAddress(ptr)),
 			m_size(size),
 			m_stride(stride)
@@ -217,38 +350,18 @@ namespace edt
 			using namespace array_view_details;
 			using CleanMemberType = decltype(GetMemberValue(*GetData(), member));
 			using MemberType = std::remove_reference_t<CleanMemberType>;
-			return ArrayView<MemberType>(&GetMemberValue(*GetData(), member), GetSize(), GetStride());
-		}
-
-		decltype(auto) begin() const
-		{
-			return begin<true>();
-		}
-
-		decltype(auto) end() const
-		{
-			return end<true>();
-		}
-
-		decltype(auto) rbegin() const
-		{
-			return begin<false>();
-		}
-
-		decltype(auto) rend() const
-		{
-			return end<false>();
+			return SparseArrayView<MemberType>(&GetMemberValue(*GetData(), member), GetSize(), GetStride());
 		}
 
 	private:
 		template<bool direct>
-		decltype(auto) begin() const
+		decltype(auto) Begin() const
 		{
 			return TIterator<direct>(BeginAddress<direct>(), m_stride);
 		}
 
 		template<bool direct>
-		decltype(auto) end() const
+		decltype(auto) End() const
 		{
 			return TIterator<direct>(EndAddress<direct>(), m_stride);
 		}
@@ -274,20 +387,117 @@ namespace edt
 				BeginAddress<direct>(), m_stride, m_size);
 		}
 
+		friend ArrayView<T, ::edt::SparseArrayView>;
+
 		size_t m_address;
 		size_t m_size;
 		size_t m_stride;
 	};
 
-	template<typename T, size_t size>
-	ArrayView<T> MakeArrayView(T(&arr)[size])
+	template<typename T>
+	class DenseArrayView :
+		public ArrayView<T, DenseArrayView>
 	{
-		return ArrayView<T>(arr, size);
+	public:
+		template<bool direct>
+		using TIterator = SparseRandomAccessIterator<T, direct>;
+		using iterator = TIterator<true>;
+		using const_iterator = iterator;
+		using reverse_iterator = TIterator<false>;
+		using const_reverse_iterator = reverse_iterator;
+
+		template<typename U, typename Enable =
+			std::enable_if_t<
+				std::is_same<std::decay_t<T>, std::decay_t<U>>::value &&
+				(std::is_const<T>::value || !(std::is_const<U>::value))
+			>>
+		DenseArrayView(const DenseArrayView<U>& another) :
+			DenseArrayView(another.GetData(), another.GetSize())
+		{}
+
+		DenseArrayView(T* ptr = nullptr, size_t size = 0) :
+			m_p(ptr),
+			m_size(size)
+		{
+			assert(size == 0 || ptr != nullptr);
+		}
+
+		size_t GetSize() const
+		{
+			return m_size;
+		}
+
+		T* GetData() const
+		{
+			return m_p;
+		}
+
+		template<typename MemberPtr,
+			class = std::enable_if_t<std::is_member_object_pointer<MemberPtr>::value>>
+		decltype(auto) MakeMemberView(MemberPtr member) const
+		{
+			using namespace array_view_details;
+			using CleanMemberType = decltype(GetMemberValue(*GetData(), member));
+			using MemberType = std::remove_reference_t<CleanMemberType>;
+			return SparseArrayView<MemberType>(&GetMemberValue(*GetData(), member), GetSize(), sizeof(T));
+		}
+
+		template<typename U,
+			class = std::enable_if_t<std::is_convertible_v<T, U>>>
+		operator SparseArrayView<U>() const
+		{
+			return SparseArrayView<U>(m_p, m_size);
+		}
+
+	private:
+		template<bool direct>
+		decltype(auto) Begin() const
+		{
+			return TIterator<direct>(BeginPointer<direct>());
+		}
+
+		template<bool direct>
+		decltype(auto) End() const
+		{
+			return TIterator<direct>(EndPointer<direct>());
+		}
+
+		template<bool direct>
+		T* BeginPointer() const
+		{
+			return m_p;
+		}
+
+		template<>
+		T* BeginPointer<false>() const
+		{
+			return m_size > 0 ?
+				m_p + (m_size - 1) :
+				m_p;
+		}
+
+		template<bool direct>
+		size_t EndPointer() const
+		{
+			return array_view_details::AdvancePointer<direct>(
+				BeginPointer<direct>(), static_cast<int>(m_size));
+		}
+
+		friend ArrayView<T, ::edt::DenseArrayView>;
+
+		T* m_p;
+		size_t m_size;
+	};
+
+	template<typename T, size_t size>
+	DenseArrayView<T> MakeArrayView(T(&arr)[size])
+	{
+		return DenseArrayView<T>(arr, size);
 	}
 
 	template<typename T, typename Member, size_t size>
-	ArrayView<Member> MakeArrayView(T(&arr)[size], Member T::* member)
+	SparseArrayView<Member> MakeArrayView(T(&arr)[size], Member T::* member)
 	{
-		return ArrayView<Member>(&(*arr.*member), size, sizeof(T));
+		return SparseArrayView<Member>(&(*arr.*member), size, sizeof(T));
 	}
 }
