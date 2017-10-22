@@ -19,6 +19,14 @@ namespace edt
 			AddRef();
 		}
 
+		template<typename U, typename Enable =
+			std::enable_if_t<std::is_convertible_v<U*, T*>>>
+		IntrusivePtr(const IntrusivePtr<U, RefCounter>& ref) :
+			m_p(ref.Get())
+		{
+			AddRef();
+		}
+
 		IntrusivePtr(const IntrusivePtr& ref) :
 			m_p(ref.m_p)
 		{
@@ -33,6 +41,11 @@ namespace edt
 		~IntrusivePtr()
 		{
 			ReleaseRef();
+		}
+
+		T* Get() const
+		{
+			return m_p;
 		}
 
 		IntrusivePtr& operator=(const IntrusivePtr& ref)
@@ -60,6 +73,28 @@ namespace edt
 			return *this;
 		}
 
+		bool operator==(const IntrusivePtr& that) const
+		{
+			return m_p == that.m_p;
+		}
+
+		bool operator!=(const IntrusivePtr& that) const
+		{
+			return m_p != that.m_p;
+		}
+
+		T* operator->() const
+		{
+			assert(m_p != nullptr);
+			return m_p;
+		}
+
+		T& operator*() const
+		{
+			assert(m_p != nullptr);
+			return *m_p;
+		}
+
 	protected:
 		void MoveFrom(IntrusivePtr& ref)
 		{
@@ -67,9 +102,6 @@ namespace edt
 			ref.m_p = nullptr;
 		}
 
-		T* m_p;
-
-	private:
 		void AddRef()
 		{
 			if (m_p != nullptr)
@@ -87,5 +119,7 @@ namespace edt
 				m_p = nullptr;
 			}
 		}
+
+		T* m_p;
 	};
 }
