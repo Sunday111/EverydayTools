@@ -248,13 +248,13 @@ namespace edt
 			return m_p;
 		}
 
-		bool TheSame(const SparseRandomAccessIterator& another) const
+		bool TheSame(const DenseRandomAccessIterator& another) const
 		{
 			return m_p == another.m_p;
 		}
 
 	private:
-		friend class BaseRandomAccessIterator<T, direct, ::edt::SparseRandomAccessIterator>;
+		friend class BaseRandomAccessIterator<T, direct, ::edt::DenseRandomAccessIterator>;
 
 	private:
 		T* m_p;
@@ -400,21 +400,33 @@ namespace edt
 	{
 	public:
 		template<bool direct>
-		using TIterator = SparseRandomAccessIterator<T, direct>;
+		using TIterator = DenseRandomAccessIterator<T, direct>;
 		using iterator = TIterator<true>;
 		using const_iterator = iterator;
 		using reverse_iterator = TIterator<false>;
 		using const_reverse_iterator = reverse_iterator;
 
+		/// Constructs dense array view with dense array view instantiated with another T
+		/**
+			Allows to construct with DenseArrayView instantiated with the same type
+			but with another qualifiers (for example from T = 'int' to V = 'const int')
+
+			@param another - array view to construct from
+		 */
 		template<typename U, typename Enable =
 			std::enable_if_t<
-				std::is_same<std::decay_t<T>, std::decay_t<U>>::value &&
-				(std::is_const<T>::value || !(std::is_const<U>::value))
+				std::is_same_v<std::decay_t<U>, std::decay_t<T>> &&
+				std::is_convertible_v<U, T>
 			>>
 		DenseArrayView(const DenseArrayView<U>& another) :
 			DenseArrayView(another.GetData(), another.GetSize())
 		{}
 
+		/// Default constructor and constructor with all parameters
+		/**
+			@param[in] ptr - pointer to the first element
+			@param[in] size - elements count
+		 */
 		DenseArrayView(T* ptr = nullptr, size_t size = 0) :
 			m_p(ptr),
 			m_size(size)
@@ -422,16 +434,30 @@ namespace edt
 			assert(size == 0 || ptr != nullptr);
 		}
 
+		/// The size of view
+		/**
+			@return viewed elements count
+		 */
 		size_t GetSize() const
 		{
 			return m_size;
 		}
 
+		/// Pointer to the first element
+		/**
+			@return pointer to the first element of viewed collection
+		 */
 		T* GetData() const
 		{
 			return m_p;
 		}
 
+		/// Constructs sparse array view to member
+		/**
+			Constructs sparse array view to some data member of T type
+			@param member - pointer to class member
+			@return members array view
+		 */
 		template<typename MemberPtr,
 			class = std::enable_if_t<std::is_member_object_pointer<MemberPtr>::value>>
 		decltype(auto) MakeMemberView(MemberPtr member) const
@@ -442,11 +468,20 @@ namespace edt
 			return SparseArrayView<MemberType>(&GetMemberValue(*GetData(), member), GetSize(), sizeof(T));
 		}
 
+		/// Casts dense array view to sparse array view of base type
+		/**
+			Casts to sparse array view instantiated with base type of T
+
+			@return sparse view to base type
+		 */
 		template<typename U,
-			class = std::enable_if_t<std::is_convertible_v<T, U>>>
+			class = std::enable_if_t<
+				std::is_base_of_v<U, T> &&
+				std::is_convertible_v<T, U>>>
 		operator SparseArrayView<U>() const
 		{
-			return SparseArrayView<U>(m_p, m_size);
+			// Stride may not change here
+			return SparseArrayView<U>(m_p, m_size, sizeof(T));
 		}
 
 	private:
@@ -477,7 +512,7 @@ namespace edt
 		}
 
 		template<bool direct>
-		size_t EndPointer() const
+		T* EndPointer() const
 		{
 			return array_view_details::AdvancePointer<direct>(
 				BeginPointer<direct>(), static_cast<int>(m_size));
