@@ -25,6 +25,12 @@ namespace edt
 					reinterpret_cast<size_t>(pointer) + count * stride);
 			}
 		}
+
+		template<typename T, typename TMember>
+		inline decltype(auto) GetMemberValue(T& t, TMember member) noexcept
+		{
+			return (t.*member);
+		}
 	}
 
 	template<
@@ -39,6 +45,11 @@ namespace edt
 		using pointer = T*;
 		using iterator_category = std::random_access_iterator_tag;
 		using difference_type = int;
+
+		pointer GetData() const noexcept
+		{
+			return m_p;
+		}
 
 		TFinal& operator++() noexcept
 		{
@@ -88,6 +99,9 @@ namespace edt
 			return CastThis().GetData();
 		}
 
+	protected:
+		friend class BaseRandomAccessIterator<T, direct, Final>;
+
 	private:
 		TFinal& CastThis() noexcept { return *static_cast<TFinal*>(this); }
 		const TFinal& CastThis() const noexcept { return *static_cast<const TFinal*>(this); }
@@ -106,17 +120,12 @@ namespace edt
 	protected:
 		void Increment() noexcept
 		{
-			m_p = array_view_details::AdvancePointer<true>(m_p, 1, m_stride);
+			m_p = array_view_details::AdvancePointer<direct>(m_p, 1, m_stride);
 		}
 
 		void Decrement() noexcept
 		{
-			m_p = array_view_details::AdvancePointer<false>(m_p, 1, m_stride);
-		}
-
-		pointer GetData() const noexcept
-		{
-			return m_p;
+			m_p = array_view_details::AdvancePointer<direct>(m_p, 1, m_stride);
 		}
 
 		bool TheSame(const SparseRandomAccessIterator& another) const noexcept
@@ -127,9 +136,7 @@ namespace edt
 		}
 
 	private:
-		friend class BaseRandomAccessIterator<T, direct, ::edt::SparseRandomAccessIterator>;
-
-		T* m_p;
+		T * m_p;
 		size_t m_stride;
 	};
 
@@ -153,21 +160,13 @@ namespace edt
 			m_p = array_view_details::DecrementPointer<direct>(m_p);
 		}
 
-		pointer GetData() const noexcept
-		{
-			return m_p;
-		}
-
 		bool TheSame(const DenseRandomAccessIterator& another) const noexcept
 		{
 			return m_p == another.m_p;
 		}
 
 	private:
-		friend class BaseRandomAccessIterator<T, direct, ::edt::DenseRandomAccessIterator>;
-
-	private:
-		T* m_p;
+		T * m_p;
 	};
 
 	template<typename T, template<typename T> typename Final>
@@ -196,6 +195,9 @@ namespace edt
 			return Cast().End<false>();
 		}
 
+	protected:
+		friend ArrayView<T, Final>;
+
 	private:
 		TFinal& Cast() noexcept
 		{
@@ -219,7 +221,13 @@ namespace edt
 		using const_iterator = iterator;
 		using reverse_iterator = TIterator<false>;
 		using const_reverse_iterator = reverse_iterator;
-
+		
+		/// Template copy constructor
+		/**
+			Constructs array view using reference to the object of the same type
+			or using regerence to array view instantiated with derived type
+			@param another - object to copy
+		 */
 		template<typename U, typename Enable =
 			std::enable_if_t<
 				(std::is_same_v<std::decay_t<T>, std::decay_t<U>> ||
@@ -229,7 +237,14 @@ namespace edt
 		SparseArrayView(const SparseArrayView<U>& another) noexcept :
 			SparseArrayView(another.GetData(), another.GetSize(), another.GetStride())
 		{}
-
+			
+		/// Constructor
+		/**
+			Constructor by parameters and default constructor
+			@param ptr - pointer to first object
+			@param size - objects count
+			@param stride - distance between objects
+		 */
 		SparseArrayView(T* ptr = nullptr, size_t size = 0, size_t stride = sizeof(T)) noexcept :
 			m_p(ptr),
 			m_size(size),
@@ -238,22 +253,40 @@ namespace edt
 			assert(stride >= sizeof(T));
 			assert(size == 0 || ptr != nullptr);
 		}
-
+		
+		/// Returns objects count
+		/**
+			@return viewed objects count
+		 */
 		size_t GetSize() const noexcept
 		{
 			return m_size;
 		}
-
+		
+		/// Returns stride
+		/**
+			@return stride between objects in view
+		 */
 		size_t GetStride() const noexcept
 		{
 			return m_stride;
 		}
-
+		
+		/// Returns internal pointer
+		/**
+			@return pointer to the first object
+		 */
 		T* GetData() const noexcept
 		{
 			return m_p;
 		}
-
+		
+		/// Constructs sparse array view to member
+		/**
+			Constructs sparse array view to some data member of T type
+			@param member - pointer to class member
+			@return members array view
+		 */
 		template<typename MemberPtr,
 			class = std::enable_if_t<std::is_member_object_pointer_v<MemberPtr>>>
 		decltype(auto) MakeMemberView(MemberPtr member) const noexcept
@@ -262,6 +295,34 @@ namespace edt
 			using CleanMemberType = decltype(GetMemberValue(*GetData(), member));
 			using MemberType = std::remove_reference_t<CleanMemberType>;
 			return SparseArrayView<MemberType>(&GetMemberValue(*GetData(), member), GetSize(), GetStride());
+		}
+		
+		/// Assigns view to some value
+		/**
+			Sets every value of viewed collection to passed value
+			@param value - value to use
+		 */
+		void Assign(const T& value) const
+		{
+			for (size_t i = 0; i < m_size; ++i)
+			{
+				operator[](i) = value;
+			}
+		}
+
+		template<bool direct = true>
+		SparseArrayView<T> Split(size_t startIndex, size_t count) const
+		{
+			assert(startIndex + count <= m_size);
+			return SparseArrayView<T>(
+				array_view_details::AdvancePointer<direct>(m_p, startIndex, m_stride),
+				count, m_stride);
+		}
+
+		T& operator[](size_t index) const noexcept
+		{
+			assert(index < m_size);
+			return *array_view_details::AdvancePointer<true>(m_p, index, m_stride);
 		}
 
 	private:
@@ -300,8 +361,6 @@ namespace edt
 				BeginPointer<direct>(), m_size, m_stride);
 		}
 
-		friend ArrayView<T, ::edt::SparseArrayView>;
-
 		T* m_p;
 		size_t m_size;
 		size_t m_stride;
@@ -318,6 +377,7 @@ namespace edt
 		using const_iterator = iterator;
 		using reverse_iterator = TIterator<false>;
 		using const_reverse_iterator = reverse_iterator;
+		using value_type = T;
 
 		/// Constructs dense array view with dense array view instantiated with another T
 		/**
@@ -381,6 +441,15 @@ namespace edt
 			return SparseArrayView<MemberType>(&GetMemberValue(*GetData(), member), GetSize(), sizeof(T));
 		}
 
+		template<bool direct>
+		SparseArrayView<T> Split(size_t startIndex, size_t count) const
+		{
+			assert(startIndex + count <= m_size);
+			return SparseArrayView<T>(
+				array_view_details::AdvancePointer<direct>(m_p, startIndex),
+				count);
+		}
+
 		/// Casts dense array view to sparse array view of base type
 		/**
 			Casts to sparse array view instantiated with base type of T
@@ -395,6 +464,12 @@ namespace edt
 		{
 			// Stride may not change here
 			return SparseArrayView<U>(m_p, m_size, sizeof(T));
+		}
+
+		T& operator[](size_t index) const noexcept
+		{
+			assert(index < m_size);
+			return *array_view_details::AdvancePointer<true>(m_p, index);
 		}
 
 	private:
@@ -413,15 +488,16 @@ namespace edt
 		template<bool direct>
 		T* BeginPointer() const noexcept
 		{
-			return m_p;
-		}
-
-		template<>
-		T* BeginPointer<false>() const noexcept
-		{
-			return m_size > 0 ?
-				m_p + (m_size - 1) :
-				m_p;
+			if constexpr (direct)
+			{
+				return m_p;
+			}
+			else
+			{
+				return
+					m_size > 0 ?
+					array_view_details::AdvancePointer<direct>(m_p, m_size - 1);
+			}
 		}
 
 		template<bool direct>
@@ -430,8 +506,6 @@ namespace edt
 			return array_view_details::AdvancePointer<direct>(
 				BeginPointer<direct>(), static_cast<int>(m_size));
 		}
-
-		friend ArrayView<T, ::edt::DenseArrayView>;
 
 		T* m_p;
 		size_t m_size;
