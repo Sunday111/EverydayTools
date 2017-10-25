@@ -7,112 +7,23 @@ namespace edt
 {
 	namespace array_view_details
 	{
-		template<typename T, bool direct>
-		struct IncrementHelper
-		{
-			static T* AdvancePointer(T* ptr, int offset) noexcept
-			{
-				return ptr + offset;
-			}
-
-			static T* IncrementPointer(T* ptr) noexcept
-			{
-				return ptr + 1;
-			}
-
-			static T* DecrementPointer(T* ptr) noexcept
-			{
-				return ptr - 1;
-			}
-		};
-
-		template<typename T>
-		struct IncrementHelper<T, false>
-		{
-			using Inverse = IncrementHelper<T, true>;
-
-			static T* AdvancePointer(T* ptr, int count) noexcept
-			{
-				return Inverse::AdvancePointer(ptr, -count);;
-			}
-
-			static T* IncrementPointer(T* ptr) noexcept
-			{
-				return Inverse::DecrementPointer(ptr);
-			}
-
-			static T* DecrementPointer(T* ptr) noexcept
-			{
-				return Inverse::IncrementPointer(ptr);
-			}
-		};
-
-		template<typename T>
-		inline size_t PointerToAddress(T* pointer) noexcept
-		{
-			return reinterpret_cast<size_t>(pointer);
-		}
-
-		template<typename T>
-		inline T* AddressToPointer(size_t address) noexcept
-		{
-			return reinterpret_cast<T*>(address);
-		}
-
-		template<bool direct>
-		inline size_t AdvanceAddress(size_t address, size_t stride, size_t elements) noexcept
-		{
-			return address + stride * elements;
-		}
-
-		template<>
-		inline size_t AdvanceAddress<false>(size_t address, size_t stride, size_t elements) noexcept
-		{
-			assert(address >= stride * elements);
-			return address - stride * elements;
-		}
-
-		template<bool direct>
-		inline size_t IncrementAddress(size_t address, size_t stride) noexcept
-		{
-			return address + stride;
-		}
-
-		template<>
-		inline size_t IncrementAddress<false>(size_t address, size_t stride) noexcept
-		{
-			assert(address > stride);
-			return address - stride;
-		}
-
 		template<bool direct, typename T>
-		inline T* IncrementPointer(T* pointer) noexcept
+		inline T* AdvancePointer(T* pointer, size_t count, size_t stride = sizeof(T)) noexcept
 		{
-			return IncrementHelper<T, direct>::IncrementPointer(pointer);
-		}
+			assert(stride >= sizeof(T));
 
-		template<bool direct, typename T>
-		inline T* DecrementPointer(T* pointer) noexcept
-		{
-			return IncrementHelper<T, direct>::DecrementPointer(pointer);
-		}
+			if constexpr (direct)
+			{
+				return reinterpret_cast<T*>(
+					reinterpret_cast<size_t>(pointer) + count * stride);
+			}
+			else
+			{
+				assert(reinterpret_cast<size_t>(pointer) >= count * stride);
 
-		template<bool direct, typename T>
-		inline T* AdvancePointer(T* pointer, int count) noexcept
-		{
-			return IncrementHelper<T, direct>::AdvancePointer(pointer, count);
-		}
-
-		template<bool direct>
-		inline size_t DecrementAddress(size_t address, size_t stride) noexcept
-		{
-			return IncrementAddress<!direct>(address, stride);
-		}
-
-		template<typename T, typename TMember>
-		inline decltype(auto) GetMemberValue(T& t, TMember member) noexcept
-		{
-			return (t.*member);
+				return reinterpret_cast<T*>(
+					reinterpret_cast<size_t>(pointer) + count * stride);
+			}
 		}
 	}
 
@@ -187,38 +98,38 @@ namespace edt
 		public BaseRandomAccessIterator<T, direct, SparseRandomAccessIterator>
 	{
 	public:
-		SparseRandomAccessIterator(size_t address, size_t stride) noexcept :
-			m_address(address),
+		SparseRandomAccessIterator(T* ptr, size_t stride) noexcept :
+			m_p(ptr),
 			m_stride(stride)
 		{}
 
 	protected:
 		void Increment() noexcept
 		{
-			m_address = array_view_details::IncrementAddress<direct>(m_address, m_stride);
+			m_p = array_view_details::AdvancePointer<true>(m_p, 1, m_stride);
 		}
 
 		void Decrement() noexcept
 		{
-			m_address = array_view_details::DecrementAddress<direct>(m_address, m_stride);
+			m_p = array_view_details::AdvancePointer<false>(m_p, 1, m_stride);
 		}
 
 		pointer GetData() const noexcept
 		{
-			return array_view_details::AddressToPointer<T>(m_address);
+			return m_p;
 		}
 
 		bool TheSame(const SparseRandomAccessIterator& another) const noexcept
 		{
 			return
-				m_address == another.m_address &&
+				m_p == another.m_p &&
 				m_stride == another.m_stride;
 		}
 
 	private:
 		friend class BaseRandomAccessIterator<T, direct, ::edt::SparseRandomAccessIterator>;
 
-		size_t m_address;
+		T* m_p;
 		size_t m_stride;
 	};
 
@@ -320,7 +231,7 @@ namespace edt
 		{}
 
 		SparseArrayView(T* ptr = nullptr, size_t size = 0, size_t stride = sizeof(T)) noexcept :
-			m_address(array_view_details::PointerToAddress(ptr)),
+			m_p(ptr),
 			m_size(size),
 			m_stride(stride)
 		{
@@ -340,7 +251,7 @@ namespace edt
 
 		T* GetData() const noexcept
 		{
-			return array_view_details::AddressToPointer<T>(m_address);
+			return m_p;
 		}
 
 		template<typename MemberPtr,
@@ -357,39 +268,41 @@ namespace edt
 		template<bool direct>
 		decltype(auto) Begin() const noexcept
 		{
-			return TIterator<direct>(BeginAddress<direct>(), m_stride);
+			return TIterator<direct>(BeginPointer<direct>(), m_stride);
 		}
 
 		template<bool direct>
 		decltype(auto) End() const noexcept
 		{
-			return TIterator<direct>(EndAddress<direct>(), m_stride);
+			return TIterator<direct>(EndPointer<direct>(), m_stride);
 		}
 
 		template<bool direct>
-		size_t BeginAddress() const noexcept
+		T* BeginPointer() const noexcept
 		{
-			return m_address;
-		}
-
-		template<>
-		size_t BeginAddress<false>() const noexcept
-		{
-			return m_size > 0 ?
-				m_address + (m_size - 1) * m_stride :
-				m_address;
+			if constexpr (direct)
+			{
+				return m_p;
+			}
+			else
+			{
+				return
+					m_size > 0 ?
+					array_view_details::AdvancePointer(m_p, m_size - 1, m_stride) :
+					m_address;
+			}
 		}
 
 		template<bool direct>
-		size_t EndAddress() const noexcept
+		T* EndPointer() const noexcept
 		{
-			return array_view_details::AdvanceAddress<direct>(
-				BeginAddress<direct>(), m_stride, m_size);
+			return array_view_details::AdvancePointer<direct>(
+				BeginPointer<direct>(), m_size, m_stride);
 		}
 
 		friend ArrayView<T, ::edt::SparseArrayView>;
 
-		size_t m_address;
+		T* m_p;
 		size_t m_size;
 		size_t m_stride;
 	};

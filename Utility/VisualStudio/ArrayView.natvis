@@ -8,7 +8,7 @@
       <Item Name="[stride]" ExcludeView="simple">m_stride</Item>
       <IndexListItems>
         <Size>m_size</Size>
-        <ValueNode>*(($T1*)(m_address + m_stride * $i))</ValueNode>
+        <ValueNode>*(($T1*)((size_t)m_p + m_stride * $i))</ValueNode>
       </IndexListItems>
     </Expand>
   </Type>
