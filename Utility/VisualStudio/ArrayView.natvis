@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  
+  <Type Name="edt::SparseArrayView&lt;*&gt;">
+    <DisplayString>{{ size = {m_size} }}</DisplayString>
+    <Expand>
+      <Item Name="[size]" ExcludeView="simple">m_size</Item>
+      <Item Name="[stride]" ExcludeView="simple">m_stride</Item>
+      <IndexListItems>
+        <Size>m_size</Size>
+        <ValueNode>*(($T1*)(m_address + m_stride * $i))</ValueNode>
+      </IndexListItems>
+    </Expand>
+  </Type>
+
+  <Type Name="edt::DenseArrayView&lt;*&gt;">
+    <DisplayString>{{ size = {m_size} }}</DisplayString>
+    <Expand>
+      <Item Name="[size]" ExcludeView="simple">m_size</Item>
+      <ArrayItems>
+        <Size>m_size</Size>
+        <ValuePointer>m_p</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+  
+</AutoVisualizer>
