@@ -36,7 +36,7 @@ namespace edt
 	template<
 		typename T, bool direct,
 		template<typename, bool> typename Final>
-	class BaseRandomAccessIterator
+	class RandomAccessIterator
 	{
 	public:
 		using TFinal = Final<T, direct>;
@@ -100,7 +100,7 @@ namespace edt
 		}
 
 	protected:
-		friend class BaseRandomAccessIterator<T, direct, Final>;
+		friend class RandomAccessIterator<T, direct, Final>;
 
 	private:
 		TFinal& CastThis() noexcept { return *static_cast<TFinal*>(this); }
@@ -109,7 +109,7 @@ namespace edt
 
 	template<typename T, bool direct>
 	class SparseRandomAccessIterator :
-		public BaseRandomAccessIterator<T, direct, SparseRandomAccessIterator>
+		public RandomAccessIterator<T, direct, SparseRandomAccessIterator>
 	{
 	public:
 		SparseRandomAccessIterator(T* ptr, size_t stride) noexcept :
@@ -142,7 +142,7 @@ namespace edt
 
 	template<typename T, bool direct>
 	class DenseRandomAccessIterator :
-		public BaseRandomAccessIterator<T, direct, DenseRandomAccessIterator>
+		public RandomAccessIterator<T, direct, DenseRandomAccessIterator>
 	{
 	public:
 		DenseRandomAccessIterator(T* ptr) noexcept :
@@ -310,12 +310,17 @@ namespace edt
 			}
 		}
 
-		template<bool direct = true>
+		/// Splits array view
+		/*
+			Makes new array view that represents some subset of originale one
+			@param startIndex - first element of resulting subset
+			@param count - the number of elements in result
+		 */
 		SparseArrayView<T> Split(size_t startIndex, size_t count) const
 		{
 			assert(startIndex + count <= m_size);
 			return SparseArrayView<T>(
-				array_view_details::AdvancePointer<direct>(m_p, startIndex, m_stride),
+				array_view_details::AdvancePointer<true>(m_p, startIndex, m_stride),
 				count, m_stride);
 		}
 
@@ -371,8 +376,8 @@ namespace edt
 		public ArrayView<T, DenseArrayView>
 	{
 	public:
-		template<bool direct>
-		using TIterator = DenseRandomAccessIterator<T, direct>;
+		template<bool directIteration>
+		using TIterator = DenseRandomAccessIterator<T, directIteration>;
 		using iterator = TIterator<true>;
 		using const_iterator = iterator;
 		using reverse_iterator = TIterator<false>;
@@ -440,13 +445,18 @@ namespace edt
 			using MemberType = std::remove_reference_t<CleanMemberType>;
 			return SparseArrayView<MemberType>(&GetMemberValue(*GetData(), member), GetSize(), sizeof(T));
 		}
-
-		template<bool direct>
+		
+		/// Splits array view
+		/*
+			Makes new array view that represents some subset of originale one
+			@param startIndex - first element of resulting subset
+			@param count - the number of elements in result
+		 */
 		SparseArrayView<T> Split(size_t startIndex, size_t count) const
 		{
 			assert(startIndex + count <= m_size);
 			return SparseArrayView<T>(
-				array_view_details::AdvancePointer<direct>(m_p, startIndex),
+				array_view_details::AdvancePointer<true>(m_p, startIndex),
 				count);
 		}
 
