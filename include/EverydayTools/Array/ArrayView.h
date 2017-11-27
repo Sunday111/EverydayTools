@@ -22,7 +22,7 @@ namespace edt
 				assert(reinterpret_cast<size_t>(pointer) >= count * stride);
 
 				return reinterpret_cast<T*>(
-					reinterpret_cast<size_t>(pointer) + count * stride);
+					reinterpret_cast<size_t>(pointer) - count * stride);
 			}
 		}
 
@@ -45,11 +45,6 @@ namespace edt
 		using pointer = T*;
 		using iterator_category = std::random_access_iterator_tag;
 		using difference_type = int;
-
-		pointer GetData() const noexcept
-		{
-			return m_p;
-		}
 
 		TFinal& operator++() noexcept
 		{
@@ -99,9 +94,6 @@ namespace edt
 			return CastThis().GetData();
 		}
 
-	protected:
-		friend class RandomAccessIterator<T, direct, Final>;
-
 	private:
 		TFinal& CastThis() noexcept { return *static_cast<TFinal*>(this); }
 		const TFinal& CastThis() const noexcept { return *static_cast<const TFinal*>(this); }
@@ -117,7 +109,6 @@ namespace edt
 			m_stride(stride)
 		{}
 
-	protected:
 		void Increment() noexcept
 		{
 			m_p = array_view_details::AdvancePointer<direct>(m_p, 1, m_stride);
@@ -125,7 +116,7 @@ namespace edt
 
 		void Decrement() noexcept
 		{
-			m_p = array_view_details::AdvancePointer<direct>(m_p, 1, m_stride);
+			m_p = array_view_details::AdvancePointer<!direct>(m_p, 1, m_stride);
 		}
 
 		bool TheSame(const SparseRandomAccessIterator& another) const noexcept
@@ -133,6 +124,11 @@ namespace edt
 			return
 				m_p == another.m_p &&
 				m_stride == another.m_stride;
+		}
+
+		pointer GetData() const noexcept
+		{
+			return m_p;
 		}
 
 	private:
@@ -149,20 +145,24 @@ namespace edt
 			m_p(ptr)
 		{}
 
-	protected:
 		void Increment() noexcept
 		{
-			m_p = array_view_details::IncrementPointer<direct>(m_p);
+			m_p = array_view_details::AdvancePointer<direct>(m_p, 1, sizeof(T));
 		}
 
 		void Decrement() noexcept
 		{
-			m_p = array_view_details::DecrementPointer<direct>(m_p);
+			m_p = array_view_details::AdvancePointer<!direct>(m_p, 1, sizeof(T));
 		}
 
 		bool TheSame(const DenseRandomAccessIterator& another) const noexcept
 		{
 			return m_p == another.m_p;
+		}
+
+		pointer GetData() const noexcept
+		{
+			return m_p;
 		}
 
 	private:
@@ -194,9 +194,6 @@ namespace edt
 		{
 			return Cast().End<false>();
 		}
-
-	protected:
-		friend ArrayView<T, Final>;
 
 	private:
 		TFinal& Cast() noexcept
@@ -329,8 +326,6 @@ namespace edt
 			assert(index < m_size);
 			return *array_view_details::AdvancePointer<true>(m_p, index, m_stride);
 		}
-
-	private:
 		template<bool direct>
 		decltype(auto) Begin() const noexcept
 		{
@@ -354,8 +349,8 @@ namespace edt
 			{
 				return
 					m_size > 0 ?
-					array_view_details::AdvancePointer(m_p, m_size - 1, m_stride) :
-					m_address;
+					array_view_details::AdvancePointer<true>(m_p, m_size - 1, m_stride) :
+					m_p;
 			}
 		}
 
@@ -366,6 +361,8 @@ namespace edt
 				BeginPointer<direct>(), m_size, m_stride);
 		}
 
+
+	private:
 		T* m_p;
 		size_t m_size;
 		size_t m_stride;
@@ -482,7 +479,6 @@ namespace edt
 			return *array_view_details::AdvancePointer<true>(m_p, index);
 		}
 
-	private:
 		template<bool direct>
 		decltype(auto) Begin() const noexcept
 		{
@@ -506,7 +502,7 @@ namespace edt
 			{
 				return
 					m_size > 0 ?
-					array_view_details::AdvancePointer<direct>(m_p, m_size - 1);
+					array_view_details::AdvancePointer<true>(m_p, m_size - 1) : 0;
 			}
 		}
 
@@ -517,6 +513,7 @@ namespace edt
 				BeginPointer<direct>(), static_cast<int>(m_size));
 		}
 
+	private:
 		T* m_p;
 		size_t m_size;
 	};
