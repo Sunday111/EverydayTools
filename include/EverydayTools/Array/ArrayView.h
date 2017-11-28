@@ -9,7 +9,20 @@ namespace edt
 	namespace array_view_details
 	{
 		template<bool direct, typename T>
-		inline T* AdvancePointer(T* pointer, size_t count, size_t stride = sizeof(T)) noexcept
+		inline T* AdvancePointer(T* pointer, size_t count) noexcept
+		{
+			if constexpr (direct)
+			{
+				return pointer + count;
+			}
+			else
+			{
+				return pointer - count;
+			}
+		}
+
+		template<bool direct, typename T>
+		inline T* AdvancePointer(T* pointer, size_t count, size_t stride) noexcept
 		{
 			assert(stride >= sizeof(T));
 
@@ -153,12 +166,12 @@ namespace edt
 
 		void Increment() noexcept
 		{
-			m_p = array_view_details::AdvancePointer<direct>(m_p, 1, sizeof(T));
+			m_p = array_view_details::AdvancePointer<direct>(m_p, 1);
 		}
 
 		void Decrement() noexcept
 		{
-			m_p = array_view_details::AdvancePointer<!direct>(m_p, 1, sizeof(T));
+			m_p = array_view_details::AdvancePointer<!direct>(m_p, 1);
 		}
 
 		bool TheSame(const DenseRandomAccessIterator& another) const noexcept
@@ -224,6 +237,9 @@ namespace edt
 	class SparseArrayView :
 		public ArrayView<T, SparseArrayView>
 	{
+		// Make base class able to use protected methods
+		friend ArrayView<T, SparseArrayView>;
+
 	public:
 		template<bool direct>
 		using TIterator = SparseRandomAccessIterator<T, direct>;
@@ -339,6 +355,8 @@ namespace edt
 			assert(index < m_size);
 			return *array_view_details::AdvancePointer<true>(m_p, index, m_stride);
 		}
+
+	protected:
 		template<bool direct>
 		decltype(auto) Begin() const noexcept
 		{
@@ -385,6 +403,9 @@ namespace edt
 	class DenseArrayView :
 		public ArrayView<T, DenseArrayView>
 	{
+		// Make base class able to use protected methods
+		friend ArrayView<T, DenseArrayView>;
+
 	public:
 		template<bool directIteration>
 		using TIterator = DenseRandomAccessIterator<T, directIteration>;
@@ -492,6 +513,7 @@ namespace edt
 			return *array_view_details::AdvancePointer<true>(m_p, index);
 		}
 
+	protected:
 		template<bool direct>
 		decltype(auto) Begin() const noexcept
 		{
@@ -542,4 +564,6 @@ namespace edt
 	{
 		return SparseArrayView<Member>(&(*arr.*member), size, sizeof(T));
 	}
+
+
 }
