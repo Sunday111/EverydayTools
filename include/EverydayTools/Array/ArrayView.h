@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <iterator>
+#include <type_traits>
 
 namespace edt
 {
@@ -126,7 +127,12 @@ namespace edt
 				m_stride == another.m_stride;
 		}
 
-		pointer GetData() const noexcept
+		T* GetData() noexcept
+		{
+			return m_p;
+		}
+
+		const T* GetData() const noexcept
 		{
 			return m_p;
 		}
@@ -160,7 +166,12 @@ namespace edt
 			return m_p == another.m_p;
 		}
 
-		pointer GetData() const noexcept
+		T* GetData() noexcept
+		{
+			return m_p;
+		}
+
+		const T* GetData() const noexcept
 		{
 			return m_p;
 		}
@@ -169,7 +180,9 @@ namespace edt
 		T * m_p;
 	};
 
-	template<typename T, template<typename T> typename Final>
+	template<
+		typename T,
+		template<typename T_> typename Final>
 	class ArrayView
 	{
 		using TFinal = Final<T>;
@@ -177,22 +190,22 @@ namespace edt
 	public:
 		decltype(auto) begin() const noexcept
 		{
-			return Cast().Begin<true>();
+			return Cast().template Begin<true>();
 		}
 
 		decltype(auto) end() const noexcept
 		{
-			return Cast().End<true>();
+			return Cast().template End<true>();
 		}
 
 		decltype(auto) rbegin() const noexcept
 		{
-			return Cast().Begin<false>();
+			return Cast().template Begin<false>();
 		}
 
 		decltype(auto) rend() const noexcept
 		{
-			return Cast().End<false>();
+			return Cast().template End<false>();
 		}
 
 	private:
@@ -227,9 +240,9 @@ namespace edt
 		 */
 		template<typename U, typename Enable =
 			std::enable_if_t<
-				(std::is_same_v<std::decay_t<T>, std::decay_t<U>> ||
-				std::is_base_of_v<T, U>)
-				&& std::is_convertible_v<U, T>
+				(std::is_same<std::decay_t<T>, std::decay_t<U>>::value ||
+				std::is_base_of<T, U>::value)
+				&& std::is_convertible<U, T>::value
 			>>
 		SparseArrayView(const SparseArrayView<U>& another) noexcept :
 			SparseArrayView(another.GetData(), another.GetSize(), another.GetStride())
@@ -285,7 +298,7 @@ namespace edt
 			@return members array view
 		 */
 		template<typename MemberPtr,
-			class = std::enable_if_t<std::is_member_object_pointer_v<MemberPtr>>>
+			class = std::enable_if_t<std::is_member_object_pointer<MemberPtr>::value>>
 		decltype(auto) MakeMemberView(MemberPtr member) const noexcept
 		{
 			using namespace array_view_details;
@@ -390,8 +403,8 @@ namespace edt
 		 */
 		template<typename U, typename Enable =
 			std::enable_if_t<
-				std::is_same_v<std::decay_t<U>, std::decay_t<T>> &&
-				std::is_convertible_v<U, T>
+				std::is_same<std::decay_t<U>, std::decay_t<T>>::value &&
+				std::is_convertible<U, T>::value
 			>>
 		DenseArrayView(const DenseArrayView<U>& another) noexcept :
 			DenseArrayView(another.GetData(), another.GetSize())
@@ -465,8 +478,8 @@ namespace edt
 		 */
 		template<typename U,
 			class = std::enable_if_t<
-				std::is_base_of_v<U, T> &&
-				std::is_convertible_v<T, U>>>
+				std::is_base_of<U, T>::value &&
+				std::is_convertible<T, U>::value>>
 		operator SparseArrayView<U>() const noexcept
 		{
 			// Stride may not change here
