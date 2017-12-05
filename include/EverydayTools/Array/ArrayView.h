@@ -140,12 +140,7 @@ namespace edt
 				m_stride == another.m_stride;
 		}
 
-		T* GetData() noexcept
-		{
-			return m_p;
-		}
-
-		const T* GetData() const noexcept
+		T* GetData() const noexcept
 		{
 			return m_p;
 		}
@@ -179,12 +174,7 @@ namespace edt
 			return m_p == another.m_p;
 		}
 
-		T* GetData() noexcept
-		{
-			return m_p;
-		}
-
-		const T* GetData() const noexcept
+		T* GetData() const noexcept
 		{
 			return m_p;
 		}
