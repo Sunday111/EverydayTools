@@ -228,7 +228,7 @@ namespace edt
 		public ArrayView<T, SparseArrayView>
 	{
 		// Make base class able to use protected methods
-		friend ArrayView<T, ::edt::SparseArrayView>;
+		friend ArrayView<T, SparseArrayView>;
 
 	public:
 		template<bool direct>
@@ -394,7 +394,7 @@ namespace edt
 		public ArrayView<T, DenseArrayView>
 	{
 		// Make base class able to use protected methods
-		friend ArrayView<T, ::edt::DenseArrayView>;
+		friend ArrayView<T, DenseArrayView>;
 
 	public:
 		template<bool directIteration>
