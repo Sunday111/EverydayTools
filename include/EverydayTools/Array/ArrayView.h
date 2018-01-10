@@ -554,6 +554,4 @@ namespace edt
 	{
 		return SparseArrayView<Member>(&(*arr.*member), size, sizeof(T));
 	}
-
-
 }
