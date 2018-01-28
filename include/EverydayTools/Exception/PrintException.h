@@ -4,7 +4,7 @@
 #include <iterator>
 #include <ostream>
 
-void PrintException(std::ostream& output, const std::exception& e, int level = 0) {
+inline void PrintException(std::ostream& output, const std::exception& e, int level = 0) {
 	auto print_level = [&output, level]() -> std::ostream& {
 		std::fill_n(std::ostream_iterator<char>(output), level, ' ');
 		return output;
