@@ -13,6 +13,11 @@ namespace edt
 				new T(std::forward<Args>(args)...));
 		}
 
+        IntrusivePtr(nullptr_t) :
+            m_p(nullptr)
+        {
+        }
+
 		explicit IntrusivePtr(T* ptr = nullptr) :
 			m_p(ptr)
 		{
@@ -20,7 +25,7 @@ namespace edt
 		}
 
 		template<typename U, typename Enable =
-			std::enable_if_t<std::is_convertible_v<U*, T*>>>
+			std::enable_if_t<std::is_convertible_v<U, T>>>
 		IntrusivePtr(const IntrusivePtr<U, RefCounter>& ref) :
 			m_p(ref.Get())
 		{
@@ -35,7 +40,7 @@ namespace edt
 
 		IntrusivePtr(IntrusivePtr&& that)
 		{
-			MoveFrom(that.m_p);
+			MoveFrom(that);
 		}
 
 		~IntrusivePtr()
@@ -83,6 +88,14 @@ namespace edt
 			return m_p != that.m_p;
 		}
 
+        bool operator==(nullptr_t) const {
+            return m_p == nullptr;
+        }
+
+        bool operator!=(nullptr_t) const {
+            return m_p != nullptr;
+        }
+
 		T* operator->() const
 		{
 			assert(m_p != nullptr);
@@ -94,6 +107,12 @@ namespace edt
 			assert(m_p != nullptr);
 			return *m_p;
 		}
+
+        template<typename U,
+            typename Enable = std::enable_if_t<std::is_base_of_v<U, T>>>
+        operator IntrusivePtr<U, RefCounter>() const {
+            return IntrusivePtr<U, RefCounter>(m_p);
+        }
 
 	protected:
 		void MoveFrom(IntrusivePtr& ref)
@@ -122,4 +141,9 @@ namespace edt
 
 		T* m_p;
 	};
+
+    template<typename To, typename From, typename RefCounter>
+    IntrusivePtr<To, RefCounter> StaticPointerCast(const IntrusivePtr<From, RefCounter>& from) {
+        return IntrusivePtr<To, RefCounter>(static_cast<To*>(from.Get()));
+    }
 }
