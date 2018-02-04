@@ -146,4 +146,9 @@ namespace edt
     IntrusivePtr<To, RefCounter> StaticPointerCast(const IntrusivePtr<From, RefCounter>& from) {
         return IntrusivePtr<To, RefCounter>(static_cast<To*>(from.Get()));
     }
+
+    template<typename To, typename From, typename RefCounter>
+    IntrusivePtr<To, RefCounter> DynamicPointerCast(const IntrusivePtr<From, RefCounter>& from) {
+        return IntrusivePtr<To, RefCounter>(dynamic_cast<To*>(from.Get()));
+    }
 }
