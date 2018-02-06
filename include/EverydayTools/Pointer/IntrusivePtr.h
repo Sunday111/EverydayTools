@@ -18,7 +18,7 @@ namespace edt
         {
         }
 
-		explicit IntrusivePtr(T* ptr = nullptr) :
+		IntrusivePtr(T* ptr = nullptr) :
 			m_p(ptr)
 		{
 			AddRef();
@@ -53,13 +53,13 @@ namespace edt
 			return m_p;
 		}
 
-		IntrusivePtr& operator=(const IntrusivePtr& ref)
+		IntrusivePtr& operator=(const IntrusivePtr& that)
 		{
 			if (this != &that &&
 				m_p != that.m_p)
 			{
 				ReleaseRef();
-				m_p = ref.m_p;
+				m_p = that.m_p;
 				AddRef();
 			}
 
