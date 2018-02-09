@@ -15,18 +15,21 @@ decltype(auto) CallAndRethrow(const TChar* rethrowMessage, F&& f) {
 }
 
 namespace call_and_rethrow_helpers {
-    struct Caller {
+    // This class created to be used in 'CallAndRethrowM' macro.
+    // It has overloaded template operator+ to accept functors.
+    // Need it to avoid passing whole lambda text as macro argument
+    // (because it leads to syntax errors sometimes)
+    class Caller {
+    public:
         constexpr Caller(const char* name) :
             m_name(name)
-        {
-        }
-
-        const char* const m_name = nullptr;
-    
+        {}
         template<typename Functor>
         inline decltype(auto) operator+(Functor&& functor) const {
-            return CallAndRethrow(m_name, std::move(functor));
+            return CallAndRethrow(m_name, std::forward<Functor>(functor));
         }
+    private:
+        const char* const m_name = nullptr;
     };
 }
 
