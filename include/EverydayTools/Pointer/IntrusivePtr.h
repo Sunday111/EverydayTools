@@ -2,153 +2,207 @@
 
 namespace edt
 {
-	template<typename T, typename RefCounter>
-	class IntrusivePtr
-	{
-	public:
-		template<typename... Args>
-		static IntrusivePtr MakeInstance(Args&&... args)
-		{
-			return IntrusivePtr(
-				new T(std::forward<Args>(args)...));
-		}
-
-        IntrusivePtr(nullptr_t) :
+    template<class T, typename Traits>
+    class IntrusivePtr
+    {
+    public:
+        IntrusivePtr() :
             m_p(nullptr)
+        {}
+
+        IntrusivePtr(std::nullptr_t) :
+            m_p(nullptr)
+        {}
+
+        IntrusivePtr(T* p) :
+            m_p(p)
         {
+            AddReference();
         }
 
-		IntrusivePtr(T* ptr = nullptr) :
-			m_p(ptr)
-		{
-			AddRef();
-		}
+        explicit IntrusivePtr(IntrusivePtr&& ptr) :
+            m_p(ptr.m_p)
+        {
+            ptr.m_p = nullptr;
+        }
 
-		template<typename U, typename Enable =
-			std::enable_if_t<std::is_convertible_v<U, T>>>
-		IntrusivePtr(const IntrusivePtr<U, RefCounter>& ref) :
-			m_p(ref.Get())
-		{
-			AddRef();
-		}
+        explicit IntrusivePtr(const IntrusivePtr& ptr) :
+            m_p(ptr.m_p)
+        {
+            AddReference();
+        }
 
-		IntrusivePtr(const IntrusivePtr& ref) :
-			m_p(ref.m_p)
-		{
-			AddRef();
-		}
+        template<typename U>
+        IntrusivePtr(const IntrusivePtr<U, Traits>& ip,
+            typename std::enable_if<std::is_convertible<U*, T*>::value, int>::type = 0) :
+            m_p(ip.m_p)
+        {
+            AddReference();
+        }
 
-		IntrusivePtr(IntrusivePtr&& that)
-		{
-			MoveFrom(that);
-		}
+        template<typename U>
+        IntrusivePtr(IntrusivePtr<U, Traits>&& ip,
+            typename std::enable_if<std::is_convertible<U*, T*>::value, int>::type = 0) :
+            m_p(ip.m_p)
+        {
+            ip.m_p = nullptr;
+        }
 
-		~IntrusivePtr()
-		{
-			ReleaseRef();
-		}
+        ~IntrusivePtr() {
+            ReleaseReference();
+        }
 
-		T* Get() const
-		{
-			return m_p;
-		}
+        void reset() {
+            ReleaseReference(m_p);
+            m_p = nullptr;
+        }
 
-		IntrusivePtr& operator=(const IntrusivePtr& that)
-		{
-			if (this != &that &&
-				m_p != that.m_p)
-			{
-				ReleaseRef();
-				m_p = that.m_p;
-				AddRef();
-			}
+        IntrusivePtr& swap(IntrusivePtr& p) {
+            auto tmp = m_p;
+            m_p = p.m_p;
+            p.m_p = tmp;
+            return *this;
+        }
 
-			return *this;
-		}
+        T* Get() const {
+            return m_p;
+        }
 
-		IntrusivePtr& operator=(IntrusivePtr&& that)
-		{
-			if (this != &that &&
-				m_p != that.m_p)
-			{
-				ReleaseRef();
-				MoveFrom(that);
-			}
+        template<typename U>
+        IntrusivePtr<U, Traits> StaticCast() const {
+            typename IntrusivePtr<U, Traits>::StaticCastTag tag;
+            return IntrusivePtr<U, Traits>(*this, tag);
+        }
 
-			return *this;
-		}
+        template<typename U>
+        IntrusivePtr<U, Traits> DynamicCast() const {
+            typename IntrusivePtr<U, Traits>::DynamicCastTag tag;
+            return IntrusivePtr<U, Traits>(*this, tag);
+        }
 
-		bool operator==(const IntrusivePtr& that) const
-		{
-			return m_p == that.m_p;
-		}
+        IntrusivePtr& operator=(const IntrusivePtr& ptr) {
+            if (this != &ptr) {
+                ReleaseReference();
+                m_p = ptr.m_p;
+                AddReference();
+            }
+            return *this;
+        }
 
-		bool operator!=(const IntrusivePtr& that) const
-		{
-			return m_p != that.m_p;
-		}
+        IntrusivePtr& operator=(IntrusivePtr&& ptr) {
+            if (this != &ptr) {
+                ReleaseReference();
+                m_p = ptr.m_p;
+                ptr.m_p = nullptr;
+            }
+            return *this;
+        }
 
-        bool operator==(nullptr_t) const {
+        template<typename U>
+        IntrusivePtr& operator=(const IntrusivePtr<U, Traits>& ptr) {
+            if (this != &ptr) {
+                ReleaseReference(m_p);
+                m_p = ptr.m_p;
+                AddReference(m_p);
+            }
+            return *this;
+        }
+
+        template<typename U>
+        IntrusivePtr& operator=(IntrusivePtr<U, Traits>&& ptr) {
+            if (this != &ptr) {
+                ReleaseReference(m_p);
+                m_p = ptr.m_p;
+                ptr.m_p = nullptr;
+            }
+
+            return *this;
+        }
+
+        bool operator==(std::nullptr_t) const {
             return m_p == nullptr;
         }
 
-        bool operator!=(nullptr_t) const {
+        bool operator!=(std::nullptr_t) const {
             return m_p != nullptr;
         }
 
-		T* operator->() const
-		{
-			assert(m_p != nullptr);
-			return m_p;
-		}
-
-		T& operator*() const
-		{
-			assert(m_p != nullptr);
-			return *m_p;
-		}
-
-        template<typename U,
-            typename Enable = std::enable_if_t<std::is_base_of_v<U, T>>>
-        operator IntrusivePtr<U, RefCounter>() const {
-            return IntrusivePtr<U, RefCounter>(m_p);
+        template<typename U>
+        bool operator==(const IntrusivePtr<U, Traits>& p) const {
+            return m_p == p.m_p;
         }
 
-	protected:
-		void MoveFrom(IntrusivePtr& ref)
-		{
-			m_p = ref.m_p;
-			ref.m_p = nullptr;
-		}
+        template<typename U>
+        bool operator!=(const IntrusivePtr<U, Traits>& p) {
+            return m_p != p.m_p;
+        }
 
-		void AddRef()
-		{
-			if (m_p != nullptr)
-			{
-				RefCounter::AddReference(m_p);
-			}
-		}
+        template<typename U>
+        bool operator<(const IntrusivePtr<U, Traits>& p) const {
+            return m_p < p.m_p;
+        }
 
-		void ReleaseRef()
-		{
-			if (m_p != nullptr &&
-				RefCounter::ReleaseReference(m_p) <= 0)
-			{
-				delete m_p;
-				m_p = nullptr;
-			}
-		}
+        T* operator->() const {
+            assert(m_p != nullptr);
+            return m_p;
+        }
 
-		T* m_p;
-	};
+        T& operator*() const {
+            assert(m_p != nullptr);
+            return *m_p;
+        }
 
-    template<typename To, typename From, typename RefCounter>
-    IntrusivePtr<To, RefCounter> StaticPointerCast(const IntrusivePtr<From, RefCounter>& from) {
-        return IntrusivePtr<To, RefCounter>(static_cast<To*>(from.Get()));
+        template<typename... Args>
+        static IntrusivePtr MakeInstance(Args&&... args) {
+            return IntrusivePtr(new T(std::forward<Args>(args)...));
+        }
+
+    protected:
+        inline void AddReference() {
+            if (m_p != nullptr) {
+                Traits::AddReference(m_p);
+            }
+        }
+
+        inline void ReleaseReference() {
+            if (m_p != nullptr) {
+                Traits::ReleaseReference(m_p);
+            }
+        }
+
+    private:
+        template<typename, typename>
+        friend class IntrusivePtr;
+
+        struct StaticCastTag {};
+        struct DynamicCastTag {};
+
+        template<typename U>
+        IntrusivePtr(const IntrusivePtr<U, Traits>& ip, StaticCastTag) :
+            m_p(static_cast<T*>(ip.m_p))
+        {
+            AddReference();
+        }
+
+        template<typename U>
+        IntrusivePtr(const IntrusivePtr<U, Traits>& ip, DynamicCastTag) :
+            m_p(dynamic_cast<T*>(ip.m_p))
+        {
+            AddReference();
+        }
+
+        T* m_p;
+    };
+}
+
+namespace std {
+    template<typename U, typename T, typename Traits>
+    edt::IntrusivePtr<U, typename Traits> static_pointer_cast(const edt::IntrusivePtr<T, typename Traits>& ip) {
+        return ip.template StaticCast<U>();
     }
 
-    template<typename To, typename From, typename RefCounter>
-    IntrusivePtr<To, RefCounter> DynamicPointerCast(const IntrusivePtr<From, RefCounter>& from) {
-        return IntrusivePtr<To, RefCounter>(dynamic_cast<To*>(from.Get()));
+    template<typename U, typename T, typename Traits>
+    edt::IntrusivePtr<U, Traits> dynamic_pointer_cast(const edt::IntrusivePtr<T, Traits>& ip) {
+        return ip.template DynamicCast<U>();
     }
 }
