@@ -1,5 +1,6 @@
 #pragma once
 
+#include "EverydayTools\Exception\ThrowIfFailed.h"
 
 template<typename T>
 using RawPtr = T*;
@@ -16,9 +17,9 @@ public:
     void Subscribe(StorePtr<Listener> listener) {
         CallAndRethrow("Observable::Subscribe", [&] {
             auto it = std::lower_bound(m_listeners.begin(), m_listeners.end(), listener);
-            if (it != m_listeners.end() && *it == listener) {
-                throw std::runtime_error("Trying to add the same listener twice");
-            }
+            edt::ThrowIfFailed(
+                it == m_listeners.end() || *it != listener,
+                "This listener already registered");
             m_listeners.insert(it, std::move(listener));
         });
     }
@@ -26,9 +27,9 @@ public:
     void Unsubscribe(StorePtr<Listener> listener) {
         CallAndRethrow("Observable::Unsubscribe", [&] {
             auto it = std::lower_bound(m_listeners.begin(), m_listeners.end(), listener);
-            if (it == m_listeners.end() || *it != listener) {
-                throw std::runtime_error("This listener is not subscribed");
-            }
+            edt::ThrowIfFailed(
+                it != m_listeners.end() && *it == listener,
+                "Could not find listener");
             m_listeners.erase(it);
         });
     }
