@@ -132,7 +132,8 @@ namespace edt::geom::details::vector_data_access {
     >
     class VectorDataAccessMixin<T, nRows, nColumns, Final,
         std::enable_if_t<is_nd_vector<nRows, nColumns, 3>>>
-    {
+	{
+		EDT_IMPLEMENT_CAST_THIS
     public:
         T x() const { return CastThis().GetData()[0]; }
         T y() const { return CastThis().GetData()[1]; }
@@ -155,6 +156,34 @@ namespace edt::geom::details::vector_data_access {
         const T& rj() const { return CastThis().GetData()[1]; }
         T& rk() { return CastThis().GetData()[2]; }
         const T& rk() const { return CastThis().GetData()[2]; }
+    };
+
+    // Acessors for four dimensional vectors
+    template
+    <
+        typename T,
+        size_t nRows,
+        size_t nColumns,
+        template<typename T, size_t, size_t> typename Final
+    >
+    class VectorDataAccessMixin<T, nRows, nColumns, Final,
+        std::enable_if_t<is_nd_vector<nRows, nColumns, 4>>>
+	{
+		EDT_IMPLEMENT_CAST_THIS
+    public:
+        T x() const { return CastThis().GetData()[0]; }
+        T y() const { return CastThis().GetData()[1]; }
+		T z() const { return CastThis().GetData()[2]; }
+		T w() const { return CastThis().GetData()[3]; }
+
+        T& rx() { return CastThis().GetData()[0]; }
+        const T& rx() const { return CastThis().GetData()[0]; }
+        T& ry() { return CastThis().GetData()[1]; }
+        const T& ry() const { return CastThis().GetData()[1]; }
+        T& rz() { return CastThis().GetData()[2]; }
+		const T& rz() const { return CastThis().GetData()[2]; }
+		T& rw() { return CastThis().GetData()[3]; }
+		const T& rw() const { return CastThis().GetData()[3]; }
     };
 }
 
