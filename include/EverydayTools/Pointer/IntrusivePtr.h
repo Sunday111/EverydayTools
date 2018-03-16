@@ -152,6 +152,10 @@ namespace edt
             return *m_p;
         }
 
+		operator bool() const {
+			return m_p != nullptr;
+		}
+
         template<typename... Args>
         static IntrusivePtr MakeInstance(Args&&... args) {
             return IntrusivePtr(new T(std::forward<Args>(args)...));
