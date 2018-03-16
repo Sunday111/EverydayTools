@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "EverydayTools\Exception\ThrowIfFailed.h"
 
 template<typename T>
