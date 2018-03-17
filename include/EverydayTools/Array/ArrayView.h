@@ -4,49 +4,49 @@
 #include <iterator>
 #include <type_traits>
 
+namespace edt::array_view_details
+{
+    template<bool direct, typename T>
+    inline T* AdvancePointer(T* pointer, size_t count) noexcept
+    {
+        if constexpr (direct)
+        {
+            return pointer + count;
+        }
+        else
+        {
+            return pointer - count;
+        }
+    }
+
+    template<bool direct, typename T>
+    inline T* AdvancePointer(T* pointer, size_t count, size_t stride) noexcept
+    {
+        assert(stride >= sizeof(T));
+
+        if constexpr (direct)
+        {
+            return reinterpret_cast<T*>(
+                reinterpret_cast<size_t>(pointer) + count * stride);
+        }
+        else
+        {
+            assert(reinterpret_cast<size_t>(pointer) >= count * stride);
+
+            return reinterpret_cast<T*>(
+                reinterpret_cast<size_t>(pointer) - count * stride);
+        }
+    }
+
+    template<typename T, typename TMember>
+    inline decltype(auto) GetMemberValue(T& t, TMember member) noexcept
+    {
+        return (t.*member);
+    }
+}
+
 namespace edt
 {
-	namespace array_view_details
-	{
-		template<bool direct, typename T>
-		inline T* AdvancePointer(T* pointer, size_t count) noexcept
-		{
-			if constexpr (direct)
-			{
-				return pointer + count;
-			}
-			else
-			{
-				return pointer - count;
-			}
-		}
-
-		template<bool direct, typename T>
-		inline T* AdvancePointer(T* pointer, size_t count, size_t stride) noexcept
-		{
-			assert(stride >= sizeof(T));
-
-			if constexpr (direct)
-			{
-				return reinterpret_cast<T*>(
-					reinterpret_cast<size_t>(pointer) + count * stride);
-			}
-			else
-			{
-				assert(reinterpret_cast<size_t>(pointer) >= count * stride);
-
-				return reinterpret_cast<T*>(
-					reinterpret_cast<size_t>(pointer) - count * stride);
-			}
-		}
-
-		template<typename T, typename TMember>
-		inline decltype(auto) GetMemberValue(T& t, TMember member) noexcept
-		{
-			return (t.*member);
-		}
-	}
-
 	template<
 		typename T, bool direct,
 		template<typename, bool> typename Final>
