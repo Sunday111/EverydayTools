@@ -3,6 +3,8 @@
 #include <cmath>
 #include <type_traits>
 
+#include "EverydayTools/Array/ArrayView.h"
+
 #define EDT_IMPLEMENT_CAST_THIS                     \
     using TFinal = Final<T, nRows, nColumns>;       \
     TFinal& CastThis() noexcept {                   \
@@ -229,6 +231,58 @@ namespace edt::geom::details::vector_rotation {
     };
 }
 
+namespace edt::geom::details::vector_methods {
+    template
+    <
+        typename T,
+        size_t nRows,
+        size_t nColumns,
+        template<typename T, size_t, size_t> typename Final,
+        typename Enable = void
+    >
+    class Mixin
+    {
+
+    };
+    
+    template
+    <
+        typename T,
+        size_t nRows,
+        size_t nColumns,
+        template<typename T, size_t, size_t> typename Final
+    >
+    class Mixin<T, nRows, nColumns, Final,
+        std::enable_if_t<is_vector<nRows, nColumns>>>
+    {
+        EDT_IMPLEMENT_CAST_THIS
+    public:
+        static constexpr size_t Size = nRows > nColumns ? nRows : nColumns;
+        static constexpr size_t IsRowVector = nRows < nColumns;
+
+        T& Elem(size_t i) {
+            return AtImpl<IsRowVector>(i);
+        }
+
+        T Dot(const TFinal& final) const {
+            T result{};
+            for (size_t i = 0; i < Size; ++i) {
+                result += Elem(i) * final.Elem(i);
+            }
+        }
+
+    private:
+        template<bool rowVector>
+        T& AtImpl(size_t i);
+
+        template<>
+        T& AtImpl<true>(size_t i) { return CastThis().At(0, i); }
+
+        template<>
+        T& AtImpl<false>(size_t i) { return CastThis().At(i, 0); }
+    };
+}
+
 namespace edt::geom::details::cast {
     template
     <
@@ -317,6 +371,7 @@ namespace edt::geom {
         public details::data::DataMixin<T, Rows, Columns, ::edt::geom::Matrix>,
         public details::vector_data_access::VectorDataAccessMixin<T, Rows, Columns, ::edt::geom::Matrix>,
         public details::vector_rotation::VectorRotationMixin<T, Rows, Columns, ::edt::geom::Matrix>,
+        public details::vector_methods::Mixin<T, Rows, Columns, ::edt::geom::Matrix>,
         public details::cast::CastMixin<T, Rows, Columns, ::edt::geom::Matrix>,
         public details::common::CommonMixin<T, Rows, Columns, ::edt::geom::Matrix>
     {
