@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 namespace edt
 {
     template<class T, typename Traits>
