@@ -7,6 +7,7 @@ namespace edt
     template<class T, typename Traits>
     class IntrusivePtr
     {
+        template<typename U> using can_convert_from = std::enable_if_t<std::is_convertible_v<U*, T*>>;
     public:
         IntrusivePtr() :
             m_p(nullptr)
@@ -22,26 +23,14 @@ namespace edt
             AddReference();
         }
 
-        explicit IntrusivePtr(IntrusivePtr&& ptr) :
-            m_p(ptr.m_p)
-        {
-            ptr.m_p = nullptr;
-        }
-
-        explicit IntrusivePtr(const IntrusivePtr& ptr) :
-            m_p(ptr.m_p)
-        {
-            AddReference();
-        }
-
-        template<typename U, typename Enable = typename std::enable_if_t<std::is_convertible_v<U*, T*>>>
+        template<typename U, typename Enable = can_convert_from<U>>
         IntrusivePtr(const IntrusivePtr<U, Traits>& ip) :
             m_p(ip.m_p)
         {
             AddReference();
         }
 
-        template<typename U, typename Enable = typename std::enable_if_t<std::is_convertible_v<U*, T*>>>
+        template<typename U, typename Enable = can_convert_from<U>>
         IntrusivePtr(IntrusivePtr<U, Traits>&& ip) :
             m_p(ip.m_p)
         {
@@ -49,12 +38,11 @@ namespace edt
         }
 
         ~IntrusivePtr() {
-            ReleaseReference();
+            ReleaseReference<false>();
         }
 
         void reset() {
-            ReleaseReference(m_p);
-            m_p = nullptr;
+            ReleaseReference<true>();
         }
 
         IntrusivePtr& swap(IntrusivePtr& p) {
@@ -80,38 +68,20 @@ namespace edt
             return IntrusivePtr<U, Traits>(*this, tag);
         }
 
-        IntrusivePtr& operator=(const IntrusivePtr& ptr) {
-            if (this != &ptr) {
-                ReleaseReference();
+        template<typename U, typename Enable = can_convert_from<U>>
+        IntrusivePtr& operator=(const IntrusivePtr<U, Traits>& ptr) {
+            if (Get() != ptr.Get()) {
+                ReleaseReference<false>();
                 m_p = ptr.m_p;
                 AddReference();
             }
             return *this;
         }
 
-        IntrusivePtr& operator=(IntrusivePtr&& ptr) {
-            if (this != &ptr) {
-                ReleaseReference();
-                m_p = ptr.m_p;
-                ptr.m_p = nullptr;
-            }
-            return *this;
-        }
-
-        template<typename U, typename Enable = std::enable_if_t<std::is_convertible_v<U*, T*>>>
-        IntrusivePtr& operator=(const IntrusivePtr<U, Traits>& ptr) {
-            if (Get() != ptr.Get()) {
-                ReleaseReference();
-                m_p = ptr.m_p;
-                AddReference(m_p);
-            }
-            return *this;
-        }
-
-        template<typename U, typename Enable = std::enable_if_t<std::is_convertible_v<U*, T*>>>
+        template<typename U, typename Enable = can_convert_from<U>>
         IntrusivePtr& operator=(IntrusivePtr<U, Traits>&& ptr) {
             if (Get() != ptr.Get()) {
-                ReleaseReference();
+                ReleaseReference<false>();
                 m_p = ptr.m_p;
                 ptr.m_p = nullptr;
             }
@@ -127,17 +97,17 @@ namespace edt
             return m_p != nullptr;
         }
 
-        template<typename U>
+        template<typename U, typename Enable = can_convert_from<U>>
         bool operator==(const IntrusivePtr<U, Traits>& p) const {
             return m_p == p.m_p;
         }
 
-        template<typename U>
+        template<typename U, typename Enable = can_convert_from<U>>
         bool operator!=(const IntrusivePtr<U, Traits>& p) {
             return m_p != p.m_p;
         }
 
-        template<typename U>
+        template<typename U, typename Enable = can_convert_from<U>>
         bool operator<(const IntrusivePtr<U, Traits>& p) const {
             return m_p < p.m_p;
         }
@@ -168,9 +138,13 @@ namespace edt
             }
         }
 
+        template<bool set_to_null>
         inline void ReleaseReference() {
             if (m_p != nullptr) {
                 Traits::ReleaseReference(m_p);
+                if constexpr (set_to_null) {
+                    m_p = nullptr;
+                }
             }
         }
 
