@@ -34,17 +34,15 @@ namespace edt
             AddReference();
         }
 
-        template<typename U>
-        IntrusivePtr(const IntrusivePtr<U, Traits>& ip,
-            typename std::enable_if<std::is_convertible<U*, T*>::value, int>::type = 0) :
+        template<typename U, typename Enable = typename std::enable_if_t<std::is_convertible_v<U*, T*>>>
+        IntrusivePtr(const IntrusivePtr<U, Traits>& ip) :
             m_p(ip.m_p)
         {
             AddReference();
         }
 
-        template<typename U>
-        IntrusivePtr(IntrusivePtr<U, Traits>&& ip,
-            typename std::enable_if<std::is_convertible<U*, T*>::value, int>::type = 0) :
+        template<typename U, typename Enable = typename std::enable_if_t<std::is_convertible_v<U*, T*>>>
+        IntrusivePtr(IntrusivePtr<U, Traits>&& ip) :
             m_p(ip.m_p)
         {
             ip.m_p = nullptr;
@@ -100,20 +98,20 @@ namespace edt
             return *this;
         }
 
-        template<typename U>
+        template<typename U, typename Enable = std::enable_if_t<std::is_convertible_v<U*, T*>>>
         IntrusivePtr& operator=(const IntrusivePtr<U, Traits>& ptr) {
-            if (this != &ptr) {
-                ReleaseReference(m_p);
+            if (Get() != ptr.Get()) {
+                ReleaseReference();
                 m_p = ptr.m_p;
                 AddReference(m_p);
             }
             return *this;
         }
 
-        template<typename U>
+        template<typename U, typename Enable = std::enable_if_t<std::is_convertible_v<U*, T*>>>
         IntrusivePtr& operator=(IntrusivePtr<U, Traits>&& ptr) {
-            if (this != &ptr) {
-                ReleaseReference(m_p);
+            if (Get() != ptr.Get()) {
+                ReleaseReference();
                 m_p = ptr.m_p;
                 ptr.m_p = nullptr;
             }
