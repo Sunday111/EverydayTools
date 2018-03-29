@@ -23,6 +23,14 @@ namespace edt
             AddReference();
         }
 
+        IntrusivePtr(const IntrusivePtr& ip) {
+            CopyFrom<false, false>(ip);
+        }
+
+        IntrusivePtr(IntrusivePtr&& ip) {
+            MoveFrom<false>(ip);
+        }
+
         template<typename U, typename Enable = can_convert_from<U>>
         IntrusivePtr(const IntrusivePtr<U, Traits>& ip) :
             m_p(ip.m_p)
@@ -68,24 +76,25 @@ namespace edt
             return IntrusivePtr<U, Traits>(*this, tag);
         }
 
+        IntrusivePtr& operator=(const IntrusivePtr& ptr) {
+            CopyFrom<true, true>(ptr);
+            return *this;
+        }
+
         template<typename U, typename Enable = can_convert_from<U>>
         IntrusivePtr& operator=(const IntrusivePtr<U, Traits>& ptr) {
-            if (Get() != ptr.Get()) {
-                ReleaseReference<false>();
-                m_p = ptr.m_p;
-                AddReference();
-            }
+            CopyFrom<true, true>(ptr);
+            return *this;
+        }
+
+        IntrusivePtr& operator=(IntrusivePtr&& ptr) {
+            MoveFrom<true>(ptr);
             return *this;
         }
 
         template<typename U, typename Enable = can_convert_from<U>>
         IntrusivePtr& operator=(IntrusivePtr<U, Traits>&& ptr) {
-            if (Get() != ptr.Get()) {
-                ReleaseReference<false>();
-                m_p = ptr.m_p;
-                ptr.m_p = nullptr;
-            }
-
+            MoveFrom<true>(ptr);
             return *this;
         }
 
@@ -122,9 +131,9 @@ namespace edt
             return *m_p;
         }
 
-		operator bool() const {
-			return m_p != nullptr;
-		}
+        operator bool() const {
+            return m_p != nullptr;
+        }
 
         template<typename... Args>
         static IntrusivePtr MakeInstance(Args&&... args) {
@@ -132,6 +141,30 @@ namespace edt
         }
 
     protected:
+        template<bool releasePrev, bool comparePointers, typename U >
+        void CopyFrom(const IntrusivePtr<U, Traits>& that) {
+            if constexpr (comparePointers) {
+                if (m_p == that.m_p) {
+                    return;
+                }
+            }
+
+            if constexpr (releasePrev) {
+                ReleaseReference<false>();
+            }
+            m_p = that.m_p;
+            AddReference();
+        }
+
+        template<bool releasePrev, typename U>
+        void MoveFrom(IntrusivePtr<U, Traits>& that) {
+            if constexpr (releasePrev) {
+                ReleaseReference<false>();
+            }
+            m_p = that.m_p;
+            that.m_p = nullptr;
+        }
+
         inline void AddReference() {
             if (m_p != nullptr) {
                 Traits::AddReference(m_p);
