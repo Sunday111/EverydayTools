@@ -73,7 +73,7 @@ namespace edt
         template<typename U>
         IntrusivePtr<U, Traits> DynamicCast() const {
             typename IntrusivePtr<U, Traits>::DynamicCastTag tag;
-            return IntrusivePtr<U, Traits>(*this, tag);
+            return IntrusivePtr<U, Traits>(*this, tag); 
         }
 
         IntrusivePtr& operator=(const IntrusivePtr& ptr) {
