@@ -39,7 +39,18 @@ namespace edt
             };
         }
 
-        void Invoke(Args... arg) {
+        template<typename T>
+        void Bind(T& functor) {
+            m_instance = &functor;
+            m_function = [](void* object, Args... args) {
+                return
+                    static_cast<R>(
+                    (*static_cast<T*>(object))
+                        (std::forward<Args>(args)...));
+            };
+        }
+
+        void Invoke(Args... args) const {
             m_function(m_instance, std::forward<Args>(args)...);
         }
 
