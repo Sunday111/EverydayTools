@@ -50,8 +50,8 @@ namespace edt
             };
         }
 
-        void Invoke(Args... args) const {
-            m_function(m_instance, std::forward<Args>(args)...);
+        R Invoke(Args... args) const {
+            return static_cast<R>(m_function(m_instance, std::forward<Args>(args)...));
         }
 
     private:

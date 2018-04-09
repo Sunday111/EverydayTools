@@ -7,7 +7,7 @@
 namespace edt::array_view_details
 {
     template<bool direct, typename T>
-    inline T* AdvancePointer(T* pointer, size_t count) noexcept
+    inline T* AdvancePointer(T* pointer, int count) noexcept
     {
         if constexpr (direct)
         {
@@ -20,7 +20,7 @@ namespace edt::array_view_details
     }
 
     template<bool direct, typename T>
-    inline T* AdvancePointer(T* pointer, size_t count, size_t stride) noexcept
+    inline T* AdvancePointer(T* pointer, int count, size_t stride) noexcept
     {
         assert(stride >= sizeof(T));
 
@@ -76,17 +76,30 @@ namespace edt
 
 		TFinal operator++(int) noexcept
 		{
-			TFinal tmp(*this);
+			TFinal tmp(CastThis());
 			operator++();
 			return tmp;
 		}
 
 		TFinal operator--(int) noexcept
 		{
-			TFinal tmp(*this);
+			TFinal tmp(CastThis());
 			operator--();
 			return tmp;
 		}
+
+        TFinal& operator+=(int val) noexcept {
+            auto& _this = CastThis();
+            _this.Advance(val);
+            return _this;
+        }
+
+        TFinal operator+(int val) const noexcept
+        {
+            TFinal tmp(CastThis());
+            tmp += val;
+            return tmp;
+        }
 
 		bool operator==(const TFinal& another) const noexcept
 		{
@@ -123,6 +136,11 @@ namespace edt
 			m_stride(stride)
 		{}
 
+        void Advance(int n)
+        {
+            m_p = array_view_details::AdvancePointer<direct>(m_p, n, m_stride);
+        }
+
 		void Increment() noexcept
 		{
 			m_p = array_view_details::AdvancePointer<direct>(m_p, 1, m_stride);
@@ -158,6 +176,11 @@ namespace edt
 		DenseRandomAccessIterator(T* ptr) noexcept :
 			m_p(ptr)
 		{}
+
+        void Advance(int n)
+        {
+            m_p = array_view_details::AdvancePointer<direct>(m_p, n);
+        }
 
 		void Increment() noexcept
 		{
@@ -379,7 +402,7 @@ namespace edt
 		T* EndPointer() const noexcept
 		{
 			return array_view_details::AdvancePointer<direct>(
-				BeginPointer<direct>(), m_size, m_stride);
+				BeginPointer<direct>(), static_cast<int>(m_size), m_stride);
 		}
 
 
@@ -500,7 +523,7 @@ namespace edt
 		T& operator[](size_t index) const noexcept
 		{
 			assert(index < m_size);
-			return *array_view_details::AdvancePointer<true>(m_p, index);
+			return *array_view_details::AdvancePointer<true>(m_p, static_cast<int>(index));
 		}
 
 	protected:
