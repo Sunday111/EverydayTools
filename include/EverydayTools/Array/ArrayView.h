@@ -247,6 +247,9 @@ namespace edt
 	};
 
 	template<typename T>
+	class DenseArrayView;
+
+	template<typename T>
 	class SparseArrayView :
         public ArrayView<T, edt::SparseArrayView>
 	{
@@ -367,6 +370,13 @@ namespace edt
 		{
 			assert(index < m_size);
 			return *array_view_details::AdvancePointer<true>(m_p, index, m_stride);
+		}
+
+		SparseArrayView<T>& operator=(const DenseArrayView<T>& dense) {
+			m_p = dense.GetData();
+			m_size = dense.GetSize();
+			m_stride = sizeof(T);
+			return *this;
 		}
 
 	protected:
