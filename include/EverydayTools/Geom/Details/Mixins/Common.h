@@ -1,5 +1,6 @@
 #pragma once
 
+#include "EverydayTools/Geom/Details/ImplementCastThis.h"
 #include "../MatrixView.h"
 
 namespace edt::geom::details::common {

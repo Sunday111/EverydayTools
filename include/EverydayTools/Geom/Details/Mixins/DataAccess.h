@@ -1,8 +1,11 @@
 #pragma once
 
+#include "EverydayTools/Geom/Details/ImplementCastThis.h"
+#include "EverydayTools/Preprocessor/EmptyBases.h"
+
 namespace edt::geom::details::vector_data_access
 {
-#define IMPLEMENT_FIELD_MIXIN($name, $index)                                                            \
+#define EDT_IMPLEMENT_FIELD_MIXIN($name, $index)                                                            \
     template                                                                                            \
     <                                                                                                   \
         typename T,                                                                                     \
@@ -21,21 +24,21 @@ namespace edt::geom::details::vector_data_access
     }
 
     // X Y Z W mixins
-    IMPLEMENT_FIELD_MIXIN(x, 0);
-    IMPLEMENT_FIELD_MIXIN(y, 1);
-    IMPLEMENT_FIELD_MIXIN(z, 2);
-    IMPLEMENT_FIELD_MIXIN(w, 3);
+    EDT_IMPLEMENT_FIELD_MIXIN(x, 0);
+    EDT_IMPLEMENT_FIELD_MIXIN(y, 1);
+    EDT_IMPLEMENT_FIELD_MIXIN(z, 2);
+    EDT_IMPLEMENT_FIELD_MIXIN(w, 3);
 
     // I J K mixins
-    IMPLEMENT_FIELD_MIXIN(i, 0);
-    IMPLEMENT_FIELD_MIXIN(j, 1);
-    IMPLEMENT_FIELD_MIXIN(k, 2);
+    EDT_IMPLEMENT_FIELD_MIXIN(i, 0);
+    EDT_IMPLEMENT_FIELD_MIXIN(j, 1);
+    EDT_IMPLEMENT_FIELD_MIXIN(k, 2);
 
     // R G B A mixins
-    IMPLEMENT_FIELD_MIXIN(r, 0);
-    IMPLEMENT_FIELD_MIXIN(g, 1);
-    IMPLEMENT_FIELD_MIXIN(b, 2);
-    IMPLEMENT_FIELD_MIXIN(a, 3);
+    EDT_IMPLEMENT_FIELD_MIXIN(r, 0);
+    EDT_IMPLEMENT_FIELD_MIXIN(g, 1);
+    EDT_IMPLEMENT_FIELD_MIXIN(b, 2);
+    EDT_IMPLEMENT_FIELD_MIXIN(a, 3);
 
     template
     <
@@ -45,7 +48,7 @@ namespace edt::geom::details::vector_data_access
         template<typename T, size_t, size_t> typename Final,
         typename Enable = void
     >
-    class _EMPTY_BASES Mixin
+    class EDT_EMPTY_BASES Mixin
     {
     };
 
@@ -57,7 +60,7 @@ namespace edt::geom::details::vector_data_access
         size_t nColumns,
         template<typename T, size_t, size_t> typename Final
     >
-    class _EMPTY_BASES Mixin<T, nRows, nColumns, Final,
+    class EDT_EMPTY_BASES Mixin<T, nRows, nColumns, Final,
         std::enable_if_t<is_nd_vector<nRows, nColumns, 2>>> :
         // X Y
         public x_mixin<T, nRows, nColumns, Final>,
@@ -76,7 +79,7 @@ namespace edt::geom::details::vector_data_access
         size_t nColumns,
         template<typename T, size_t, size_t> typename Final
     >
-    class _EMPTY_BASES Mixin<T, nRows, nColumns, Final,
+    class EDT_EMPTY_BASES Mixin<T, nRows, nColumns, Final,
         std::enable_if_t<is_nd_vector<nRows, nColumns, 3>>> :
         // X Y Z
         public x_mixin<T, nRows, nColumns, Final>,
@@ -101,7 +104,7 @@ namespace edt::geom::details::vector_data_access
         size_t nColumns,
         template<typename T, size_t, size_t> typename Final
     >
-    class _EMPTY_BASES Mixin<T, nRows, nColumns, Final,
+    class EDT_EMPTY_BASES Mixin<T, nRows, nColumns, Final,
         std::enable_if_t<is_nd_vector<nRows, nColumns, 4>>> :
         // X Y Z W
         public x_mixin<T, nRows, nColumns, Final>,
@@ -113,6 +116,8 @@ namespace edt::geom::details::vector_data_access
         public g_mixin<T, nRows, nColumns, Final>,
         public b_mixin<T, nRows, nColumns, Final>,
         public a_mixin<T, nRows, nColumns, Final>
-	{
+    {
     };
+
+#undef EDT_IMPLEMENT_FIELD_MIXIN
 }

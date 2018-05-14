@@ -1,5 +1,7 @@
 #pragma once
 
+#include "EverydayTools/Geom/Details/ImplementCastThis.h"
+
 namespace edt::geom::details::vector_rotation {
     template
     <
