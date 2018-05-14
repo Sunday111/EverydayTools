@@ -5,9 +5,9 @@
 
 #include "EverydayTools/Preprocessor/EmptyBases.h"
 
-#include "Details/IsNdVector.h"
 #include "Details/Mixins/Data.h"
-#include "Details/Mixins/DataAccess.h"
+#include "Details/Mixins/MatrixMultiplication.h"
+#include "Details/Mixins/VectorDataAccess.h"
 #include "Details/Mixins/VectorRotation.h"
 #include "Details/Mixins/VectorMethods.h"
 #include "Details/Mixins/Cast.h"
@@ -17,6 +17,7 @@ namespace edt::geom {
     template<typename T, size_t Rows, size_t Columns>
     class EDT_EMPTY_BASES Matrix :
         public details::data::Mixin<T, Rows, Columns, ::edt::geom::Matrix>,
+        public details::matrix_multiplication::Mixin<T, Rows, Columns, ::edt::geom::Matrix>,
         public details::vector_data_access::Mixin<T, Rows, Columns, ::edt::geom::Matrix>,
         public details::vector_rotation::Mixin<T, Rows, Columns, ::edt::geom::Matrix>,
         public details::vector_methods::Mixin<T, Rows, Columns, ::edt::geom::Matrix>,

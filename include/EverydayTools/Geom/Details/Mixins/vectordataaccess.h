@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EverydayTools/Geom/Details/ImplementCastThis.h"
+#include "EverydayTools/Geom/Details/IsNdVector.h"
 #include "EverydayTools/Preprocessor/EmptyBases.h"
 
 namespace edt::geom::details::vector_data_access
