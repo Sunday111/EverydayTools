@@ -32,24 +32,38 @@ namespace edt::geom::details::vector_methods {
         static constexpr size_t IsRowVector = nRows < nColumns;
 
         T& Elem(size_t i) {
-            return AtImpl<IsRowVector>(i);
+            auto& result = const_cast<const Mixin*>(this)->Elem(i);
+            return const_cast<T&>(result);
         }
 
-        T Dot(const TFinal& final) const {
+        const T& Elem(size_t i) const {
+            return AtImpl<IsRowVector>(i);
+        }
+        
+        template
+        <
+            typename U,
+            size_t argRows,
+            size_t argColumns,
+            template<typename, size_t, size_t> typename Arg,
+            class = std::enable_if_t<is_vector<argRows, argColumns>>
+        >
+        T Dot(const Arg<U, argRows, argColumns>& arg) const {
             T result{};
             for (size_t i = 0; i < Size; ++i) {
-                result += Elem(i) * final.Elem(i);
+                result += Elem(i) * arg.Elem(i);
             }
+            return result;
         }
 
     private:
         template<bool rowVector>
-        T& AtImpl(size_t i);
+        const T& AtImpl(size_t i) const;
 
         template<>
-        T& AtImpl<true>(size_t i) { return CastThis().At(0, i); }
+        const T& AtImpl<true>(size_t i) const { return CastThis().At(0, i); }
 
         template<>
-        T& AtImpl<false>(size_t i) { return CastThis().At(i, 0); }
+        const T& AtImpl<false>(size_t i) const { return CastThis().At(i, 0); }
     };
 }

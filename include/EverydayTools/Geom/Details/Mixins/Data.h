@@ -1,5 +1,7 @@
 #pragma once
 
+#include "EverydayTools/Geom/Details/MatrixView.h"
+
 namespace edt::geom::details::data {
     template
     <
@@ -40,6 +42,42 @@ namespace edt::geom::details::data {
 
         const T* GetData() const {
             return &data[0][0];
+        }
+
+        MatrixView<T, 1, nColumns> GetRow(size_t row) {
+            MatrixView<T, 1, nColumns> result;
+            result.startRow = row;
+            result.parentData = GetData();
+            result.parentRowSize = nColumns;
+            result.rowStride = 1;
+            return result;
+        }
+
+        MatrixView<std::add_const_t<T>, 1, nColumns> GetRow(size_t row) const {
+            MatrixView<std::add_const_t<T>, 1, nColumns> result;
+            result.startRow = row;
+            result.parentData = GetData();
+            result.parentRowSize = nColumns;
+            result.rowStride = 1;
+            return result;
+        }
+
+        MatrixView<T, nRows, 1> GetColumn(size_t column) {
+            MatrixView<T, nRows, 1> result;
+            result.startColumn = column;
+            result.parentData = GetData();
+            result.parentRowSize = nColumns;
+            result.rowStride = 1;
+            return result;
+        }
+
+        MatrixView<std::add_const_t<T>, nRows, 1> GetColumn(size_t column) const {
+            MatrixView<std::add_const_t<T>, nRows, 1> result;
+            result.startColumn = column;
+            result.parentData = GetData();
+            result.parentRowSize = nColumns;
+            result.rowStride = 1;
+            return result;
         }
 
         Table<T, nRows, nColumns> data;
