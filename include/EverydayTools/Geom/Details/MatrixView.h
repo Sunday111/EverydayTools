@@ -12,13 +12,13 @@ namespace edt::geom
         size_t nColumns
     >
     class MatrixView :
-        public details::data_view::Mixin<T, Rows, Columns, ::edt::geom::Matrix>,
-        public details::matrix_multiplication::Mixin<T, Rows, Columns, ::edt::geom::Matrix>,
-        public details::vector_data_access::Mixin<T, Rows, Columns, ::edt::geom::Matrix>,
-        public details::vector_rotation::Mixin<T, Rows, Columns, ::edt::geom::Matrix>,
-        public details::vector_methods::Mixin<T, Rows, Columns, ::edt::geom::Matrix>,
-        public details::cast::Mixin<T, Rows, Columns, ::edt::geom::Matrix>,
-        public details::common::Mixin<T, Rows, Columns, ::edt::geom::Matrix>
+        public details::data_view::Mixin<T, Rows, Columns, ::edt::geom::MatrixView>,
+        public details::matrix_multiplication::Mixin<T, Rows, Columns, ::edt::geom::MatrixView>,
+        public details::vector_data_access::Mixin<T, Rows, Columns, ::edt::geom::MatrixView>,
+        public details::vector_rotation::Mixin<T, Rows, Columns, ::edt::geom::MatrixView>,
+        public details::vector_methods::Mixin<T, Rows, Columns, ::edt::geom::MatrixView>,
+        public details::cast::Mixin<T, Rows, Columns, ::edt::geom::MatrixView>,
+        public details::common::Mixin<T, Rows, Columns, ::edt::geom::MatrixView>
     {
     };
 }
