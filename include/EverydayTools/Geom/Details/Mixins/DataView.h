@@ -6,7 +6,8 @@ namespace edt::geom::data_view
     <
         typename T,
         size_t nRows,
-        size_t nColumns
+        size_t nColumns,
+        template<typename T, size_t, size_t> typename Final
     >
     class Mixin
     {

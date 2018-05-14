@@ -1,13 +1,7 @@
 #pragma once
 
-#include "EverydayTools/Geom/Details/Mixins/Data.h"
 #include "EverydayTools/Geom/Details/Mixins/DataView.h"
-#include "EverydayTools/Geom/Details/Mixins/MatrixMultiplication.h"
-#include "EverydayTools/Geom/Details/Mixins/VectorDataAccess.h"
-#include "EverydayTools/Geom/Details/Mixins/VectorRotation.h"
-#include "EverydayTools/Geom/Details/Mixins/VectorMethods.h"
-#include "EverydayTools/Geom/Details/Mixins/Cast.h"
-#include "EverydayTools/Geom/Details/Mixins/Common.h"
+#include "EverydayTools/Geom/Matrix.h"
 
 namespace edt::geom
 {
