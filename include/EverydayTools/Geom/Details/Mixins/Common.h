@@ -57,5 +57,7 @@ namespace edt::geom::details::common {
             result += that_;
             return result;
         }
+
+
     };
 }

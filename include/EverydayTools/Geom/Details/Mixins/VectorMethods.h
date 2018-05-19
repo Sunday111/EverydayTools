@@ -56,6 +56,14 @@ namespace edt::geom::details::vector_methods {
             return result;
         }
 
+        T& operator[](size_t i) {
+            return Elem(i);
+        }
+
+        const T& operator[](size_t i) const {
+            return Elem(i);
+        }
+
     private:
         template<bool rowVector>
         const T& AtImpl(size_t i) const;

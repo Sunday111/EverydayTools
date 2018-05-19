@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EverydayTools/Geom/Details/MatrixView.h"
+#include "EverydayTools/Geom/LineMatrixView.h"
 
 namespace edt::geom::details::data {
     template
@@ -44,40 +44,24 @@ namespace edt::geom::details::data {
             return &data[0][0];
         }
 
-        MatrixView<T, 1, nColumns> GetRow(size_t row) {
-            MatrixView<T, 1, nColumns> result;
-            result.startRow = row;
-            result.parentData = GetData();
-            result.parentRowSize = nColumns;
-            result.rowStride = 1;
-            return result;
+        LineMatrixView<T, 1, nColumns> GetRow(size_t row) {
+            assert(row < nRows);
+            return LineMatrixView<T, 1, nColumns>(&data[row][0]);
         }
 
-        MatrixView<std::add_const_t<T>, 1, nColumns> GetRow(size_t row) const {
-            MatrixView<std::add_const_t<T>, 1, nColumns> result;
-            result.startRow = row;
-            result.parentData = GetData();
-            result.parentRowSize = nColumns;
-            result.rowStride = 1;
-            return result;
+        LineMatrixView<std::add_const_t<T>, 1, nColumns> GetRow(size_t row) const {
+            assert(row < nRows);
+            return LineMatrixView<std::add_const_t<T>, 1, nColumns>(&data[row][0]);
         }
 
-        MatrixView<T, nRows, 1> GetColumn(size_t column) {
-            MatrixView<T, nRows, 1> result;
-            result.startColumn = column;
-            result.parentData = GetData();
-            result.parentRowSize = nColumns;
-            result.rowStride = 1;
-            return result;
+        LineMatrixView<T, nRows, 1> GetColumn(size_t column) {
+            assert(column < nColumns);
+            return LineMatrixView<T, nRows, 1>(&data[0][column], nColumns);
         }
 
-        MatrixView<std::add_const_t<T>, nRows, 1> GetColumn(size_t column) const {
-            MatrixView<std::add_const_t<T>, nRows, 1> result;
-            result.startColumn = column;
-            result.parentData = GetData();
-            result.parentRowSize = nColumns;
-            result.rowStride = 1;
-            return result;
+        LineMatrixView<std::add_const_t<T>, nRows, 1> GetColumn(size_t column) const {
+            assert(column < nColumns);
+            return LineMatrixView<std::add_const_t<T>, nRows, 1>(&data[0][column], nColumns);
         }
 
         Table<T, nRows, nColumns> data;
