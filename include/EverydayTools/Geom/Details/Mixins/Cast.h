@@ -8,8 +8,8 @@ namespace edt::geom::details::cast {
         typename T,
         size_t nRows,
         size_t nColumns,
-        template<typename T, size_t, size_t> typename Final,
-        template<typename T, size_t, size_t> typename ReturnValue,
+        template<typename, size_t, size_t> typename Final,
+        template<typename, size_t, size_t> typename ReturnValue,
         typename Enable = void
     >
     class Mixin
@@ -17,7 +17,7 @@ namespace edt::geom::details::cast {
         EDT_MATRIX_IMPLEMENT_CAST_THIS
     public:
         template<typename U,
-            typename Enable = std::enable_if_t<std::is_convertible_v<T, U>>>
+            typename = std::enable_if_t<std::is_convertible<T, U>::value>>
         Final<U, nRows, nColumns> Cast() const noexcept {
             Final<U, nRows, nColumns> that_;
             auto& this_ = CastThis();

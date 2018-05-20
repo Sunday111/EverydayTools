@@ -9,8 +9,8 @@ namespace edt::geom::details::data_view
         typename T,
         size_t nRows,
         size_t nColumns,
-        template<typename T, size_t, size_t> typename Final,
-        template<typename T, size_t, size_t> typename ReturnValue
+        template<typename, size_t, size_t> typename Final,
+        template<typename, size_t, size_t> typename ReturnValue
     >
     class Mixin
     {
