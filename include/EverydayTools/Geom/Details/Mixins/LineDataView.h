@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cassert>
-#include "../ImplementCastThis.h"
+#include "EverydayTools/Geom/Details/ImplementCastThis.h"
 
 namespace edt::geom::details::line_data_view
 {
@@ -11,6 +11,7 @@ namespace edt::geom::details::line_data_view
         size_t nRows,
         size_t nColumns,
         template<typename T, size_t, size_t> typename Final,
+        template<typename T, size_t, size_t> typename ReturnValue,
         typename Enable = void
     >
     class Mixin
@@ -23,9 +24,10 @@ namespace edt::geom::details::line_data_view
         typename T,
         size_t nRows,
         size_t nColumns,
-        template<typename T, size_t, size_t> typename Final
+        template<typename T, size_t, size_t> typename Final,
+        template<typename T, size_t, size_t> typename ReturnValue
     >
-    class Mixin<T, nRows, nColumns, Final, std::enable_if_t<nRows == 1>>
+    class Mixin<T, nRows, nColumns, Final, ReturnValue, std::enable_if_t<nRows == 1>>
     {
         EDT_MATRIX_IMPLEMENT_CAST_THIS
     public:
@@ -73,9 +75,10 @@ namespace edt::geom::details::line_data_view
         typename T,
         size_t nRows,
         size_t nColumns,
-        template<typename T, size_t, size_t> typename Final
+        template<typename T, size_t, size_t> typename Final,
+        template<typename T, size_t, size_t> typename ReturnValue
     >
-    class Mixin<T, nRows, nColumns, Final, std::enable_if_t<(nColumns == 1) &&(nRows > 1)>>
+    class Mixin<T, nRows, nColumns, Final, ReturnValue, std::enable_if_t<(nColumns == 1) &&(nRows > 1)>>
     {
         EDT_MATRIX_IMPLEMENT_CAST_THIS
     public:

@@ -9,6 +9,7 @@ namespace edt::geom::details::vector_rotation {
         size_t nRows,
         size_t nColumns,
         template<typename T, size_t, size_t> typename Final,
+        template<typename T, size_t, size_t> typename ReturnValue,
         typename Enable = void
     >
     class Mixin
@@ -20,9 +21,10 @@ namespace edt::geom::details::vector_rotation {
         typename T,
         size_t nRows,
         size_t nColumns,
-        template<typename T, size_t, size_t> typename Final
+        template<typename T, size_t, size_t> typename Final,
+        template<typename T, size_t, size_t> typename ReturnValue
     >
-    class Mixin<T, nRows, nColumns, Final,
+    class Mixin<T, nRows, nColumns, Final, ReturnValue,
         std::enable_if_t<is_nd_vector<nRows, nColumns, 2>>>
     {
         EDT_MATRIX_IMPLEMENT_CAST_THIS

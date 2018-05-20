@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EverydayTools/Geom/LineMatrixView.h"
+#include "EverydayTools/Geom/Details/FwdDecl.h"
 
 namespace edt::geom::details::data {
     template
@@ -23,7 +23,8 @@ namespace edt::geom::details::data {
         typename T,
         size_t nRows,
         size_t nColumns,
-        template<typename T, size_t, size_t> typename Final
+        template<typename T, size_t, size_t> typename Final,
+        template<typename T, size_t, size_t> typename ReturnValue
     >
     class Mixin
     {

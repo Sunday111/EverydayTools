@@ -6,22 +6,23 @@
 
 namespace edt::geom::details::vector_data_access
 {
-#define EDT_IMPLEMENT_FIELD_MIXIN($name, $index)                                        \
+#define EDT_IMPLEMENT_FIELD_MIXIN(name, index)                                          \
     template                                                                            \
     <                                                                                   \
         typename T,                                                                     \
         size_t nRows,                                                                   \
         size_t nColumns,                                                                \
-        template<typename T, size_t, size_t> typename Final                             \
+        template<typename T, size_t, size_t> typename Final,                            \
+        template<typename T, size_t, size_t> typename ReturnValue                       \
     >                                                                                   \
-    class $name##_mixin                                                                 \
+    class name##_mixin                                                                  \
     {                                                                                   \
         EDT_MATRIX_IMPLEMENT_CAST_THIS                                                  \
-        static_assert($index < (nRows > nColumns ? nRows : nColumns), "Invalid usage"); \
+        static_assert(index < (nRows > nColumns ? nRows : nColumns), "Invalid usage");  \
     public:                                                                             \
-        T $name() const noexcept { return CastThis().Elem($index); }                    \
-        T& r##$name() noexcept { return CastThis().Elem($index); }                      \
-        const T& r##$name() const noexcept { return CastThis().Elem($index); }          \
+        T name() const noexcept { return CastThis().Elem(index); }                      \
+        T& r##name() noexcept { return CastThis().Elem(index); }                        \
+        const T& r##name() const noexcept { return CastThis().Elem(index); }            \
     }
 
     // X Y Z W mixins
@@ -47,6 +48,7 @@ namespace edt::geom::details::vector_data_access
         size_t nRows,
         size_t nColumns,
         template<typename T, size_t, size_t> typename Final,
+        template<typename T, size_t, size_t> typename ReturnValue,
         typename Enable = void
     >
     class EDT_EMPTY_BASES Mixin
@@ -59,16 +61,17 @@ namespace edt::geom::details::vector_data_access
         typename T,
         size_t nRows,
         size_t nColumns,
-        template<typename T, size_t, size_t> typename Final
+        template<typename T, size_t, size_t> typename Final,
+        template<typename T, size_t, size_t> typename ReturnValue
     >
-    class EDT_EMPTY_BASES Mixin<T, nRows, nColumns, Final,
+    class EDT_EMPTY_BASES Mixin<T, nRows, nColumns, Final, ReturnValue,
         std::enable_if_t<is_nd_vector<nRows, nColumns, 2>>> :
         // X Y
-        public x_mixin<T, nRows, nColumns, Final>,
-        public y_mixin<T, nRows, nColumns, Final>,
+        public x_mixin<T, nRows, nColumns, Final, ReturnValue>,
+        public y_mixin<T, nRows, nColumns, Final, ReturnValue>,
         // I J
-        public i_mixin<T, nRows, nColumns, Final>,
-        public j_mixin<T, nRows, nColumns, Final>
+        public i_mixin<T, nRows, nColumns, Final, ReturnValue>,
+        public j_mixin<T, nRows, nColumns, Final, ReturnValue>
     {
     };
 
@@ -78,22 +81,23 @@ namespace edt::geom::details::vector_data_access
         typename T,
         size_t nRows,
         size_t nColumns,
-        template<typename T, size_t, size_t> typename Final
+        template<typename T, size_t, size_t> typename Final,
+        template<typename T, size_t, size_t> typename ReturnValue
     >
-    class EDT_EMPTY_BASES Mixin<T, nRows, nColumns, Final,
+    class EDT_EMPTY_BASES Mixin<T, nRows, nColumns, Final, ReturnValue,
         std::enable_if_t<is_nd_vector<nRows, nColumns, 3>>> :
         // X Y Z
-        public x_mixin<T, nRows, nColumns, Final>,
-        public y_mixin<T, nRows, nColumns, Final>,
-        public z_mixin<T, nRows, nColumns, Final>,
+        public x_mixin<T, nRows, nColumns, Final, ReturnValue>,
+        public y_mixin<T, nRows, nColumns, Final, ReturnValue>,
+        public z_mixin<T, nRows, nColumns, Final, ReturnValue>,
         // I J K
-        public i_mixin<T, nRows, nColumns, Final>,
-        public j_mixin<T, nRows, nColumns, Final>,
-        public k_mixin<T, nRows, nColumns, Final>,
+        public i_mixin<T, nRows, nColumns, Final, ReturnValue>,
+        public j_mixin<T, nRows, nColumns, Final, ReturnValue>,
+        public k_mixin<T, nRows, nColumns, Final, ReturnValue>,
         // R G B
-        public r_mixin<T, nRows, nColumns, Final>,
-        public g_mixin<T, nRows, nColumns, Final>,
-        public b_mixin<T, nRows, nColumns, Final>
+        public r_mixin<T, nRows, nColumns, Final, ReturnValue>,
+        public g_mixin<T, nRows, nColumns, Final, ReturnValue>,
+        public b_mixin<T, nRows, nColumns, Final, ReturnValue>
     {
     };
 
@@ -103,20 +107,21 @@ namespace edt::geom::details::vector_data_access
         typename T,
         size_t nRows,
         size_t nColumns,
-        template<typename T, size_t, size_t> typename Final
+        template<typename T, size_t, size_t> typename Final,
+        template<typename T, size_t, size_t> typename ReturnValue
     >
-    class EDT_EMPTY_BASES Mixin<T, nRows, nColumns, Final,
+    class EDT_EMPTY_BASES Mixin<T, nRows, nColumns, Final, ReturnValue,
         std::enable_if_t<is_nd_vector<nRows, nColumns, 4>>> :
         // X Y Z W
-        public x_mixin<T, nRows, nColumns, Final>,
-        public y_mixin<T, nRows, nColumns, Final>,
-        public z_mixin<T, nRows, nColumns, Final>,
-        public w_mixin<T, nRows, nColumns, Final>,
+        public x_mixin<T, nRows, nColumns, Final, ReturnValue>,
+        public y_mixin<T, nRows, nColumns, Final, ReturnValue>,
+        public z_mixin<T, nRows, nColumns, Final, ReturnValue>,
+        public w_mixin<T, nRows, nColumns, Final, ReturnValue>,
         // R G B A
-        public r_mixin<T, nRows, nColumns, Final>,
-        public g_mixin<T, nRows, nColumns, Final>,
-        public b_mixin<T, nRows, nColumns, Final>,
-        public a_mixin<T, nRows, nColumns, Final>
+        public r_mixin<T, nRows, nColumns, Final, ReturnValue>,
+        public g_mixin<T, nRows, nColumns, Final, ReturnValue>,
+        public b_mixin<T, nRows, nColumns, Final, ReturnValue>,
+        public a_mixin<T, nRows, nColumns, Final, ReturnValue>
     {
     };
 

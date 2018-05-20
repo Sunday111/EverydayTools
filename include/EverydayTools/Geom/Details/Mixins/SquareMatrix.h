@@ -2,7 +2,7 @@
 
 #include "EverydayTools/Geom/Details/ImplementCastThis.h"
 
-namespace edt::geom::details::cast {
+namespace edt::geom::details::square_matrix {
     template
     <
         typename T,
@@ -14,19 +14,30 @@ namespace edt::geom::details::cast {
     >
     class Mixin
     {
+
+    };
+
+    template
+    <
+        typename T,
+        size_t nRows,
+        size_t nColumns,
+        template<typename T, size_t, size_t> typename Final,
+        template<typename T, size_t, size_t> typename ReturnValue
+    >
+    class Mixin<T, nRows, nColumns, Final, ReturnValue,
+        std::enable_if_t<nRows == nColumns>>
+    {
         EDT_MATRIX_IMPLEMENT_CAST_THIS
     public:
-        template<typename U,
-            typename Enable = std::enable_if_t<std::is_convertible_v<T, U>>>
-        Final<U, nRows, nColumns> Cast() const noexcept {
-            Final<U, nRows, nColumns> that_;
-            auto& this_ = CastThis();
+        static decltype(auto) Identity() {
+            ReturnValue<T, nRows, nColumns> r;
             for (size_t i = 0; i < nRows; ++i) {
                 for (size_t j = 0; j < nColumns; ++j) {
-                    that_.At(i, j) = static_cast<U>(this_.At(i, j));
+                    r.At(i, j) = i == j ? T(1) : T(0);
                 }
             }
-            return that_;
+            return r;
         }
     };
 }
