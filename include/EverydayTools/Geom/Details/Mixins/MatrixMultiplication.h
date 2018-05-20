@@ -9,7 +9,8 @@ namespace edt::geom::details::matrix_multiplication
         typename T,
         size_t nRows,
         size_t nColumns,
-        template<typename T, size_t, size_t> typename Final
+        template<typename T, size_t, size_t> typename Final,
+        template<typename T, size_t, size_t> typename ReturnValue
     >
     class Mixin
     {

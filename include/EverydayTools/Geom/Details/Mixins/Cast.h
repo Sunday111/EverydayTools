@@ -9,6 +9,7 @@ namespace edt::geom::details::cast {
         size_t nRows,
         size_t nColumns,
         template<typename T, size_t, size_t> typename Final,
+        template<typename T, size_t, size_t> typename ReturnValue,
         typename Enable = void
     >
     class Mixin
