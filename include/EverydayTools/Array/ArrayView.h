@@ -369,7 +369,7 @@ namespace edt
 		T& operator[](size_t index) const noexcept
 		{
 			assert(index < m_size);
-			return *array_view_details::AdvancePointer<true>(m_p, index, m_stride);
+			return *array_view_details::AdvancePointer<true>(m_p, static_cast<int>(index), m_stride);
 		}
 
 		SparseArrayView<T>& operator=(const DenseArrayView<T>& dense) {
@@ -403,7 +403,7 @@ namespace edt
 			{
 				return
 					m_size > 0 ?
-					array_view_details::AdvancePointer<true>(m_p, m_size - 1, m_stride) :
+					array_view_details::AdvancePointer<true>(m_p, static_cast<int>(m_size) - 1, m_stride) :
 					m_p;
 			}
 		}
@@ -560,7 +560,7 @@ namespace edt
 			{
 				return
 					m_size > 0 ?
-					array_view_details::AdvancePointer<true>(m_p, m_size - 1) : 0;
+					array_view_details::AdvancePointer<true>(m_p, static_cast<int>(m_size - 1)) : 0;
 			}
 		}
 
