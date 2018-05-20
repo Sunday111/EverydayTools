@@ -6,7 +6,7 @@
 
 namespace edt::geom::details::vector_data_access
 {
-#define EDT_IMPLEMENT_FIELD_MIXIN($name, $index)                                        \
+#define EDT_IMPLEMENT_FIELD_MIXIN(name, index)                                          \
     template                                                                            \
     <                                                                                   \
         typename T,                                                                     \
@@ -14,14 +14,14 @@ namespace edt::geom::details::vector_data_access
         size_t nColumns,                                                                \
         template<typename T, size_t, size_t> typename Final                             \
     >                                                                                   \
-    class $name##_mixin                                                                 \
+    class name##_mixin                                                                  \
     {                                                                                   \
         EDT_MATRIX_IMPLEMENT_CAST_THIS                                                  \
-        static_assert($index < (nRows > nColumns ? nRows : nColumns), "Invalid usage"); \
+        static_assert(index < (nRows > nColumns ? nRows : nColumns), "Invalid usage");  \
     public:                                                                             \
-        T $name() const noexcept { return CastThis().Elem($index); }                    \
-        T& r##$name() noexcept { return CastThis().Elem($index); }                      \
-        const T& r##$name() const noexcept { return CastThis().Elem($index); }          \
+        T name() const noexcept { return CastThis().Elem(index); }                      \
+        T& r##name() noexcept { return CastThis().Elem(index); }                        \
+        const T& r##name() const noexcept { return CastThis().Elem(index); }            \
     }
 
     // X Y Z W mixins
