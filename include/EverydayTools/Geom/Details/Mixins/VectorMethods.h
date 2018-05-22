@@ -51,7 +51,7 @@ namespace edt::geom::details::vector_methods {
             class = std::enable_if_t<is_vector<argRows, argColumns>>
         >
         T Dot(const Arg<U, argRows, argColumns>& arg) const {
-            T result{};
+            std::remove_const_t<T> result{};
             for (size_t i = 0; i < Size; ++i) {
                 result += Elem(i) * arg.Elem(i);
             }

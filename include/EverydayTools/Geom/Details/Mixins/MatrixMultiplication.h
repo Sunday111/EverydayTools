@@ -22,7 +22,7 @@ namespace edt::geom::details::matrix_multiplication
             size_t bColumns,
             template<typename, size_t, size_t> typename Mtx
         >
-        decltype(auto) Multiply(const Mtx<U, nColumns, bColumns>& that_) {
+        decltype(auto) Multiply(const Mtx<U, nColumns, bColumns>& that_) const {
             // nRows is n
             // nColumns is m
             // bColumns is p
@@ -43,6 +43,16 @@ namespace edt::geom::details::matrix_multiplication
             }
 
             return result;
+        }
+        
+        template
+        <
+            typename U,
+            size_t bColumns,
+            template<typename, size_t, size_t> typename Mtx
+        >
+        decltype(auto) operator*(const Mtx<U, nColumns, bColumns>& that_) const {
+            return Multiply(that_);
         }
     };
 }

@@ -15,8 +15,33 @@ namespace edt::geom::details::common {
     {
         EDT_MATRIX_IMPLEMENT_CAST_THIS
     public:
+        template
+        <
+            typename U,
+            template<typename, size_t, size_t> typename Mtx
+        >
+        TFinal& Add(const Mtx<U, nRows, nColumns>& that_) noexcept {
+            auto& this_ = CastThis();
+            for (size_t i = 0; i < nRows; ++i) {
+                for (size_t j = 0; j < nColumns; ++j) {
+                    this_.At(i, j) += that_.At(i, j);
+                }
+            }
+            return this_;
+        }
+
+        TFinal& Add(const T& value) noexcept {
+            auto& this_ = CastThis();
+            for (size_t i = 0; i < nRows; ++i) {
+                for (size_t j = 0; j < nColumns; ++j) {
+                    this_.At(i, j) += value;
+                }
+            }
+            return this_;
+        }
+        
         template<typename U>
-        TFinal& operator*=(U value) noexcept {
+        TFinal& Multiply(U value) noexcept {
             auto& this_ = CastThis();
             for (size_t i = 0; i < nRows; ++i) {
                 for (size_t j = 0; j < nColumns; ++j) {
@@ -24,6 +49,21 @@ namespace edt::geom::details::common {
                 }
             }
             return this_;
+        }
+
+        TFinal& Fill(const T& value) noexcept {
+            auto& this_ = CastThis();
+            for (size_t i = 0; i < nRows; ++i) {
+                for (size_t j = 0; j < nColumns; ++j) {
+                    this_.At(i, j) = value;
+                }
+            }
+            return this_;
+        }
+
+        template<typename U>
+        TFinal& operator*=(U value) noexcept {
+            return Multiply(value);
         }
 
         template<typename U>
@@ -39,13 +79,7 @@ namespace edt::geom::details::common {
             template<typename, size_t, size_t> typename Mtx
         >
         TFinal& operator+=(const Mtx<U, nRows, nColumns>& that_) noexcept {
-            auto& this_ = CastThis();
-            for (size_t i = 0; i < nRows; ++i) {
-                for (size_t j = 0; j < nColumns; ++j) {
-                    this_.At(i, j) += that_.At(i, j);
-                }
-            }
-            return this_;
+            return Add(that_);
         }
         
         template
