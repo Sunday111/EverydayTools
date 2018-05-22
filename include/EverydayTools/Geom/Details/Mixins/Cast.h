@@ -17,7 +17,7 @@ namespace edt::geom::details::cast {
         EDT_MATRIX_IMPLEMENT_CAST_THIS
     public:
         template<typename U,
-            typename = std::enable_if_t<std::is_convertible<T, U>::value>>
+            typename = std::enable_if_t<std::is_convertible_v<T, U>>>
         Final<U, nRows, nColumns> Cast() const noexcept {
             Final<U, nRows, nColumns> that_;
             auto& this_ = CastThis();
