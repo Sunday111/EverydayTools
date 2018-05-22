@@ -10,8 +10,8 @@ namespace edt::geom::details::not_vector_methods
         typename T,
         size_t nRows,
         size_t nColumns,
-        template<typename T, size_t, size_t> typename Final,
-        template<typename T, size_t, size_t> typename ReturnValue,
+        template<typename, size_t, size_t> typename Final,
+        template<typename, size_t, size_t> typename ReturnValue,
         typename Enable = void
     >
     class Mixin
@@ -23,8 +23,8 @@ namespace edt::geom::details::not_vector_methods
         typename T,
         size_t nRows,
         size_t nColumns,
-        template<typename T, size_t, size_t> typename Final,
-        template<typename T, size_t, size_t> typename ReturnValue
+        template<typename, size_t, size_t> typename Final,
+        template<typename, size_t, size_t> typename ReturnValue
     >
     class Mixin<T, nRows, nColumns, Final, ReturnValue,
         std::enable_if_t<!is_vector<nRows, nColumns>>>

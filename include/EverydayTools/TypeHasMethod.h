@@ -15,19 +15,21 @@
         static std::false_type Test(...);                                                                           \
                                                                                                                     \
         typedef decltype(Test<T>(nullptr)) type;                                                                    \
-        static const bool Value = std::is_same<std::true_type, decltype(Test<T>(nullptr))>::value;                  \
-    }
+        static const bool Value = std::is_same_v<std::true_type, decltype(Test<T>(nullptr))>;                       \
+    };                                                                                                              \
+    template<typename T>                                                                                            \
+    constexpr bool Has##$name##Method_v = Has##$name##Method<T>::Value
 
 namespace edt::HasMethodTest
 {
     ImplementHasMethod(Run);
 
     struct TrueTest { void Run(void) {} };
-    static_assert(HasRunMethod<TrueTest>::Value);
+    static_assert(HasRunMethod_v<TrueTest>);
 
     struct TrueTestStatic { static void Run(void) {} };
-    static_assert(HasRunMethod<TrueTestStatic>::Value);
+    static_assert(HasRunMethod_v<TrueTestStatic>);
 
     struct FalseTest {};
-    static_assert(!HasRunMethod<FalseTest>::Value);
+    static_assert(!HasRunMethod_v<FalseTest>);
 }

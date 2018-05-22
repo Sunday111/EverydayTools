@@ -8,8 +8,8 @@ namespace edt::geom::details::vector_methods {
         typename T,
         size_t nRows,
         size_t nColumns,
-        template<typename T, size_t, size_t> typename Final,
-        template<typename T, size_t, size_t> typename ReturnValue,
+        template<typename, size_t, size_t> typename Final,
+        template<typename, size_t, size_t> typename ReturnValue,
         typename Enable = void
     >
     class Mixin
@@ -22,8 +22,8 @@ namespace edt::geom::details::vector_methods {
         typename T,
         size_t nRows,
         size_t nColumns,
-        template<typename T, size_t, size_t> typename Final,
-        template<typename T, size_t, size_t> typename ReturnValue
+        template<typename, size_t, size_t> typename Final,
+        template<typename, size_t, size_t> typename ReturnValue
     >
     class Mixin<T, nRows, nColumns, Final, ReturnValue,
         std::enable_if_t<is_vector<nRows, nColumns>>>
@@ -68,12 +68,16 @@ namespace edt::geom::details::vector_methods {
 
     private:
         template<bool rowVector>
-        const T& AtImpl(size_t i) const;
-
-        template<>
-        const T& AtImpl<true>(size_t i) const { return CastThis().At(0, i); }
-
-        template<>
-        const T& AtImpl<false>(size_t i) const { return CastThis().At(i, 0); }
+        const T& AtImpl(size_t i) const
+        {
+            if constexpr (rowVector)
+            {
+                return CastThis().At(0, i);
+            }
+            else
+            {
+                return CastThis().At(i, 0);
+            }
+        }
     };
 }
