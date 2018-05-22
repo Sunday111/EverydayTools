@@ -27,8 +27,8 @@ namespace edt::geom::details::common {
         }
 
         template<typename U>
-        TFinal operator*(U value) const noexcept {
-            TFinal result(CastThis());
+        ReturnValue<T, nRows, nColumns> operator*(U value) const noexcept {
+            ReturnValue<T, nRows, nColumns> result(CastThis());
             result *= value;
             return result;
         }
@@ -53,8 +53,8 @@ namespace edt::geom::details::common {
             typename U,
             template<typename, size_t, size_t> typename Mtx
         >
-        TFinal operator+(const Mtx<U, nRows, nColumns>& that_) const noexcept {
-            TFinal result(CastThis());
+        ReturnValue<T, nRows, nColumns> operator+(const Mtx<U, nRows, nColumns>& that_) const noexcept {
+            ReturnValue<T, nRows, nColumns> result(CastThis());
             result += that_;
             return result;
         }
