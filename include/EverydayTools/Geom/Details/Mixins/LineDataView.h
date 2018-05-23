@@ -42,6 +42,7 @@ namespace edt::geom::details::line_data_view
 
         const T& At(size_t nRow, size_t nColumn) const noexcept {
             assert(nRow == 0);
+            UnusedVar(nRow);
             assert(m_data != nullptr);
             assert(nColumn < nColumns);
             return m_data[nColumn];
@@ -95,6 +96,7 @@ namespace edt::geom::details::line_data_view
         const T& At(size_t nRow, size_t nColumn) const noexcept {
             assert(m_data != nullptr);
             assert(nColumn == 0);
+            UnusedVar(nColumn);
             assert(nRow < nRows);
             return m_data[nRow * m_stride];
         }
