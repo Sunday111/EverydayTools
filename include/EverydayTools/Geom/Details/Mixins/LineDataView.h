@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include "EverydayTools/Geom/Details/ImplementCastThis.h"
+#include "EverydayTools/UnusedVar.h"
 
 namespace edt::geom::details::line_data_view
 {
