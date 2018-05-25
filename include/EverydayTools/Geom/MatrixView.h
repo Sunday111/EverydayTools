@@ -5,6 +5,7 @@
 #include "EverydayTools/Geom/Details/Mixins/VectorDataAccess.h"
 #include "EverydayTools/Geom/Details/Mixins/VectorRotation.h"
 #include "EverydayTools/Geom/Details/Mixins/VectorMethods.h"
+#include "EverydayTools/Geom/Details/Mixins/Vector3.h"
 #include "EverydayTools/Geom/Details/Mixins/Cast.h"
 #include "EverydayTools/Geom/Details/Mixins/Common.h"
 
@@ -22,6 +23,7 @@ namespace edt::geom
     class EDT_EMPTY_BASES MatrixView:
         public details::data_view::Mixin<T, nRows, nColumns, ::edt::geom::MatrixView, ::edt::geom::Matrix>,
         public details::matrix_multiplication::Mixin<T, nRows, nColumns, ::edt::geom::MatrixView, ::edt::geom::Matrix>,
+        public details::vector_3::Mixin<T, nRows, nColumns, ::edt::geom::MatrixView, ::edt::geom::Matrix>,
         public details::vector_data_access::Mixin<T, nRows, nColumns, ::edt::geom::MatrixView, ::edt::geom::Matrix>,
         public details::vector_rotation::Mixin<T, nRows, nColumns, ::edt::geom::MatrixView, ::edt::geom::Matrix>,
         public details::vector_methods::Mixin<T, nRows, nColumns, ::edt::geom::MatrixView, ::edt::geom::Matrix>,
