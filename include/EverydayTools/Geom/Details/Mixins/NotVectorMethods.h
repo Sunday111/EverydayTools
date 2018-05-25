@@ -1,7 +1,7 @@
 #pragma once
 
 #include "EverydayTools/Geom/Details/ImplementCastThis.h"
-#include "EverydayTools/Geom/Details/IsNdVector.h"
+#include "EverydayTools/Geom/Traits.h"
 
 namespace edt::geom::details::not_vector_methods
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EverydayTools/Geom/Details/ImplementCastThis.h"
+#include "EverydayTools/Geom/Traits.h"
 
 namespace edt::geom::details::square_matrix {
     template
@@ -26,7 +27,7 @@ namespace edt::geom::details::square_matrix {
         template<typename, size_t, size_t> typename ReturnValue
     >
     class Mixin<T, nRows, nColumns, Final, ReturnValue,
-        std::enable_if_t<nRows == nColumns>>
+        std::enable_if_t<is_square<nRows, nColumns>>>
     {
         EDT_MATRIX_IMPLEMENT_CAST_THIS
     public:
