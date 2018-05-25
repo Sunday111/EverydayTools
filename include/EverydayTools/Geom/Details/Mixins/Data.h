@@ -57,12 +57,20 @@ namespace edt::geom::details::data {
 
         LineMatrixView<T, nRows, 1> GetColumn(size_t column) {
             assert(column < nColumns);
-            return LineMatrixView<T, nRows, 1>(&data[0][column], nColumns);
+            if constexpr (nRows == 1) {
+                return LineMatrixView<T, 1, 1>(&data[0][column]);
+            } else {
+                return LineMatrixView<T, nRows, 1>(&data[0][column], nColumns);
+            }
         }
 
         LineMatrixView<std::add_const_t<T>, nRows, 1> GetColumn(size_t column) const {
             assert(column < nColumns);
-            return LineMatrixView<std::add_const_t<T>, nRows, 1>(&data[0][column], nColumns);
+            if constexpr (nRows == 1) {
+                return LineMatrixView<std::add_const_t<T>, 1, 1>(&data[0][column]);
+            } else {
+                return LineMatrixView<std::add_const_t<T>, nRows, 1>(&data[0][column], nColumns);
+            }
         }
 
         Table<T, nRows, nColumns> data;

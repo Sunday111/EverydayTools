@@ -93,6 +93,7 @@ namespace edt::geom::details::common {
             return result;
         }
 
-
+        static size_t RowsCount() noexcept { return nRows; }
+        static size_t ColumnsCount() noexcept { return nColumns; }
     };
 }
