@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.5.1)
+include(generate_vs_filters)
+include(glob_cxx_sources)
 set(module_name EverydayTools)
 set(EverydayTools true CACHE BOOL "Code for everyday use")
 if(NOT ${EverydayTools})
@@ -7,9 +9,6 @@ endif()
 add_library(${module_name} INTERFACE)
 target_include_directories(${module_name} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_custom_target(EverydayTools_
-    SOURCES
-    "include/EverydayTools/Array/ArrayView.h"
-    "include/EverydayTools/Array/ArrayViewVector.h"
-)
- 
+glob_cxx_sources(${CMAKE_CURRENT_SOURCE_DIR} target_sources)
+add_custom_target(EverydayTools_ SOURCES ${target_sources})
+generate_vs_filters(${target_sources})
