@@ -6,3 +6,10 @@ if(NOT ${EverydayTools})
 endif()
 add_library(${module_name} INTERFACE)
 target_include_directories(${module_name} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+add_custom_target(EverydayTools_
+    SOURCES
+    "include/EverydayTools/Array/ArrayView.h"
+    "include/EverydayTools/Array/ArrayViewVector.h"
+)
+ 
