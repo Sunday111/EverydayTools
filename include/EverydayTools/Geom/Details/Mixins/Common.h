@@ -1,6 +1,7 @@
 #pragma once
 
-#include "EverydayTools/Geom/Details/ImplementCastThis.h"
+#include <type_traits>
+#include "../ImplementCastThis.h"
 
 namespace edt::geom::details::common {
     template

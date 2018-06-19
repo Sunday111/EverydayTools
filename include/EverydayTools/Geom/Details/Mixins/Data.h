@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include "EverydayTools/Geom/Details/FwdDecl.h"
 
 namespace edt::geom::details::data {
