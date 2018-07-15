@@ -101,6 +101,10 @@ namespace edt
             return tmp;
         }
 
+        friend bool operator<(const TFinal& a, const TFinal b) noexcept {
+            return a.GetData() < b.GetData();
+        }
+
 		bool operator==(const TFinal& another) const noexcept
 		{
 			return CastThis().TheSame(another);
