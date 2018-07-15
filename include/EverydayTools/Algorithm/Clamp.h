@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <type_traits>
 
-namespace edt::math
+namespace edt
 {
     template<typename T>
     inline T Clamp(T min, T value, T max) {
