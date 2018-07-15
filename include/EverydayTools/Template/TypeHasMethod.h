@@ -2,6 +2,10 @@
 
 #include <type_traits>
 
+/// Creates Has##$name##Method type trait
+/* Value will be true for any method signature or return value.
+    Target method can also be static.
+ */
 #define ImplementHasMethod($name)                                                                                   \
     template <typename T>                                                                                           \
     struct Has##$name##Method                                                                                       \
@@ -19,17 +23,3 @@
     };                                                                                                              \
     template<typename T>                                                                                            \
     constexpr bool Has##$name##Method_v = Has##$name##Method<T>::Value
-
-namespace edt::HasMethodTest
-{
-    ImplementHasMethod(Run);
-
-    struct TrueTest { void Run(void) {} };
-    static_assert(HasRunMethod_v<TrueTest>);
-
-    struct TrueTestStatic { static void Run(void) {} };
-    static_assert(HasRunMethod_v<TrueTestStatic>);
-
-    struct FalseTest {};
-    static_assert(!HasRunMethod_v<FalseTest>);
-}

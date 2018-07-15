@@ -7,7 +7,7 @@ namespace edt
          typename Test,
          template<typename...> typename Type
      >
-     struct is_specialization :
+     struct IsSpecialization :
          std::false_type
      {};
      
@@ -16,7 +16,7 @@ namespace edt
          template<typename...> typename Type,
          typename... Args
      >
-     struct is_specialization<Type<Args...>, Type> :
+     struct IsSpecialization<Type<Args...>, Type> :
          std::true_type
      {};
      
@@ -25,5 +25,5 @@ namespace edt
          typename Test,
          template<typename...> typename Type
      >
-     constexpr bool is_specialization_v = is_specialization<Test, Type>::value;
+     constexpr bool isSpecialization = IsSpecialization<Test, Type>::value;
 }
