@@ -23,18 +23,7 @@ namespace edt
                 Parse(str) : Parse(str.substr(1, usualStringLength));
         }
     private:
-        inline static constexpr GUID Parse(std::string_view str) {
-            //auto check = [&](size_t index) {
-            //    if (str[index] != '-')
-            //        throw std::runtime_error("Invalid GUID format");
-            //};
-            //
-            //auto callForEach = [](auto&& fn, auto... args) {
-            //    (fn(args), ...);
-            //};
-            //
-            //callForEach(check, 8u, 13u, 18u, 23u);
-    
+        inline static constexpr GUID Parse(const std::string_view str) {
             const auto parsePart = [str](auto indexMap) {
                 const auto parseBytes = [str, indexMap](const auto... indices) {
                     const auto parseByte = [str, indexMap](size_t index) {
