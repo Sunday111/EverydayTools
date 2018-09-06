@@ -33,7 +33,7 @@
         return static_cast<ET_>(reinterpret_cast<std::underlying_type<ET_>::type&>(a) >>= i); }
 
 #define EDT_ENUM_FLAG_OPERATORS(ET_) \
-    _EDT_ENUM_FLAG_OPERATORS(inline, ET_)
+    _EDT_ENUM_FLAG_OPERATORS(inline constexpr, ET_)
 
 #define EDT_ENUM_FLAG_OPERATORS_CLASS(ET_) \
-    _EDT_ENUM_FLAG_OPERATORS(friend inline, ET_)
+    _EDT_ENUM_FLAG_OPERATORS(friend inline constexpr, ET_)
