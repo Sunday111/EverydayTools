@@ -15,6 +15,22 @@ namespace edt
     class GUID
     {
     public:
+		friend bool operator==(const GUID& a, const GUID& b) {
+			return a.part1 == b.part1 && a.part2 == b.part2;
+		}
+
+		friend bool operator!=(const GUID& a, const GUID& b) {
+			return !(a == b);
+		}
+
+		bool operator<(const GUID& another) const {
+			if (part1 == another.part1) {
+				return part2 < another.part2;
+			}
+
+			return part1 < another.part1;
+		}
+
         static constexpr size_t usualStringLength = 36;
         static constexpr size_t stringLengthWithBracers = usualStringLength + 2;
     
