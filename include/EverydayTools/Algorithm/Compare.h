@@ -53,4 +53,12 @@ namespace edt
         const MinIntegerComparator comparator;
         return CompareValues(comparator, std::forward<Arg0>(a0), std::forward<Arg1>(a1), std::forward<Args>(args)...);
     }
+
+    template<typename Arg0, typename Arg1, typename... Args>
+    constexpr decltype(auto) MaxInteger(Arg0&& a0, Arg1&& a1, Args&&... args) noexcept {
+        using namespace detail;
+        static_assert(pureSame<Arg0, Arg1, Args...>);
+        const MaxIntegerComparator comparator;
+        return CompareValues(comparator, std::forward<Arg0>(a0), std::forward<Arg1>(a1), std::forward<Args>(args)...);
+    }
 }

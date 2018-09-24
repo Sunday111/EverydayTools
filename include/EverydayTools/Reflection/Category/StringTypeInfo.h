@@ -5,10 +5,14 @@
 
 namespace edt::reflection
 {
-	template<typename T>
-	struct StringInterface
-	{
-	};
+    class IString
+    {
+    public:
+        virtual const char* GetValue() const = 0;
+    };
+
+    template<typename T>
+    inline constexpr bool HasStringInterface = std::is_base_of_v<IString, T>;
 
 	class StringTypeInfo : public CommonTypeInfo
 	{
@@ -16,15 +20,16 @@ namespace edt::reflection
 	};
 
 	template<typename T>
-	class TypeInfo<T, typename StringInterface<T>::Type> : public StringTypeInfo
+	class TypeInfo<T, std::enable_if_t<HasStringInterface<T>>> : public StringTypeInfo
 	{
+
 	};
 }
 
 namespace edt::reflection::detail
 {
 	template<typename T>
-	class CategoryReflector<T, typename StringInterface<T>::Type> : public CommonTypeReflector<T>
+	class CategoryReflector<T, std::enable_if_t<HasStringInterface<T>>> : public CommonTypeReflector<T>
 	{
 	public:
 		CategoryReflector(TypeInfo<T>& typeInfo)
