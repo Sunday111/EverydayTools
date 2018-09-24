@@ -1,8 +1,8 @@
 #pragma once
 
 #include <type_traits>
-#include "../Detail/FwdDecl.h"
-#include "../TypeOperators.h"
+#include "../FwdDecl.h"
+#include "CommonOperators.h"
 
 namespace edt::reflection::detail
 {
@@ -19,7 +19,7 @@ namespace edt::reflection::detail
     }
 
     template<typename T>
-    constexpr TypeOperators::DefaultConstructor MakeDefaultConstructor() noexcept {
+    constexpr CommonOperators::DefaultConstructor MakeDefaultConstructor() noexcept {
         if constexpr (!std::is_default_constructible_v<T>) {
             return nullptr;
         } else {
@@ -30,7 +30,7 @@ namespace edt::reflection::detail
     }
 
     template<typename T>
-    constexpr TypeOperators::CopyConstructor MakeCopyConstructor() noexcept {
+    constexpr CommonOperators::CopyConstructor MakeCopyConstructor() noexcept {
         if constexpr (!std::is_copy_constructible_v<T>) {
             return nullptr;
         } else {
@@ -41,7 +41,7 @@ namespace edt::reflection::detail
     }
 
     template<typename T>
-    constexpr TypeOperators::MoveConstructor MakeMoveConstructor() noexcept {
+    constexpr CommonOperators::MoveConstructor MakeMoveConstructor() noexcept {
         if constexpr (!std::is_move_constructible_v<T>) {
             return nullptr;
         } else {
@@ -52,7 +52,7 @@ namespace edt::reflection::detail
     }
 
     template<typename T>
-    constexpr TypeOperators::CopyAssign MakeCopyAssignOperator() noexcept {
+    constexpr CommonOperators::CopyAssign MakeCopyAssignOperator() noexcept {
         if constexpr (!std::is_copy_assignable_v<T>) {
             return nullptr;
         } else {
@@ -65,7 +65,7 @@ namespace edt::reflection::detail
     }
 
     template<typename T>
-    constexpr TypeOperators::MoveAssign MakeMoveAssignOperator() noexcept {
+    constexpr CommonOperators::MoveAssign MakeMoveAssignOperator() noexcept {
         if constexpr (!std::is_move_assignable_v<T>) {
             return nullptr;
         } else {
@@ -78,7 +78,7 @@ namespace edt::reflection::detail
     }
 
     template<typename T>
-    constexpr TypeOperators::Destructor MakeDestructor() noexcept {
+    constexpr CommonOperators::Destructor MakeDestructor() noexcept {
         if constexpr (!std::is_destructible_v<T>) {
             return nullptr;
         } else {
@@ -90,7 +90,7 @@ namespace edt::reflection::detail
     }
 
     template<typename T>
-    constexpr TypeOperators::Equals MakeEqualsOperator() noexcept {
+    constexpr CommonOperators::Equals MakeEqualsOperator() noexcept {
         if constexpr (!has_operator::has_equals_operator_v<T>) {
             return nullptr;
         } else {
@@ -103,8 +103,8 @@ namespace edt::reflection::detail
     }
 
     template<typename T>
-    constexpr TypeOperators MakeTypeOperators() {
-        return TypeOperators {
+    constexpr CommonOperators MakeCommonOperators() {
+        return CommonOperators {
             MakeDefaultConstructor<T>(),
             MakeCopyConstructor<T>(),
             MakeMoveConstructor<T>(),

@@ -3,8 +3,9 @@
 #include "EverydayTools/Exception/ThrowIfFailed.h"
 #include "EverydayTools/GUID.h"
 
-#include "../Detail/FwdDecl.h"
-#include "../TypeOperators.h"
+#include "../FwdDecl.h"
+#include "../Operators/TypeOperators.h"
+#include "../Operators/MakeCommonOperators.h"
 
 namespace edt::reflection
 {
@@ -14,8 +15,6 @@ namespace edt::reflection
 		Integral,
 		FloatingPoint,
 		Enumeration,
-		String,
-		Array,
 		Class
 	};
 
@@ -39,7 +38,7 @@ namespace edt::reflection::detail
 			: m_typeInfo(typeInfo)
 		{
 			m_typeInfo.size = sizeof(T);
-			m_typeInfo.operators = MakeTypeOperators<T>();
+			m_typeInfo.operators.common = MakeCommonOperators<T>();
 			m_typeInfo.category = TypeCategory::Unknown;
 		}
 

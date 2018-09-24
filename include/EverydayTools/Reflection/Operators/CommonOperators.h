@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Detail/FwdDecl.h"
+#include "../FwdDecl.h"
 
 namespace edt::reflection
 {
-    class TypeOperators
+    class CommonOperators
     {
     public:
         using DefaultConstructor = void(*)(void* object);

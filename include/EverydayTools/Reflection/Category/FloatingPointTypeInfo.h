@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Detail/FwdDecl.h"
+#include "../FwdDecl.h"
 #include "CommonTypeInfo.h"
 
 namespace edt::reflection
