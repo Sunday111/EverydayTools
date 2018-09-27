@@ -2,38 +2,75 @@
 
 #include <type_traits>
 
-#define _EDT_ENUM_FLAG_OPERATORS(PREFIX, ET_) \
-    PREFIX ET_ operator|(ET_ a, ET_ b) { \
-        return static_cast<ET_>(static_cast<std::underlying_type<ET_>::type>(a) | \
-                                static_cast<std::underlying_type<ET_>::type>(b)); } \
-    PREFIX ET_ operator&(ET_ a, ET_ b) { \
-        return static_cast<ET_>(static_cast<std::underlying_type<ET_>::type>(a) & \
-                                static_cast<std::underlying_type<ET_>::type>(b)); } \
-    PREFIX ET_ operator^(ET_ a, ET_ b) { \
-        return static_cast<ET_>(static_cast<std::underlying_type<ET_>::type>(a) ^ \
-                                static_cast<std::underlying_type<ET_>::type>(b)); } \
-    PREFIX ET_ operator~(ET_ a) { \
-        return static_cast<ET_>(~static_cast<std::underlying_type<ET_>::type>(a)); } \
-    PREFIX ET_ operator<<(ET_ a, int i) { \
-        return static_cast<ET_>(static_cast<std::underlying_type<ET_>::type>(a) << i); } \
-    PREFIX ET_ operator>>(ET_ a, int i) { \
-        return static_cast<ET_>(static_cast<std::underlying_type<ET_>::type>(a) >> i); } \
-    PREFIX ET_ operator|=(ET_& a, ET_ b) { \
-        return static_cast<ET_>(reinterpret_cast<std::underlying_type<ET_>::type&>(a) |= \
-                                static_cast<std::underlying_type<ET_>::type>(b)); } \
-    PREFIX ET_ operator&=(ET_& a, ET_ b) { \
-        return static_cast<ET_>(reinterpret_cast<std::underlying_type<ET_>::type&>(a) &= \
-                                static_cast<std::underlying_type<ET_>::type>(b)); } \
-    PREFIX ET_ operator^=(ET_& a, ET_ b) { \
-        return static_cast<ET_>(reinterpret_cast<std::underlying_type<ET_>::type&>(a) ^= \
-                                static_cast<std::underlying_type<ET_>::type>(b)); } \
-    PREFIX ET_ operator<<=(ET_& a, int i) { \
-        return static_cast<ET_>(reinterpret_cast<std::underlying_type<ET_>::type&>(a) <<= i); } \
-    PREFIX ET_ operator>>=(ET_& a, int i) { \
-        return static_cast<ET_>(reinterpret_cast<std::underlying_type<ET_>::type&>(a) >>= i); }
+namespace edt
+{
+	template<typename T>
+	struct enable_enum_flags
+	{
+		static constexpr bool value = false;
+	};
 
-#define EDT_ENUM_FLAG_OPERATORS(ET_) \
-    _EDT_ENUM_FLAG_OPERATORS(inline constexpr, ET_)
+	template<typename T>
+	inline constexpr bool enable_enum_flags_v = enable_enum_flags<std::decay_t<T>>::value;
+}
 
-#define EDT_ENUM_FLAG_OPERATORS_CLASS(ET_) \
-    _EDT_ENUM_FLAG_OPERATORS(friend inline constexpr, ET_)
+template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
+constexpr inline E operator|(const E lhs, const E rhs) {
+	using underlying = std::underlying_type_t<E>;
+	return static_cast<E>(static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
+}
+
+template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
+constexpr inline E operator&(const E lhs, const E rhs) {
+	using underlying = std::underlying_type_t<E>;
+	return static_cast<E>(static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
+}
+
+template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
+constexpr inline E operator^(const E lhs, const E rhs) {
+	using underlying = std::underlying_type_t<E>;
+	return static_cast<E>(static_cast<underlying>(lhs) ^ static_cast<underlying>(rhs));
+}
+
+template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
+constexpr inline E operator~(const E value) {
+	using underlying = std::underlying_type_t<E>;
+	return static_cast<E>(~static_cast<underlying>(value));
+}
+
+template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
+constexpr inline E operator<<(const E value, size_t i) {
+	using underlying = std::underlying_type_t<E>;
+	return static_cast<E>(static_cast<underlying>(value) << i);
+}
+
+template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
+constexpr inline E operator>>(const E value, size_t i) {
+	using underlying = std::underlying_type_t<E>;
+	return static_cast<E>(static_cast<underlying>(value) >> i);
+}
+
+template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
+inline E& operator|=(E& lhs, const E rhs) {
+	return lhs = (lhs | rhs);
+}
+
+template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
+inline E& operator&=(E& lhs, const E rhs) {
+	return (lhs = (lhs & rhs));
+}
+
+template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
+inline E& operator^=(E& lhs, const E rhs) {
+	return (lhs = (lhs ^ rhs));
+}
+
+template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
+inline E& operator<<=(E& value, size_t i) {
+	return (lhs = (lhs << rhs));
+}
+
+template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
+inline E& operator>>=(E& value, size_t i) {
+	return (lhs = (lhs >> rhs));
+}

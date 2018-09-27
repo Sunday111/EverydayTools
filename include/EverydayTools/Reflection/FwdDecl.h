@@ -3,7 +3,7 @@
 namespace edt::reflection
 {
 	template<typename T, typename Enable = void>
-	class TypeInfo {};
+	class TypeInfo;
 
 	template<typename T>
 	class Reflector;
