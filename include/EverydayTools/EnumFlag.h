@@ -39,13 +39,13 @@ constexpr inline E operator~(const E value) {
 }
 
 template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
-constexpr inline E operator<<(const E value, size_t i) {
+constexpr inline E operator<<(const E value, std::size_t i) {
 	using underlying = std::underlying_type_t<E>;
 	return static_cast<E>(static_cast<underlying>(value) << i);
 }
 
 template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
-constexpr inline E operator>>(const E value, size_t i) {
+constexpr inline E operator>>(const E value, std::size_t i) {
 	using underlying = std::underlying_type_t<E>;
 	return static_cast<E>(static_cast<underlying>(value) >> i);
 }
@@ -66,11 +66,11 @@ inline E& operator^=(E& lhs, const E rhs) {
 }
 
 template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
-inline E& operator<<=(E& value, size_t i) {
-	return (lhs = (lhs << rhs));
+inline E& operator<<=(E& value, std::size_t i) {
+	return (value = (value << i));
 }
 
 template<typename E, typename Enable = std::enable_if_t<edt::enable_enum_flags_v<E>>>
-inline E& operator>>=(E& value, size_t i) {
-	return (lhs = (lhs >> rhs));
+inline E& operator>>=(E& value, std::size_t i) {
+	return (value = (value >> i));
 }
