@@ -1,5 +1,6 @@
 #pragma once
 
+#include <tuple>
 #include <type_traits>
 #include "FwdDecl.h"
 
@@ -8,6 +9,8 @@ namespace edt
     template<typename... Types>
     class TypesList
     {
+    public:
+        using TupleType = std::tuple<Types...>;
     };
 
     template<typename... A, typename... B>

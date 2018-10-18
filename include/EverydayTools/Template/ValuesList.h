@@ -111,4 +111,20 @@ namespace edt
         typename List
     >
     using ValuesList_FilterT = decltype(ValuesList_Filter<Predicate>(std::declval<List>()));
+    
+    template<typename T, T... values>
+    constexpr auto ValuesList_ToIntegerSequence(ValuesList<values...>) {
+        return std::integer_sequence<T, values...>();
+    }
+
+    template<typename T, typename List>
+    using ValuesList_ToIntegerSequenceT = decltype(ValuesList_ToIntegerSequence<T>(std::declval<List>()));
+
+    template<typename T, T... values>
+    constexpr auto ValuesList_FromIntegerSequence(std::integer_sequence<T, values...>) {
+        return ValuesList<values...> {};
+    }
+
+    template<typename List>
+    using ValuesList_FromIntegerSequenceT = decltype(ValuesList_FromIntegerSequence(std::declval<List>()));
 }
