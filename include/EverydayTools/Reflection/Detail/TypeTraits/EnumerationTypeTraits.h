@@ -2,18 +2,13 @@
 
 #include <type_traits>
 #include "TypeFlagTraits.h"
+#include "../../SpecificTypeInfo/EnumerationTypeInfo.h"
 
-namespace edt::reflection
+namespace edt::reflection::detail
 {
-    class EnumerationTypeInfo
+    template<>
+    struct TypeFlagTraits<TypeFlags::Enumeration>
     {
-    public:
-        int enumTypeInfoMember;
-    };
-
-    class EnumerationTypeTraits
-    {
-    public:
         template<typename T>
         static inline constexpr bool IsTypeApplicable = std::is_enum_v<T>;
         using Container = EnumerationTypeInfo;
@@ -22,11 +17,5 @@ namespace edt::reflection
         static void ConstructContainer(Container&) {
 
         }
-    };
-
-    template<>
-    struct TypeFlagToTraitMap<TypeFlags::Enumeration>
-    {
-        using Trait = EnumerationTypeTraits;
     };
 }

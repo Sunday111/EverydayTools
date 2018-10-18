@@ -1,20 +1,13 @@
 #pragma once
 
-#include "MakeCommonOperators.h"
 #include "TypeFlagTraits.h"
+#include "../../SpecificTypeInfo/CommonTypeInfo.h"
 
-namespace edt::reflection
+namespace edt::reflection::detail
 {
-    class CommonTypeInfo
+    template<>
+    struct TypeFlagTraits<TypeFlags::Common>
     {
-    public:
-        std::size_t size;
-        CommonOperators operators;
-    };
-
-    class CommonTypeTraits
-    {
-    public:
         template<typename T>
         static inline constexpr bool IsTypeApplicable = true;
 
@@ -25,11 +18,5 @@ namespace edt::reflection
             c.size = sizeof(T);
             c.operators = detail::MakeCommonOperators<T>();
         }
-    };
-
-    template<>
-    struct TypeFlagToTraitMap<TypeFlags::Common>
-    {
-        using Trait = CommonTypeTraits;
     };
 }

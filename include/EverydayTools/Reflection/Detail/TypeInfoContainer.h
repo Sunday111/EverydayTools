@@ -1,22 +1,13 @@
 #pragma once
 
-#include "Categories/TypeTraitMap.h"
-#include "TypeFlags.h"
-#include "../Template/TypesList.h"
-#include "Template/MapFuctors.h"
-#include "Template/FilterPredicates.h"
+#include "TypeTraits/CommonTypeTraits.h"
+#include "TypeTraits/NumberTypeTraits.h"
+#include "TypeTraits/EnumerationTypeTraits.h"
+#include "TypeTraits/ClassTypeTraits.h"
+#include "../../Template/TypesList.h"
 
-namespace edt::reflection
+namespace edt::reflection::detail
 {
-    class ITypeInfo
-    {
-    public:
-        virtual TypeFlags                    GetFlags() const = 0;
-        virtual const NumberTypeInfo*        CastToNumber() const = 0;
-        virtual const EnumerationTypeInfo*   CastToEnumeration() const = 0;
-        virtual const ClassTypeInfo*         CastToClass() const = 0;
-    };
-
     template<typename T>
     using BitsetFlagsList = ValuesList_FilterT<TypeFlagHasTrait,
         ValuesList_MapToValueT<MakeFlagByIndexMapFunctor<T>::template Functor,
@@ -24,13 +15,13 @@ namespace edt::reflection
         std::make_index_sequence<SizeInBits<T>>>>>;
 
     template<typename T>
-    using AllTypeFlagTraitsList = ValuesList_MapToTypeT<TypeTraitMap, BitsetFlagsList<T>>;
+    using AllTypeFlagTraitsList = ValuesList_MapToTypeT<TypeFlagTraits, BitsetFlagsList<T>>;
 
     template<auto bitset>
     using BitsetValuesList = ValuesList_FilterT<FlagIsSetFilter<bitset>::template Functor, BitsetFlagsList<decltype(bitset)>>;
 
     template<auto bitset>
-    using BitsetTraitsList = ValuesList_MapToTypeT<TypeTraitMap, BitsetValuesList<bitset>>;
+    using BitsetTraitsList = ValuesList_MapToTypeT<TypeFlagTraits, BitsetValuesList<bitset>>;
 
     template<typename ... Traits>
     class BasesList : public Traits::Container ...
@@ -53,10 +44,7 @@ namespace edt::reflection
     {
     public:
         template<TypeFlags flag>
-        using FlagTraits = typename TypeFlagToTraitMap<flag>::Trait;
-
-        template<TypeFlags flag>
-        using FlagContainer = typename FlagTraits<flag>::Container;
+        using FlagContainer = typename TypeFlagTraits<flag>::Container;
 
         template<TypeFlags flag>
         using FlagContainerPtr = std::add_pointer_t<FlagContainer<flag>>;
@@ -118,5 +106,12 @@ namespace edt::reflection
         } else {
             return nullptr;
         }
+    }
+
+    template<typename T>
+    constexpr TypeFlags GetTypeFlags()
+    {
+        using ApplicableTraits = edt::ValuesList_FilterT<FlagIsDefaultApplicableFilter<T>::template Predicate, BitsetFlagsList<TypeFlags>>;
+        return FlagsToBitset(ApplicableTraits{});
     }
 }

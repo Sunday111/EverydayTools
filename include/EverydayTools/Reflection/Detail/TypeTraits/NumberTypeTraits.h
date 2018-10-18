@@ -2,25 +2,13 @@
 
 #include <type_traits>
 #include "TypeFlagTraits.h"
+#include "../../SpecificTypeInfo/NumberTypeInfo.h"
 
-namespace edt::reflection
+namespace edt::reflection::detail
 {
-    enum class NumberType
+    template<>
+    struct TypeFlagTraits<TypeFlags::Number>
     {
-        SignedInteger,
-        UnsignedInteger,
-        FloatingPoint
-    };
-
-    class NumberTypeInfo
-    {
-    public:
-        NumberType numberType;
-    };
-
-    class NumberTypeTraits
-    {
-    public:
         template<typename T>
         static inline constexpr bool IsTypeApplicable = std::is_arithmetic_v<T>;
         using Container = NumberTypeInfo;
@@ -29,19 +17,15 @@ namespace edt::reflection
         static void ConstructContainer(Container& c) {
             if constexpr (std::is_floating_point_v<T>) {
                 c.numberType = NumberType::FloatingPoint;
-            } else {
+            }
+            else {
                 if constexpr (std::is_signed_v<T>) {
                     c.numberType = NumberType::SignedInteger;
-                } else {
+                }
+                else {
                     c.numberType = NumberType::UnsignedInteger;
                 }
             }
         }
-    };
-
-    template<>
-    struct TypeFlagToTraitMap<TypeFlags::Number>
-    {
-        using Trait = NumberTypeTraits;
     };
 }

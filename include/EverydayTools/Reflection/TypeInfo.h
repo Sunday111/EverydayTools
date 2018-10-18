@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Template/TypeHasMethod.h"
-#include "TypeInfoContainer.h"
+#include "Detail/TypeInfoContainer.h"
 
 namespace edt::reflection
 {
@@ -12,22 +12,22 @@ namespace edt::reflection
         if constexpr (HasGetTypeFlagsMethod_v<T>) {
             return T::GetTypeFlags();
         } else {
-            return GetTypeFlags<T>();
+            return detail::GetTypeFlags<T>();
         }
     }
 
     template<typename T>
-    class TypeInfo : public TypeInfoContainer<SelectTypeFlags<T>()>
+    class TypeInfo : public detail::TypeInfoContainer<SelectTypeFlags<T>()>
     {
     public:
         TypeInfo() {
-            Construct(BitsetValuesList<GetTypeFlags()> {});
+            Construct(detail::BitsetValuesList<GetTypeFlags()> {});
         }
 
     protected:
         template<auto... typeFlag>
         void Construct(edt::ValuesList<typeFlag...>) {
-            (FlagTraits<typeFlag>::template ConstructContainer<T>(*this), ...);
+            (detail::TypeFlagTraits<typeFlag>::template ConstructContainer<T>(*this), ...);
         }
     };
 }

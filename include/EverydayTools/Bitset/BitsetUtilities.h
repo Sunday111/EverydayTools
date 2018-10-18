@@ -60,4 +60,9 @@ namespace edt
 
         return r;
     }
+
+    template<auto... values>
+    constexpr auto FlagsToBitset(edt::ValuesList<values...>) {
+        return (values | ...);
+    }
 }

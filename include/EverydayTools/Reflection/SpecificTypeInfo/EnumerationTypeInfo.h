@@ -2,5 +2,7 @@
 
 namespace edt::reflection
 {
-    enum class TypeFlags;
+    class EnumerationTypeInfo
+    {
+    };
 }
