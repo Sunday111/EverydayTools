@@ -1,7 +1,7 @@
 #pragma once
 
 #include "TypeFlagTraits.h"
-#include "../../SpecificTypeInfo/CommonTypeInfo.h"
+#include "../ReflectTypeInterface/CommonReflectTypeInterface.h"
 
 namespace edt::reflection::detail
 {
@@ -11,7 +11,7 @@ namespace edt::reflection::detail
         template<typename T>
         static inline constexpr bool IsTypeApplicable = true;
 
-        using Container = CommonTypeInfo;
+        using Container = CommonReflectTypeInterface;
 
         template<typename T>
         static void ConstructContainer(Container& c) {

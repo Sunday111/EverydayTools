@@ -2,7 +2,7 @@
 
 #include <type_traits>
 #include "TypeFlagTraits.h"
-#include "../../SpecificTypeInfo/NumberTypeInfo.h"
+#include "../ReflectTypeInterface/NumberReflectTypeInterface.h"
 
 namespace edt::reflection::detail
 {
@@ -11,7 +11,7 @@ namespace edt::reflection::detail
     {
         template<typename T>
         static inline constexpr bool IsTypeApplicable = std::is_arithmetic_v<T>;
-        using Container = NumberTypeInfo;
+        using Container = NumberReflectTypeInterface;
 
         template<typename T>
         static void ConstructContainer(Container& c) {

@@ -2,7 +2,7 @@
 
 #include <type_traits>
 #include "TypeFlagTraits.h"
-#include "../../SpecificTypeInfo/ClassTypeInfo.h"
+#include "../ReflectTypeInterface/ClassReflectTypeInterface.h"
 
 namespace edt::reflection::detail
 {
@@ -11,7 +11,7 @@ namespace edt::reflection::detail
     {
         template<typename T>
         static inline constexpr bool IsTypeApplicable = std::is_class_v<T>;
-        using Container = ClassTypeInfo;
+        using Container = ClassReflectTypeInterface;
 
         static void ConstructContainer(Container&) {
 
