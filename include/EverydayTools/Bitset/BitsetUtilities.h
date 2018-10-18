@@ -1,9 +1,32 @@
 #pragma once
 
 #include "EnumBitset.h"
+#include "../Size.h"
+#include "../Template/TypesList.h"
+#include "../Template/ValuesList.h"
 
 namespace edt
 {
+    template<auto bitset>
+    struct FlagIsSetFilter
+    {
+        template<auto flag>
+        struct Functor
+        {
+            static constexpr bool Value = FlagIsSet(bitset, flag);
+        };
+    };
+
+    template<typename T>
+    struct MakeFlagByIndexMapFunctor
+    {
+        template<auto index>
+        struct Functor
+        {
+            static constexpr auto Value = MakeFlagByIndex<T, index>();
+        };
+    };
+
     template<typename T>
     constexpr T MakeFlagByIndex(const size_t index) {
         return (T(1) << index);
@@ -11,7 +34,7 @@ namespace edt
 
     template<typename T, size_t index>
     constexpr T MakeFlagByIndex() {
-        static_assert(index < SizeInBits<TypeFlags>);
+        static_assert(index < SizeInBits<T>);
         return MakeFlagByIndex<T>(index);
     }
 

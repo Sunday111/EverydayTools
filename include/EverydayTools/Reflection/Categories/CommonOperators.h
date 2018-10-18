@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../FwdDecl.h"
-
 namespace edt::reflection
 {
     class CommonOperators

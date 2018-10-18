@@ -1,7 +1,6 @@
 #pragma once
 
 #include <type_traits>
-#include "../FwdDecl.h"
 #include "CommonOperators.h"
 
 namespace edt::reflection::detail
