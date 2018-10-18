@@ -2,6 +2,7 @@
 
 #include "../Template/TypeHasMethod.h"
 #include "Detail/TypeInfoContainer.h"
+#include "Detail/ReflectType.h"
 
 namespace edt::reflection
 {
@@ -22,6 +23,7 @@ namespace edt::reflection
     public:
         TypeInfo() {
             Construct(detail::BitsetValuesList<GetTypeFlags()> {});
+            detail::CallReflectType(*this);
         }
 
     protected:
