@@ -34,7 +34,7 @@ namespace edt
 
     template<typename T, size_t index>
     constexpr T MakeFlagByIndex() {
-        static_assert(index < SizeInBits<T>);
+        static_assert((index < SizeInBits<T>));
         return MakeFlagByIndex<T>(index);
     }
 

@@ -17,7 +17,7 @@ namespace edt
 {
     template<typename Head, typename... Tail>
     class PureSame : public AllTypesMatchCondition<
-        typename detail::IsPureSameTrait<Head>::Trait, Tail...>
+        detail::IsPureSameTrait<Head>:: template Trait, Tail...>
     {
     };
 
