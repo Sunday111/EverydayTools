@@ -44,13 +44,13 @@ namespace edt::reflection::detail
 	{
 	public:
 		CategoryReflector(TypeInfo<T>& typeInfo)
-			: CommonTypeReflector(typeInfo)
+			: CommonTypeReflector<T>(typeInfo)
 		{
-			m_typeInfo.category = TypeCategory::Enumeration;
+			this->m_typeInfo.category = TypeCategory::Enumeration;
 		}
 
 		void AddConstant(T value, const char* name) {
-			m_typeInfo.m_constants.push_back(typename EnumerationTypeInfo::EnumerationEntryInfo {
+			this->m_typeInfo.m_constants.push_back(typename EnumerationTypeInfo::EnumerationEntryInfo {
 				static_cast<size_t>(value),
 				std::string(name)
 				});

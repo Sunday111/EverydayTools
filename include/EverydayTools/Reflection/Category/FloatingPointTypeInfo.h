@@ -23,9 +23,9 @@ namespace edt::reflection::detail
     {
     public:
         CategoryReflector(TypeInfo<T>& typeInfo)
-            : CommonTypeReflector(typeInfo)
+            : CommonTypeReflector<T>(typeInfo)
         {
-            m_typeInfo.category = TypeCategory::FloatingPoint;
+            this->m_typeInfo.category = TypeCategory::FloatingPoint;
         }
     };
 }

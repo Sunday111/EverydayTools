@@ -24,10 +24,10 @@ namespace edt::reflection::detail
     {
     public:
         CategoryReflector(TypeInfo<T>& typeInfo)
-            : CommonTypeReflector(typeInfo)
+            : CommonTypeReflector<T>(typeInfo)
         {
-            m_typeInfo.category = TypeCategory::Integral;
-            m_typeInfo.isSigned = std::is_signed_v<T>;
+            this->m_typeInfo.category = TypeCategory::Integral;
+            this->m_typeInfo.isSigned = std::is_signed_v<T>;
         }
     };
 }

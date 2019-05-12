@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EnumBitset.h"
+#include "../Size.h"
 
 namespace edt
 {
@@ -11,7 +12,7 @@ namespace edt
 
     template<typename T, size_t index>
     constexpr T MakeFlagByIndex() {
-        static_assert(index < SizeInBits<TypeFlags>);
+        static_assert((index < SizeInBits<T>));
         return MakeFlagByIndex<T>(index);
     }
 
