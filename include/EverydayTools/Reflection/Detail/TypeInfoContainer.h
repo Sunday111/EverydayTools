@@ -5,6 +5,7 @@
 #include "TypeTraits/EnumerationTypeTraits.h"
 #include "TypeTraits/ClassTypeTraits.h"
 #include "../../Template/TypesList.h"
+#include "../../Template/ValuesList.h"
 
 namespace edt::reflection::detail
 {

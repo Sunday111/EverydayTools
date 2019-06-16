@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <utility>
 #include "FwdDecl.h"
+#include "../Size.h"
 
 namespace edt
 {
