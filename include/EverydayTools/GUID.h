@@ -34,7 +34,7 @@ namespace edt
         static constexpr size_t usualStringLength = 36;
         static constexpr size_t stringLengthWithBracers = usualStringLength + 2;
     
-        inline static constexpr GUID Create(const std::string_view str) {
+        inline static constexpr GUID Create(const std::string_view& str) {
             return str.length() == usualStringLength ?
                 Parse(str) : Parse(str.substr(1, usualStringLength));
         }

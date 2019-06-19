@@ -556,10 +556,7 @@ namespace edt
 
             @return sparse view to base type
          */
-        template<typename U,
-            class = std::enable_if_t<
-                std::is_base_of_v<U, T> &&
-                std::is_convertible_v<T, U>>>
+        template<typename U, class = std::enable_if_t<std::is_convertible_v<T, U>>>
         [[nodiscard]]
         constexpr operator SparseArrayView<U>() const noexcept
         {

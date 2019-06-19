@@ -1,19 +1,21 @@
 #pragma once
 
 #include "ArrayView.h"
-#include "EverydayTools/Template/IsSpecialization.h"
+#include "../Template/IsSpecialization.h"
 #include <vector>
+#include <type_traits>
 
 namespace edt
 {
     template
     <
         typename VectorSpecialization,
-        typename Enable = std::enable_if_t<isSpecialization<VectorSpecialization, std::vector>>
+        typename Enable = std::enable_if_t<isSpecialization<std::decay_t<VectorSpecialization>, std::vector>>
     >
     decltype(auto) MakeArrayView(VectorSpecialization& vector) noexcept {
-        using Value = typename VectorSpecialization::value_type;
-        using Result = DenseArrayView<Value>;
+        using VectorValue = typename VectorSpecialization::value_type;
+        using ViewValue = std::conditional_t<std::is_const_v<VectorSpecialization>, std::add_const_t<const VectorValue>, VectorValue>;
+        using Result = DenseArrayView<ViewValue>;
         if (vector.empty()) {
             return Result();
         }
