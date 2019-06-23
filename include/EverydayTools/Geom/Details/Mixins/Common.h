@@ -67,9 +67,25 @@ namespace edt::geom::details::common {
             return Multiply(value);
         }
 
+        template
+        <
+            template<typename, size_t, size_t> typename Mtx
+        >
+        void Copy(const Mtx<T, nRows, nColumns>& that_) noexcept {
+            auto& this_ = CastThis();
+            for (size_t r = 0; r < nRows; ++r) {
+                for (size_t c = 0; c < nColumns; ++c) {
+                    this_.At(r, c) = that_.At(r, c);
+                }
+            }
+        }
+
         template<typename U>
-        ReturnValue<T, nRows, nColumns> operator*(U value) const noexcept {
-            ReturnValue<T, nRows, nColumns> result(CastThis());
+        constexpr ReturnValue<T, nRows, nColumns> operator*(U value) const noexcept {
+            ReturnValue<T, nRows, nColumns> result;
+            result.Copy(CastThis());
+            //auto result = static_cast<ReturnValue<T, nRows, nColumns>>(CastThis());
+            //ReturnValue<T, nRows, nColumns> result(CastThis());
             result *= value;
             return result;
         }
@@ -94,7 +110,10 @@ namespace edt::geom::details::common {
             return result;
         }
 
-        static size_t RowsCount() noexcept { return nRows; }
-        static size_t ColumnsCount() noexcept { return nColumns; }
+        [[nodiscard]]
+        constexpr static size_t RowsCount() noexcept { return nRows; }
+
+        [[nodiscard]]
+        constexpr static size_t ColumnsCount() noexcept { return nColumns; }
     };
 }

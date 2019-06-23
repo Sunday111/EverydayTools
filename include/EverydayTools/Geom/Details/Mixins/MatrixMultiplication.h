@@ -29,7 +29,7 @@ namespace edt::geom::details::matrix_multiplication
 
             //using TR = decltype(std::declval(T) * std::declval(U));
             using TR = T;
-            Final<TR, nRows, bColumns> result;
+            ReturnValue<TR, nRows, bColumns> result;
 
             auto& this_ = CastThis();
 

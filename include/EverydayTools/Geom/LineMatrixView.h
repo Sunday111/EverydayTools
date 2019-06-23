@@ -30,5 +30,11 @@ namespace edt::geom
         using Data = ::edt::geom::details::line_data_view::Mixin<T, Rows, Columns, ::edt::geom::LineMatrixView, ::edt::geom::Matrix>;
     public:
         using Data::Data;
+
+        //constexpr operator Matrix<T, Rows, Columns>() const noexcept {
+        //    Matrix<T, Rows, Columns> Result;
+        //    Result = *this;
+        //    return Result;
+        //}
     };
 }

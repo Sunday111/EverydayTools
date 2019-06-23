@@ -40,5 +40,18 @@ namespace edt::geom::details::square_matrix {
             }
             return r;
         }
+
+        constexpr bool IsIdentity() const {
+            auto& this_ = CastThis();
+            for (size_t i = 0; i < nRows; ++i) {
+                for (size_t j = 0; j < nColumns; ++j) {
+                    if (this_.At(i, j) != (i == j ? 1 : 0)) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
     };
 }

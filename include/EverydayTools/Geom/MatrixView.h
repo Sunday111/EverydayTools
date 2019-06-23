@@ -1,13 +1,13 @@
 #pragma once
 
-#include "EverydayTools/Geom/Details/Mixins/DataView.h"
-#include "EverydayTools/Geom/Details/Mixins/MatrixMultiplication.h"
-#include "EverydayTools/Geom/Details/Mixins/VectorDataAccess.h"
-#include "EverydayTools/Geom/Details/Mixins/VectorRotation.h"
-#include "EverydayTools/Geom/Details/Mixins/VectorMethods.h"
-#include "EverydayTools/Geom/Details/Mixins/Vector3.h"
-#include "EverydayTools/Geom/Details/Mixins/Cast.h"
-#include "EverydayTools/Geom/Details/Mixins/Common.h"
+#include "Details/Mixins/DataView.h"
+#include "Details/Mixins/MatrixMultiplication.h"
+#include "Details/Mixins/VectorDataAccess.h"
+#include "Details/Mixins/VectorRotation.h"
+#include "Details/Mixins/VectorMethods.h"
+#include "Details/Mixins/Vector3.h"
+#include "Details/Mixins/Cast.h"
+#include "Details/Mixins/Common.h"
 
 #include "Matrix.h"
 #include "LineMatrixView.h"
