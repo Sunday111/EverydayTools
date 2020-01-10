@@ -13,7 +13,7 @@ namespace edt::detail
     {
     public:
         template<typename T1, typename T2>
-        constexpr bool operator()(const T1& a, const T2& b) const {
+        constexpr bool operator()(const T1& a, const T2& b) const noexcept {
             return a < b;
         }
     };
@@ -22,7 +22,7 @@ namespace edt::detail
     {
     public:
         template<typename T>
-        constexpr bool Compare(const T& a, const T& b) const {
+        constexpr bool Compare(const T& a, const T& b) const noexcept {
             return a > b;
         }
     };
