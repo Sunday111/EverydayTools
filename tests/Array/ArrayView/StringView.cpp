@@ -1,4 +1,4 @@
-#include "EverydayTools/Array/StringView.h"
+#include "EverydayTools/Array/StringView.hpp"
 
 static_assert(edt::StringView(nullptr).GetSize() == 0);
 static_assert(edt::StringView("").GetSize() == 0);
