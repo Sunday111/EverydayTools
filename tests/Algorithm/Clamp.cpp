@@ -1,6 +1,5 @@
 #include "EverydayTools/Algorithm/Clamp.hpp"
 
-#include "EverydayTools/UnusedVar.hpp"
 #include "gtest/gtest.h"
 
 TEST(AlgorithmTest, Clamp) {

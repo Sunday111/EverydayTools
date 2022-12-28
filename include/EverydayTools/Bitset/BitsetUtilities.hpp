@@ -5,7 +5,6 @@
 #include "../Template/ValuesList.hpp"
 #include "EnumBitset.hpp"
 
-
 namespace edt {
 template <typename T>
 constexpr T MakeFlagByIndex(const size_t index) {

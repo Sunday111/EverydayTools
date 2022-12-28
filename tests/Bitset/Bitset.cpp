@@ -1,14 +1,10 @@
 #include "EverydayTools/Bitset/Bitset.hpp"
 
-#include "EverydayTools/UnusedVar.hpp"
 #include "gtest/gtest.h"
 
 using namespace edt;
 
-TEST(BitsetTest, construction) {
-  Bitset a(10);
-  UnusedVar(a);
-}
+TEST(BitsetTest, construction) { [[maybe_unused]] Bitset a(10); }
 
 TEST(BitsetTest, SetGet) {
   Bitset a(10);

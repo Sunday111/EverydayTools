@@ -3,8 +3,6 @@
 #include <cassert>
 
 #include "EverydayTools/Geom/Details/ImplementCastThis.hpp"
-#include "EverydayTools/UnusedVar.hpp"
-
 
 namespace edt::geom::details::line_data_view {
 template <typename T, size_t nRows, size_t nColumns,
@@ -27,9 +25,8 @@ class Mixin<T, nRows, nColumns, Final, ReturnValue,
     return const_cast<T&>(const_cast<const Mixin*>(this)->At(nRow, nColumn));
   }
 
-  const T& At(size_t nRow, size_t nColumn) const noexcept {
+  const T& At([[maybe_unused]] size_t nRow, size_t nColumn) const noexcept {
     assert(nRow == 0);
-    UnusedVar(nRow);
     assert(m_data != nullptr);
     assert(nColumn < nColumns);
     return m_data[nColumn];
@@ -67,10 +64,9 @@ class Mixin<T, nRows, nColumns, Final, ReturnValue,
     return const_cast<T&>(const_cast<const Mixin*>(this)->At(nRow, nColumn));
   }
 
-  const T& At(size_t nRow, size_t nColumn) const noexcept {
+  const T& At(size_t nRow, [[maybe_unused]] size_t nColumn) const noexcept {
     assert(m_data != nullptr);
     assert(nColumn == 0);
-    UnusedVar(nColumn);
     assert(nRow < nRows);
     return m_data[nRow * m_stride];
   }

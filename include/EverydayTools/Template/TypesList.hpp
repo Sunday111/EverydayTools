@@ -5,7 +5,6 @@
 
 #include "FwdDecl.hpp"
 
-
 namespace edt {
 template <typename... Types>
 class TypesList {

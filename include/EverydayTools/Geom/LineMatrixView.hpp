@@ -12,7 +12,6 @@
 #include "Matrix.hpp"
 #include "MatrixView.hpp"
 
-
 namespace edt::geom {
 // May represent both rows and columns
 template <typename T, size_t Rows, size_t Columns>

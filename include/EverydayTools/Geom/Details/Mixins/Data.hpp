@@ -4,7 +4,6 @@
 
 #include "EverydayTools/Geom/Details/FwdDecl.hpp"
 
-
 namespace edt::geom::details::data {
 template <typename T, size_t N>
 using Row = T[N];

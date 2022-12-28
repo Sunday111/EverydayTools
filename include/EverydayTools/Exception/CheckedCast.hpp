@@ -5,7 +5,6 @@
 
 #include "ThrowIfFailed.hpp"
 
-
 namespace edt {
 // Allows to find numeric overflows
 template <typename To, typename From>

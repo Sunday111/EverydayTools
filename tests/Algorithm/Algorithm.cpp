@@ -1,7 +1,6 @@
 #include <memory>
 
 #include "EverydayTools/Algorithm/Compare.hpp"
-#include "EverydayTools/UnusedVar.hpp"
 #include "gtest/gtest.h"
 
 TEST(AlgorithmTest, MinInteger) {

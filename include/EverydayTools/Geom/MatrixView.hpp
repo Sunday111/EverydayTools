@@ -11,7 +11,6 @@
 #include "LineMatrixView.hpp"
 #include "Matrix.hpp"
 
-
 namespace edt::geom {
 template <typename T, size_t nRows, size_t nColumns>
 class EDT_EMPTY_BASES MatrixView

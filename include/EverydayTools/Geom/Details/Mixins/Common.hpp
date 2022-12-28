@@ -4,7 +4,6 @@
 
 #include "../ImplementCastThis.hpp"
 
-
 namespace edt::geom::details::common {
 template <typename T, size_t nRows, size_t nColumns,
           template <typename, size_t, size_t> typename Final,

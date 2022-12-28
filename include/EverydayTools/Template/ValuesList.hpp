@@ -6,7 +6,6 @@
 #include "../Size.hpp"
 #include "FwdDecl.hpp"
 
-
 namespace edt {
 template <auto... Values>
 class ValuesList {};

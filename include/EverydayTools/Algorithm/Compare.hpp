@@ -7,7 +7,6 @@
 #include "../Template/PureSameTypes.hpp"
 #include "../Template/WorstReference.hpp"
 
-
 namespace edt::detail {
 class MinIntegerComparator {
  public:

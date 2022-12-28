@@ -1,7 +1,6 @@
 #include <cmath>
 
 #include "EverydayTools/Geom/Matrix.hpp"
-#include "EverydayTools/UnusedVar.hpp"
 #include "gtest/gtest.h"
 
 using namespace edt::geom;
@@ -154,8 +153,8 @@ struct InputGenerator<random, std::tuple<Types...>> {
   using Result = std::tuple<Types...>;
 
   template <size_t... Indices>
-  static void Randomize(std::index_sequence<Indices...>, Result& result) {
-    UnusedVar(result);  // <- 0 Arguments case
+  static void Randomize(std::index_sequence<Indices...>,
+                        [[maybe_unused]] Result& result) {
     (RandomizeValue(std::get<Indices>(result)), ...);
   }
 
@@ -175,8 +174,8 @@ struct TestArgumentCombinator {
   using Input = typename FT::Input;
 
   template <size_t... Indices>
-  static void FoldExecuteArgs(Input input, std::index_sequence<Indices...>) {
-    UnusedVar(input);  // <- 0 Arguments case
+  static void FoldExecuteArgs([[maybe_unused]] Input input,
+                              std::index_sequence<Indices...>) {
     FT::Execute(std::get<Indices>(input)...);
   }
 

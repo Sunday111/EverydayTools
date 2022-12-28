@@ -6,7 +6,6 @@
 #include "../Template/IsSpecialization.hpp"
 #include "ArrayView.hpp"
 
-
 namespace edt {
 template <typename VectorSpecialization,
           typename Enable = std::enable_if_t<isSpecialization<
