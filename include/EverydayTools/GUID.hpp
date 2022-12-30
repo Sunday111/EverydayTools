@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <ostream>
 #include <string_view>
 
 #include "Constexpr/HexToDec.hpp"
@@ -36,6 +37,41 @@ class GUID {
                : Parse(str.substr(1, usualStringLength));
   }
 
+  constexpr std::array<char, 36> ToCharArray() const {
+    std::array<char, 36> result;
+    [&]<size_t... indices>(std::index_sequence<indices...>) {
+      ((result[indices] = GetChar(indices)), ...);
+    }
+    (std::make_index_sequence<36>());
+    return result;
+  };
+
+  constexpr char GetChar(size_t index) const {
+    constexpr int8_t shifts[]{28, 24,  20, 16,  12,  8,   4,   0,   -1,
+                              44, 40,  36, 32,  -1,  60,  56,  52,  48,
+                              -1, 68,  64, 76,  72,  -1,  84,  80,  92,
+                              88, 100, 96, 108, 104, 116, 112, 124, 120};
+    int8_t shift = shifts[index];
+    if (shift < 0) {
+      return '-';
+    }
+
+    uint64_t v = part1;
+    if (shift >= 64) {
+      v = part2;
+      shift %= 64;
+    }
+
+    v >>= shift;
+    v &= 0xF;
+
+    if (v < 10) {
+      return '0' + static_cast<char>(v);
+    }
+
+    return 'A' - 10 + static_cast<char>(v);
+  }
+
  private:
   inline static constexpr GUID Parse(const std::string_view str) {
     const auto parsePart = [str](auto indexMap) {
@@ -57,6 +93,7 @@ class GUID {
     };
 
     return GUID{
+        //                              0  1  2  3   4  5  6   7
         parsePart(std::array<size_t, 8>{6, 4, 2, 0, 11, 9, 16, 14}),
         parsePart(std::array<size_t, 8>{19, 21, 24, 26, 28, 30, 32, 34})};
   }
@@ -66,3 +103,19 @@ class GUID {
   uint64_t part2 = 0;
 };
 }  // namespace edt
+
+namespace std {
+template <>
+struct hash<edt::GUID> {
+  [[nodiscard]] inline std::size_t operator()(const edt::GUID& k) const {
+    std::hash<uint64_t> hasher;
+    return hasher(k.part1) ^ hasher(k.part2);
+  }
+};
+}  // namespace std
+
+inline std::ostream& operator<<(std::ostream& stream, const edt::GUID& guid) {
+  const auto char_guid = guid.ToCharArray();
+  std::string_view view(char_guid.data(), char_guid.size());
+  return stream << view;
+}
