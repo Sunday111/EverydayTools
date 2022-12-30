@@ -8,11 +8,9 @@ set_generic_compile_options(${target_name} PRIVATE)
 add_dependencies(${target_name} gtest)
 target_link_libraries(${target_name} gtest gtest_main EverydayTools)
 target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(${target_name} PRIVATE ${gtest_SOURCE_DIR}/include)
-target_include_directories(${target_name} PRIVATE ${gtest_SOURCE_DIR})
 enable_testing()
-add_test(NAME    ${target_name} 
-         COMMAND ${target_name})
+add_test(NAME ${target_name}
+    COMMAND ${target_name})
 
 if(MSVC)
     target_compile_options(${target_name} PRIVATE "/bigobj")
