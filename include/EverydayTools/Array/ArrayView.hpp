@@ -6,7 +6,7 @@
 
 namespace edt::array_view_details {
 template <bool direct, typename T>
-[[nodiscard]] inline T* AdvancePointer(T* pointer, int count) noexcept {
+[[nodiscard]] inline T* AdvancePointer(T* pointer, size_t count) noexcept {
   if constexpr (direct) {
     return pointer + count;
   } else {
@@ -15,7 +15,7 @@ template <bool direct, typename T>
 }
 
 template <bool direct, typename T>
-[[nodiscard]] inline T* AdvancePointer(T* pointer, int count,
+[[nodiscard]] inline T* AdvancePointer(T* pointer, size_t count,
                                        size_t stride) noexcept {
   assert(stride >= sizeof(T));
 
@@ -94,7 +94,7 @@ class RandomAccessIterator {
   }
 
   [[nodiscard]] bool operator!=(const TFinal& another) const noexcept {
-    return !(*this == another);
+    return !(CastThis() == another);
   }
 
   [[nodiscard]] reference operator*() const noexcept {
@@ -307,8 +307,7 @@ class SparseArrayView : public ArrayView<T, edt::SparseArrayView> {
 
   [[nodiscard]] T& operator[](size_t index) const noexcept {
     assert(index < m_size);
-    return *array_view_details::AdvancePointer<true>(
-        m_p, static_cast<int>(index), m_stride);
+    return *array_view_details::AdvancePointer<true>(m_p, index, m_stride);
   }
 
   SparseArrayView<T>& operator=(const DenseArrayView<T>& dense) {
@@ -335,15 +334,15 @@ class SparseArrayView : public ArrayView<T, edt::SparseArrayView> {
       return m_p;
     } else {
       return m_size > 0 ? array_view_details::AdvancePointer<true>(
-                              m_p, static_cast<int>(m_size) - 1, m_stride)
+                              m_p, m_size - 1, m_stride)
                         : m_p;
     }
   }
 
   template <bool direct>
   [[nodiscard]] T* EndPointer() const noexcept {
-    return array_view_details::AdvancePointer<direct>(
-        BeginPointer<direct>(), static_cast<int>(m_size), m_stride);
+    return array_view_details::AdvancePointer<direct>(BeginPointer<direct>(),
+                                                      m_size, m_stride);
   }
 
  private:
@@ -447,8 +446,7 @@ class DenseArrayView : public ArrayView<T, edt::DenseArrayView> {
 
   [[nodiscard]] T& operator[](size_t index) const noexcept {
     assert(index < m_size);
-    return *array_view_details::AdvancePointer<true>(m_p,
-                                                     static_cast<int>(index));
+    return *array_view_details::AdvancePointer<true>(m_p, index);
   }
 
  protected:
@@ -467,16 +465,16 @@ class DenseArrayView : public ArrayView<T, edt::DenseArrayView> {
     if constexpr (direct) {
       return m_p;
     } else {
-      return m_size > 0 ? array_view_details::AdvancePointer<true>(
-                              m_p, static_cast<int>(m_size - 1))
-                        : 0;
+      return m_size > 0
+                 ? array_view_details::AdvancePointer<true>(m_p, m_size - 1)
+                 : nullptr;
     }
   }
 
   template <bool direct>
   [[nodiscard]] T* EndPointer() const noexcept {
     return array_view_details::AdvancePointer<direct>(BeginPointer<direct>(),
-                                                      static_cast<int>(m_size));
+                                                      m_size);
   }
 
  private:

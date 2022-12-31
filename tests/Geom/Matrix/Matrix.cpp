@@ -95,7 +95,7 @@ struct AddNumberMarixTest {
   using Input = std::tuple<Mtx>;
   static void Execute(Mtx a) {
     auto b = a;
-    T val = (T)std::rand();
+    T val = static_cast<T>(std::rand());
     b.Add(val);
     for (size_t i = 0; i < R; ++i) {
       for (size_t j = 0; j < C; ++j) {

@@ -41,7 +41,13 @@ struct ViewHelpers<T, edt::DenseArrayView> {
     return Final(ptr, collection.size());
   }
 
-  static bool Compare(T orig, T test) { return orig == test; }
+  static bool Compare(T orig, T test) {
+    if constexpr (std::is_floating_point_v<T>) {
+      return std::abs(orig - test) < static_cast<T>(0.000001);
+    } else {
+      return orig == test;
+    }
+  }
 
   static const char* GetViewName() { return "DenseArrayView"; }
 };
@@ -79,7 +85,13 @@ struct ViewHelpers<T, edt::SparseArrayView> {
     return Final(ptr, collection.size(), sizeof(Dummy));
   }
 
-  static bool Compare(T orig, Dummy& test) { return orig == test.value; }
+  static bool Compare(T orig, Dummy& test) {
+    if constexpr (std::is_floating_point_v<T>) {
+      return std::abs(orig - test.value) < static_cast<T>(0.000001);
+    } else {
+      return orig == test.value;
+    }
+  }
 
   static const char* GetViewName() { return "SparseArrayView"; }
 };

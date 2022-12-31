@@ -86,7 +86,7 @@ class GUID {
           return MakeByte(index, parseWord(indexMap[index]));
         };
 
-        return (parseByte(indices) | ...);
+        return (parseByte(static_cast<size_t>(indices)) | ...);
       };
 
       return parseBytes(0, 1, 2, 3, 4, 5, 6, 7);
