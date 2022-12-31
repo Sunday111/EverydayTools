@@ -36,7 +36,7 @@ class Mixin<T, nRows, nColumns, Final, ReturnValue,
 
   const T* GetData() const { return m_data; }
 
-  Mixin GetRow(size_t row) {
+  Mixin GetRow([[maybe_unused]] size_t row) {
     assert(row < nRows);
     return *this;
   }
@@ -80,7 +80,7 @@ class Mixin<T, nRows, nColumns, Final, ReturnValue,
     return Final<T, 1, 1>(&At(row, 0));
   }
 
-  Mixin GetColumn(size_t column) {
+  Mixin GetColumn([[maybe_unused]] size_t column) {
     assert(column < nColumns);
     return *this;
   }
