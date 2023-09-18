@@ -1,0 +1,10 @@
+project(EverydayTools)
+set(edt_include_dir ${CMAKE_CURRENT_SOURCE_DIR}/include)
+file(GLOB_RECURSE edt_heders_headers ${edt_include_dir})
+add_library(edt INTERFACE ${edt_headers})
+target_include_directories(edt INTERFACE ${edt_include_dir})
+
+option(EDT_WITH_TESTS "Build EverydayTools library tests" OFF)
+if (EDT_WITH_TESTS)
+    add_subdirectory(tests)
+endif()
