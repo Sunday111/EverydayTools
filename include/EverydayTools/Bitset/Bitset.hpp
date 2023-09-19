@@ -80,10 +80,8 @@ public:
                 SetPartMasked(part_begin, mask, value);
             }
 
-            for (size_t part_index = part_begin + 1; part_index != part_end; ++part_index)
-            {
-                SetPartMasked(part_index, kFullPart, value);
-            }
+            // fill middle parts
+            std::fill(&parts_[part_begin + 1], &parts_[part_end], value ? kFullPart : kEmptyPart);
 
             // Patch the last part
             {
