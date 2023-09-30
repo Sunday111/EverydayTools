@@ -115,3 +115,74 @@ TEST(DynamicBitsetTest, ResizeSetGet)  // NOLINT
         }
     }
 }
+
+TEST(BitsetAdapterTest, ForEach)  // NOLINT
+{
+    uint64_t bitset = 0;
+    constexpr unsigned kSeed = 0;
+    std::mt19937 generator(kSeed);  // NOLINT
+    std::uniform_int_distribution<uint64_t> value_distribution;
+
+    edt::BitsetAdapter adapter(bitset);
+
+    std::vector<size_t> expected;
+    std::vector<size_t> actual;
+
+    for (size_t i = 0; i != 1'000'000; ++i)
+    {
+        bitset = value_distribution(generator);
+        expected.clear();
+        actual.clear();
+
+        for (size_t i = 0; i != adapter.kBitsCount; ++i)
+        {
+            if (adapter.Get(i))
+            {
+                expected.push_back(i);
+            }
+        }
+
+        adapter.ForEachBit(
+            [&](const size_t bit_index)
+            {
+                actual.push_back(bit_index);
+            });
+
+        ASSERT_EQ(expected, actual) << "i = " << i;
+    }
+}
+
+TEST(BitIteratorTest, Test)  // NOLINT
+{
+    uint64_t bitset = 0;
+    constexpr unsigned kSeed = 0;
+    std::mt19937 generator(kSeed);  // NOLINT
+    std::uniform_int_distribution<uint64_t> value_distribution;
+
+    std::vector<size_t> expected;
+    std::vector<size_t> actual;
+    edt::BitsetAdapter adapter(bitset);
+
+    for (size_t i = 0; i != 1'000'000; ++i)
+    {
+        bitset = value_distribution(generator);
+        expected.clear();
+        actual.clear();
+
+        BitIterator iterator(bitset);
+        while (auto opt = iterator.Next())
+        {
+            actual.push_back(*opt);
+        }
+
+        for (size_t i = 0; i != adapter.kBitsCount; ++i)
+        {
+            if (adapter.Get(i))
+            {
+                expected.push_back(i);
+            }
+        }
+
+        ASSERT_EQ(expected, actual) << "i = " << i;
+    }
+}

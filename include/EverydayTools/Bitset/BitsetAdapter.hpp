@@ -1,11 +1,15 @@
 #pragma once
 
+#include <bit>
 #include <cassert>
 #include <cstddef>
 #include <type_traits>
 
+#include "BitIterator.hpp"
+
 namespace edt
 {
+
 template <typename T, typename Enable = std::enable_if_t<std::is_unsigned_v<T>>>
 class BitsetAdapter
 {
@@ -86,7 +90,45 @@ public:
         SetMasked(value ? kFullMask : kEmptyMask);
     }
 
+    // Invokes callback with each bit index starting from the lowest
+    template <typename F>
+    bool ForEachBitWithReturn(F&& callback) const
+    {
+        size_t num_scanned = 0;
+        while (true)
+        {
+            auto shifted = bitset_;
+            shifted >>= num_scanned;
+            num_scanned += std::countr_zero(shifted);
+            if (num_scanned >= kBitsCount)
+            {
+                return true;
+            }
+
+            if (!callback(num_scanned++))
+            {
+                return false;
+            }
+        }
+    }
+
+    // Invokes callback with each bit index starting from the lowest
+    template <typename F>
+    void ForEachBit(F&& callback) const
+    {
+        ForEachBitWithReturn(
+            [&](const size_t bit_index)
+            {
+                callback(bit_index);
+                return true;
+            });
+    }
+
 private:
     T& bitset_;
 };
+
+template <typename T>
+BitsetAdapter(T&) -> BitsetAdapter<T>;
+
 }  // namespace edt
