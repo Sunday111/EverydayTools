@@ -19,12 +19,12 @@ public:
     static constexpr Mask kFullMask = ~kEmptyMask;
 
 public:
-    constexpr explicit BitIterator(T& bitset) : bitset_(bitset) {}
+    constexpr explicit BitIterator(T& bitset) : bitset_(&bitset) {}
 
     std::optional<size_t> Next()
     {
         assert(bitset_);
-        auto shifted = bitset_;
+        auto shifted = *bitset_;
         shifted >>= num_scanned_;
         num_scanned_ += std::countr_zero(shifted);
         if (num_scanned_ < kBitsCount) return num_scanned_++;
@@ -33,7 +33,7 @@ public:
 
 private:
     size_t num_scanned_ = 0;
-    T& bitset_ = nullptr;
+    T* bitset_ = nullptr;
 };
 
 template <typename T>

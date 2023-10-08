@@ -26,7 +26,7 @@ public:
     {
         assert(index < kBitsCount);
         Mask mask = 1;
-        mask <<= index;
+        LeftShift(mask, index);
         SetMasked(mask, value);
     }
 
@@ -46,7 +46,7 @@ public:
     {
         assert(index < kBitsCount);
         Mask mask = 1;
-        mask <<= index;
+        LeftShift(mask, index);
         return (bitset_ & mask) != 0;
     }
 
@@ -54,8 +54,8 @@ public:
     {
         assert(begin < kBitsCount && (begin + count) <= kBitsCount);
         Mask mask = kFullMask;
-        mask >>= kEmptyMask - count;
-        mask <<= begin;
+        RightShift(mask, kBitsCount - count);
+        LeftShift(mask, begin);
         SetMasked(mask, value);
     }
 
@@ -64,8 +64,8 @@ public:
         assert(begin < kBitsCount && end <= kBitsCount);
         const size_t count = end - begin;
         Mask mask = kFullMask;
-        mask >>= kEmptyMask - count;
-        mask <<= begin;
+        RightShift(mask, kBitsCount - count);
+        LeftShift(mask, begin);
         SetMasked(mask, value);
     }
 
@@ -73,7 +73,7 @@ public:
     constexpr void SetLastN(const size_t count, const bool value) const noexcept
     {
         Mask mask = kFullMask;
-        mask <<= kBitsCount - count;
+        LeftShift(mask, kBitsCount - count);
         SetMasked(mask, value);
     }
 
@@ -81,13 +81,20 @@ public:
     constexpr void SetFirstN(const size_t count, const bool value) const noexcept
     {
         Mask mask = kFullMask;
-        mask >>= kBitsCount - count;
+        RightShift(mask, kBitsCount - count);
         SetMasked(mask, value);
     }
 
     constexpr void Fill(const bool value) const noexcept
     {
         SetMasked(value ? kFullMask : kEmptyMask);
+    }
+
+    size_t NextBitAfter(const size_t ignore_count) const
+    {
+        Mask copy = bitset_;
+        copy &= LeftShifted(kFullMask, ignore_count);
+        return std::countr_zero(copy);
     }
 
     // Invokes callback with each bit index starting from the lowest
@@ -97,14 +104,11 @@ public:
         size_t num_scanned = 0;
         while (true)
         {
-            auto shifted = bitset_;
-            shifted >>= num_scanned;
-            num_scanned += std::countr_zero(shifted);
+            num_scanned = NextBitAfter(num_scanned);
             if (num_scanned >= kBitsCount)
             {
                 return true;
             }
-
             if (!callback(num_scanned++))
             {
                 return false;
@@ -122,6 +126,29 @@ public:
                 callback(bit_index);
                 return true;
             });
+    }
+
+private:
+    static Mask LeftShifted(const Mask mask, const size_t count) noexcept
+    {
+        if (count < kBitsCount) return mask << count;
+        return kEmptyMask;
+    }
+
+    static void LeftShift(Mask& mask, size_t count) noexcept
+    {
+        mask = LeftShifted(mask, count);
+    }
+
+    static Mask RightShifted(const Mask mask, const size_t count) noexcept
+    {
+        if (count < kBitsCount) return mask >> count;
+        return kEmptyMask;
+    }
+
+    static void RightShift(Mask& mask, size_t count) noexcept
+    {
+        mask = RightShifted(mask, count);
     }
 
 private:
