@@ -3,9 +3,9 @@
 #include <cmath>
 #include <concepts>
 
-#include "constants.hpp"
-#include "float_range.hpp"
-#include "matrix.hpp"
+#include "Constants.hpp"
+#include "FloatRange.hpp"
+#include "Matrix.hpp"
 
 namespace edt
 {

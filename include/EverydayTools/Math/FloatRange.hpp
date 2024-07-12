@@ -1,6 +1,6 @@
 #pragma once
 
-#include "matrix.hpp"
+#include "Matrix.hpp"
 
 namespace edt
 {
