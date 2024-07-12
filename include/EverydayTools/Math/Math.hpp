@@ -47,6 +47,13 @@ public:
             static_cast<uint8_t>(255.0f * Sqr(std::sin(t + 0.33f * 2.0f * kPi<float>))),
             static_cast<uint8_t>(255.0f * Sqr(std::sin(t + 0.66f * 2.0f * kPi<float>)))};
     }
+
+    [[nodiscard]] inline static Mat2f MakeRotationMatrix(const float radians)
+    {
+        auto s = std::sin(radians);
+        auto c = std::cos(radians);
+        return Mat2f{{c, -s, s, c}};
+    }
 };
 
 }  // namespace edt

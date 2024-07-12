@@ -415,6 +415,9 @@ template <typename T>
 using Vec4 = Matrix<T, 4, 1>;
 
 template <typename T>
+using Mat2 = Matrix<T, 2, 2>;
+
+template <typename T>
 using Mat3 = Matrix<T, 3, 3>;
 
 template <typename T>
@@ -426,6 +429,7 @@ using Vec3f = Vec3<float>;
 using Vec3i = Vec3<int>;
 using Vec4f = Vec4<float>;
 using Vec4i = Vec4<int>;
+using Mat2f = Mat2<float>;
 using Mat3f = Mat3<float>;
 using Mat4f = Mat4<float>;
 
