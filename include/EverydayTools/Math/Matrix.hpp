@@ -420,6 +420,27 @@ public:
         return r;
     }
 
+    template <typename Self>
+        requires(std::is_lvalue_reference_v<Self>)
+    [[nodiscard]] constexpr auto RefTuple(this Self&& self)
+    {
+        return [&]<size_t... indices>(std::index_sequence<indices...>)
+        {
+            return std::forward_as_tuple(std::forward<Self>(self).data_[indices]...);
+        }
+        (std::make_index_sequence<Size()>{});
+    }
+
+    template <typename Self>
+    [[nodiscard]] constexpr auto Tuple(this Self&& self)
+    {
+        return [&]<size_t... indices>(std::index_sequence<indices...>)
+        {
+            return std::make_tuple(std::forward<Self>(self).data_[indices]...);
+        }
+        (std::make_index_sequence<Size()>{});
+    }
+
     std::array<T, Size()> data_{};
 };
 

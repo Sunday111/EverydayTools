@@ -32,6 +32,12 @@ public:
         EnlargeLeft(value);
         EnlargeRight(value);
     }
+    [[nodiscard]] constexpr FloatRange Enlarged(const float value) const
+    {
+        auto copy = *this;
+        copy.Enlarge(value);
+        return copy;
+    }
 
     T begin = std::numeric_limits<T>::lowest();
     T end = std::numeric_limits<T>::max();
