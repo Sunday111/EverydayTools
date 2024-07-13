@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <ranges>
 
@@ -164,6 +165,26 @@ public:
         requires(IsVector())
     {
         return Magnitude();
+    }
+
+    [[nodiscard]] T Length() const
+        requires(IsVector())
+    {
+        return std::sqrt(SquaredLength());
+    }
+
+    void Normalize()
+        requires(IsVector())
+    {
+        *this /= Length();
+    }
+
+    [[nodiscard]] Matrix Normalized() const
+        requires(IsVector())
+    {
+        auto copy = *this;
+        copy.Normalize();
+        return copy;
     }
 
     [[nodiscard]] constexpr auto RowIndices() const
