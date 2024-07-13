@@ -1,4 +1,4 @@
-#include "EverydayTools/Math/matrix.hpp"
+#include "EverydayTools/Math/Matrix.hpp"
 
 namespace edt
 {

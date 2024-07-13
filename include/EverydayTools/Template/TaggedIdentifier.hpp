@@ -11,6 +11,9 @@ class TaggedIdentifier
 public:
     using Repr = Repr_;
 
+private:
+    explicit constexpr TaggedIdentifier(const Repr& value) noexcept : value_(value) {}
+
 public:
     constexpr TaggedIdentifier() noexcept = default;
     constexpr TaggedIdentifier(const TaggedIdentifier&) noexcept = default;
@@ -52,9 +55,6 @@ public:
     {
         return value_ > id.value_;
     }
-
-private:
-    explicit constexpr TaggedIdentifier(const Repr& value) noexcept : value_(value) {}
 
 private:
     Repr value_ = invalid_id;
