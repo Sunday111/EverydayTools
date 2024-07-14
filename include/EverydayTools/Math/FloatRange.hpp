@@ -1,5 +1,8 @@
 #pragma once
 
+#include <algorithm>
+#include <cmath>
+
 #include "Matrix.hpp"
 
 namespace edt
@@ -19,15 +22,15 @@ public:
         return v >= begin && v <= end;
     }
 
-    void EnlargeLeft(const float v)
+    constexpr void EnlargeLeft(const float v)
     {
         begin -= v;
     }
-    void EnlargeRight(const float v)
+    constexpr void EnlargeRight(const float v)
     {
         end += v;
     }
-    void Enlarge(const float value)
+    constexpr void Enlarge(const float value)
     {
         EnlargeLeft(value);
         EnlargeRight(value);
@@ -37,6 +40,11 @@ public:
         auto copy = *this;
         copy.Enlarge(value);
         return copy;
+    }
+
+    [[nodiscard]] constexpr T Clamp(const float value) const
+    {
+        return std::clamp(value, begin, end);
     }
 
     T begin = std::numeric_limits<T>::lowest();
@@ -55,38 +63,57 @@ public:
     {
         return x.Contains(vx) && y.Contains(vy);
     }
-    [[nodiscard]] constexpr Vec2f Extent() const noexcept
+    [[nodiscard]] constexpr Vec2<T> Extent() const noexcept
     {
-        return Vec2f{{x.Extent(), y.Extent()}};
+        return Vec2<T>{{x.Extent(), y.Extent()}};
     }
 
-    [[nodiscard]] constexpr Vec2f Min() const noexcept
+    [[nodiscard]] constexpr Vec2<T> Min() const noexcept
     {
         return {x.begin, y.begin};
     }
 
-    [[nodiscard]] constexpr Vec2f Uniform(const float v) const noexcept
+    [[nodiscard]] constexpr Vec2<T> Max() const noexcept
     {
-        return Uniform(Vec2f{v, v});
+        return {x.end, y.end};
     }
 
-    [[nodiscard]] constexpr Vec2f Uniform(const Vec2f& v) const noexcept
+    [[nodiscard]] constexpr Vec2<T> Uniform(const float v) const noexcept
+    {
+        return Uniform(Vec2<T>{v, v});
+    }
+
+    [[nodiscard]] constexpr Vec2<T> Uniform(const Vec2<T>& v) const noexcept
     {
         return Min() + v * Extent();
     }
 
-    [[nodiscard]] static constexpr FloatRange2D FromMinMax(const Vec2f& min, const Vec2f max)
+    [[nodiscard]] static constexpr FloatRange2D FromMinMax(const Vec2<T>& min, const Vec2<T> max)
     {
         return {{min.x(), max.x()}, {min.y(), max.y()}};
     }
 
-    void Enlarge(const float value)
+    constexpr void Enlarge(const float value)
     {
         x.Enlarge(value);
         y.Enlarge(value);
     }
 
+    [[nodiscard]] constexpr FloatRange2D Enlarged(const float value) const
+    {
+        auto copy = *this;
+        copy.Enlarge(value);
+        return copy;
+    }
+
+    [[nodiscard]] constexpr Vec2<T> Clamp(const Vec2<T>& v) const
+    {
+        return Vec2<T>{x.Clamp(v.x()), y.Clamp(v.y())};
+    }
+
     FloatRange<T> x{};
     FloatRange<T> y{};
 };
+
+using FloatRange2Df = FloatRange2D<float>;
 }  // namespace edt

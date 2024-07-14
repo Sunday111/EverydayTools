@@ -363,6 +363,10 @@ public:
     {
         return data_ == other.data_;
     }
+    [[nodiscard]] constexpr bool operator!=(const Matrix& other) const
+    {
+        return !(*this == other);
+    }
 
     [[nodiscard]] constexpr Matrix<T, num_rows, 1> GetColumn(const size_t column_index) const
     {

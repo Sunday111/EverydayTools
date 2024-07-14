@@ -4,6 +4,11 @@
 #include <limits>
 #include <tuple>
 
+#include "Matrix.hpp"
+
+namespace edt
+{
+
 template <std::integral T>
 class IntRange
 {
@@ -16,6 +21,14 @@ public:
     [[nodiscard]] constexpr T Extent() const
     {
         return end - begin;
+    }
+
+    [[nodiscard]] constexpr std::tuple<IntRange, IntRange> Split(size_t left_side_size) const
+    {
+        return {
+            {.begin = begin, .end = begin + left_side_size},
+            {.begin = begin + left_side_size, .end = end},
+        };
     }
 
     T begin = std::numeric_limits<T>::lowest();
@@ -35,6 +48,21 @@ public:
         return x.Contains(vx) && y.Contains(vy);
     }
 
+    [[nodiscard]] constexpr Vec2<T> Extent() const
+    {
+        return {x.Extent(), y.Extent()};
+    }
+
+    [[nodiscard]] static constexpr IntRange2D FromBeginAndExtent(const Vec2<T>& begin, const Vec2<T>& extent)
+    {
+        const auto end = begin + extent;
+        return {
+            .x = {.begin = begin.x(), .end = end.x()},
+            .y = {.begin = begin.y(), .end = end.y()},
+        };
+    }
+
     IntRange<T> x{};
     IntRange<T> y{};
 };
+}  // namespace edt
