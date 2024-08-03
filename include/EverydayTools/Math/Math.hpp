@@ -54,6 +54,41 @@ public:
         auto c = std::cos(radians);
         return Mat2f{{c, -s, s, c}};
     }
+
+    template <typename T, const size_t rows, const size_t columns>
+    [[nodiscard]] static constexpr edt::Matrix<T, rows, columns> Clamp(
+        const edt::Matrix<T, rows, columns>& v,
+        const edt::Matrix<T, rows, columns>& min,
+        const edt::Matrix<T, rows, columns>& max)
+    {
+        edt::Matrix<T, rows, columns> r;
+        for (size_t row_index = 0; row_index != rows; ++row_index)
+        {
+            for (size_t col_index = 0; col_index != columns; ++col_index)
+            {
+                r(row_index, col_index) =
+                    std::clamp(v(row_index, col_index), min(row_index, col_index), max(row_index, col_index));
+            }
+        }
+
+        return v;
+    }
+
+    template <typename T, const size_t rows, const size_t columns>
+    [[nodiscard]] static constexpr edt::Matrix<T, rows, columns>
+    Clamp(const edt::Matrix<T, rows, columns>& v, T min, T max)
+    {
+        edt::Matrix<T, rows, columns> r;
+        for (size_t row_index = 0; row_index != rows; ++row_index)
+        {
+            for (size_t col_index = 0; col_index != columns; ++col_index)
+            {
+                r(row_index, col_index) = std::clamp(v(row_index, col_index), min, max);
+            }
+        }
+
+        return v;
+    }
 };
 
 }  // namespace edt

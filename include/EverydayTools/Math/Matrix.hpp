@@ -87,25 +87,13 @@ public:
         return m;
     }
 
-    [[nodiscard]] static constexpr size_t NumRows() noexcept
-    {
-        return num_rows;
-    }
+    [[nodiscard]] static constexpr size_t NumRows() noexcept { return num_rows; }
 
-    [[nodiscard]] static constexpr size_t NumColumns() noexcept
-    {
-        return num_columns;
-    }
+    [[nodiscard]] static constexpr size_t NumColumns() noexcept { return num_columns; }
 
-    [[nodiscard]] static constexpr bool IsVector()
-    {
-        return NumRows() == 1 or NumColumns() == 1;
-    }
+    [[nodiscard]] static constexpr bool IsVector() { return NumRows() == 1 or NumColumns() == 1; }
 
-    [[nodiscard]] static constexpr size_t Size() noexcept
-    {
-        return NumRows() * NumColumns();
-    }
+    [[nodiscard]] static constexpr size_t Size() noexcept { return NumRows() * NumColumns(); }
 
     template <size_t other_rows, size_t other_columns>
         requires(kVectorsWithSameSize<Matrix<T, other_rows, other_columns>, Matrix>)
@@ -135,15 +123,9 @@ public:
         }};
     }
 
-    [[nodiscard]] constexpr T* data()
-    {
-        return data_.data();
-    }
+    [[nodiscard]] constexpr T* data() { return data_.data(); }
 
-    [[nodiscard]] const T* data() const
-    {
-        return data_.data();
-    }
+    [[nodiscard]] const T* data() const { return data_.data(); }
 
     // Two-dimensional "cross product". A hack to obtain a magnitude of 3-dimensional cross product
     template <size_t other_rows, size_t other_columns>
@@ -187,15 +169,9 @@ public:
         return copy;
     }
 
-    [[nodiscard]] constexpr auto RowIndices() const
-    {
-        return std::views::iota(0uz, NumRows());
-    }
+    [[nodiscard]] constexpr auto RowIndices() const { return std::views::iota(0uz, NumRows()); }
 
-    [[nodiscard]] constexpr auto ColumnIndices() const
-    {
-        return std::views::iota(0uz, NumColumns());
-    }
+    [[nodiscard]] constexpr auto ColumnIndices() const { return std::views::iota(0uz, NumColumns()); }
 
     [[nodiscard]] constexpr auto Indices() const
         requires(IsVector())
@@ -251,10 +227,7 @@ public:
         return copy;
     }
 
-    [[nodiscard]] friend constexpr Matrix operator+(const T& value, const Matrix& m)
-    {
-        return m + value;
-    }
+    [[nodiscard]] friend constexpr Matrix operator+(const T& value, const Matrix& m) { return m + value; }
 
     constexpr Matrix& operator-=(const T& value)
     {
@@ -318,10 +291,7 @@ public:
         return copy;
     }
 
-    [[nodiscard]] friend constexpr Matrix operator*(const T& value, const Matrix& m)
-    {
-        return m * value;
-    }
+    [[nodiscard]] friend constexpr Matrix operator*(const T& value, const Matrix& m) { return m * value; }
 
     constexpr Matrix& operator/=(const T& value)
     {
@@ -359,14 +329,8 @@ public:
         return copy;
     }
 
-    [[nodiscard]] constexpr bool operator==(const Matrix& other) const
-    {
-        return data_ == other.data_;
-    }
-    [[nodiscard]] constexpr bool operator!=(const Matrix& other) const
-    {
-        return !(*this == other);
-    }
+    [[nodiscard]] constexpr bool operator==(const Matrix& other) const { return data_ == other.data_; }
+    [[nodiscard]] constexpr bool operator!=(const Matrix& other) const { return !(*this == other); }
 
     [[nodiscard]] constexpr Matrix<T, num_rows, 1> GetColumn(const size_t column_index) const
     {
