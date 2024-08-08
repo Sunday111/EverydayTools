@@ -2,12 +2,14 @@
 
 #include <concepts>
 
-#include "constants.hpp"
+#include "Constants.hpp"
 
-namespace edt {
+namespace edt
+{
 
 template <std::floating_point T>
-[[nodiscard]] inline constexpr T DegToRad(T degrees) {
-  return degrees * PI<T> / 180;
+[[nodiscard]] inline constexpr T DegToRad(T degrees)
+{
+    return degrees * kPi<T> / 180;
 }
 }  // namespace edt

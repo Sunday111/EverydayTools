@@ -2,6 +2,7 @@
 #include <random>
 #include <vector>
 
+#include "EverydayTools/Bitset/BitIterator.hpp"
 #include "EverydayTools/Bitset/DynamicBitset.hpp"
 #include "EverydayTools/Bitset/FixedBitset.hpp"
 #include "gtest/gtest.h"
@@ -142,11 +143,7 @@ TEST(BitsetAdapterTest, ForEach)  // NOLINT
             }
         }
 
-        adapter.ForEachBit(
-            [&](const size_t bit_index)
-            {
-                actual.push_back(bit_index);
-            });
+        adapter.ForEachBit([&](const size_t bit_index) { actual.push_back(bit_index); });
 
         ASSERT_EQ(expected, actual) << "i = " << i;
     }

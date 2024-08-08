@@ -5,7 +5,6 @@
 #include <span>
 #include <tuple>
 
-#include "BitsetAdapter.hpp"
 #include "BitsetArrayAdapter.hpp"
 
 namespace edt::fixed_bitset_internals
@@ -79,15 +78,9 @@ class FixedBitsetEx
 public:
     using Part = Part_;
 
-    static constexpr size_t Size() noexcept
-    {
-        return bits_count;
-    }
+    static constexpr size_t Size() noexcept { return bits_count; }
 
-    static constexpr size_t PartsCount() noexcept
-    {
-        return fixed_bitset_internals::PartsCount<Part>(Size());
-    }
+    static constexpr size_t PartsCount() noexcept { return fixed_bitset_internals::PartsCount<Part>(Size()); }
 
     inline constexpr void Set(const size_t index, const bool value) noexcept
     {
@@ -102,15 +95,9 @@ public:
     }
 
 private:
-    constexpr auto Adapter() noexcept
-    {
-        return BitsetArrayAdapter(std::span(parts_));
-    }
+    constexpr auto Adapter() noexcept { return BitsetArrayAdapter(std::span(parts_)); }
 
-    constexpr auto Adapter() const noexcept
-    {
-        return BitsetArrayAdapter(std::span(parts_));
-    }
+    constexpr auto Adapter() const noexcept { return BitsetArrayAdapter(std::span(parts_)); }
 
 private:
     std::array<Part, PartsCount()> parts_{};

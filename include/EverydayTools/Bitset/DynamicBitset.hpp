@@ -1,11 +1,9 @@
 #pragma once
 
-#include <bitset>
 #include <cassert>
 #include <cstdint>
 #include <vector>
 
-#include "BitsetAdapter.hpp"
 #include "BitsetArrayAdapter.hpp"
 
 namespace edt
@@ -58,21 +56,12 @@ public:
         Adapter().SetRange(begin, end, value);
     }
 
-    size_t Size() const
-    {
-        return size_;
-    }
+    size_t Size() const { return size_; }
 
 private:
-    BitsetArrayAdapter<Part> Adapter()
-    {
-        return BitsetArrayAdapter(std::span(parts_));
-    }
+    BitsetArrayAdapter<Part> Adapter() { return BitsetArrayAdapter(std::span(parts_)); }
 
-    BitsetArrayAdapter<const Part> Adapter() const
-    {
-        return BitsetArrayAdapter(std::span(parts_));
-    }
+    BitsetArrayAdapter<const Part> Adapter() const { return BitsetArrayAdapter(std::span(parts_)); }
 
 private:
     std::vector<Part> parts_;

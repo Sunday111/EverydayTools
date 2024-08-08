@@ -1,9 +1,9 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 #include "../Size.hpp"
-#include "../Template/TypesList.hpp"
 #include "../Template/ValuesList.hpp"
 #include "EnumBitset.hpp"
 

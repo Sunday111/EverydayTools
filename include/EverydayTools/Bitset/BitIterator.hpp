@@ -2,6 +2,7 @@
 
 #include <bit>
 #include <cassert>
+#include <concepts>
 #include <cstddef>
 #include <optional>
 #include <type_traits>
@@ -9,7 +10,7 @@
 namespace edt
 {
 
-template <typename T, typename Enable = std::enable_if_t<std::is_unsigned_v<T>>>
+template <std::unsigned_integral T>
 class BitIterator
 {
 public:

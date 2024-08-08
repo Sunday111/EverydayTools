@@ -5,8 +5,6 @@
 #include <cstddef>
 #include <type_traits>
 
-#include "BitIterator.hpp"
-
 namespace edt
 {
 
@@ -20,7 +18,7 @@ public:
     static constexpr Mask kFullMask = ~kEmptyMask;
 
 public:
-    constexpr explicit BitsetAdapter(T& bitset) : bitset_(bitset) {}
+    constexpr explicit BitsetAdapter(T& bitset) : bitset_(&bitset) {}
 
     constexpr void Set(const size_t index, const bool value) const
     {
@@ -34,11 +32,11 @@ public:
     {
         if (value)
         {
-            bitset_ |= mask;
+            *bitset_ |= mask;
         }
         else
         {
-            bitset_ &= ~mask;
+            *bitset_ &= ~mask;
         }
     }
 
@@ -47,7 +45,7 @@ public:
         assert(index < kBitsCount);
         Mask mask = 1;
         LeftShift(mask, index);
-        return (bitset_ & mask) != 0;
+        return (*bitset_ & mask) != 0;
     }
 
     constexpr void SetN(const size_t begin, const size_t count, const bool value) const noexcept
@@ -85,14 +83,11 @@ public:
         SetMasked(mask, value);
     }
 
-    constexpr void Fill(const bool value) const noexcept
-    {
-        SetMasked(value ? kFullMask : kEmptyMask);
-    }
+    constexpr void Fill(const bool value) const noexcept { SetMasked(value ? kFullMask : kEmptyMask); }
 
     size_t NextBitAfter(const size_t ignore_count) const
     {
-        Mask copy = bitset_;
+        Mask copy = *bitset_;
         copy &= LeftShifted(kFullMask, ignore_count);
         return std::countr_zero(copy);
     }
@@ -135,10 +130,7 @@ private:
         return kEmptyMask;
     }
 
-    static void LeftShift(Mask& mask, size_t count) noexcept
-    {
-        mask = LeftShifted(mask, count);
-    }
+    static void LeftShift(Mask& mask, size_t count) noexcept { mask = LeftShifted(mask, count); }
 
     static Mask RightShifted(const Mask mask, const size_t count) noexcept
     {
@@ -146,13 +138,10 @@ private:
         return kEmptyMask;
     }
 
-    static void RightShift(Mask& mask, size_t count) noexcept
-    {
-        mask = RightShifted(mask, count);
-    }
+    static void RightShift(Mask& mask, size_t count) noexcept { mask = RightShifted(mask, count); }
 
 private:
-    T& bitset_;
+    T* bitset_ = nullptr;
 };
 
 template <typename T>
