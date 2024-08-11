@@ -1,10 +1,10 @@
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 #include <concepts>
 
 #include "Constants.hpp"
-#include "FloatRange.hpp"
 #include "Matrix.hpp"
 
 namespace edt
@@ -23,20 +23,6 @@ public:
     [[nodiscard]] static constexpr T Sqr(T x)
     {
         return x * x;
-    }
-
-    [[nodiscard]] static constexpr Mat3f MakeTransform(const FloatRange2D<float>& from, const FloatRange2D<float>& to)
-    {
-        Mat3f uniform_to_canvas = Mat3f::Identity();
-        const float tx = -from.x.begin;
-        const float ty = -from.y.begin;
-        const float sx = to.x.Extent() / from.x.Extent();
-        const float sy = to.y.Extent() / from.y.Extent();
-        uniform_to_canvas(0, 0) = sx;
-        uniform_to_canvas(1, 1) = sy;
-        uniform_to_canvas(0, 2) = tx * sx + to.x.begin;
-        uniform_to_canvas(1, 2) = ty * sy + to.y.begin;
-        return uniform_to_canvas;
     }
 
     // Get rainbow colors by time t
@@ -88,6 +74,34 @@ public:
         }
 
         return v;
+    }
+
+    static constexpr edt::Mat3f TranslationMatrix(const Vec2f translation)
+    {
+        auto m = edt::Mat3f::Identity();
+        m(0, 2) = translation.x();
+        m(1, 2) = translation.y();
+        return m;
+    }
+
+    static constexpr edt::Mat3f ScaleMatrix(const Vec2f scale)
+    {
+        auto m = edt::Mat3f::Identity();
+        m(0, 0) = scale.x();
+        m(1, 1) = scale.y();
+        return m;
+    }
+
+    [[nodiscard]] static constexpr Vec2f TransformPos(const Mat3f& mat, const Vec2f& pos)
+    {
+        Vec3f v3 = mat.MatMul(Vec3f{{pos.x(), pos.y(), 1.f}});
+        return Vec2f{{v3.x(), v3.y()}};
+    }
+
+    [[nodiscard]] static constexpr Vec2f TransformVector(const Mat3f& mat, const Vec2f& vec)
+    {
+        Vec3f v3 = mat.MatMul(Vec3f{{vec.x(), vec.y(), 0.f}});
+        return Vec2f{{v3.x(), v3.y()}};
     }
 };
 
