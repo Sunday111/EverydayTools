@@ -77,7 +77,7 @@ public:
 
     [[nodiscard]] static constexpr Matrix Identity() noexcept
     {
-        Matrix m;
+        Matrix m{};
 
         for (size_t k = 0; k != num_rows && k != num_columns; ++k)
         {
