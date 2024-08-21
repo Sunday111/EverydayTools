@@ -34,6 +34,13 @@ public:
             static_cast<uint8_t>(255.0f * Sqr(std::sin(t + 0.66f * 2.0f * kPi<float>)))};
     }
 
+    // Get rainbow colors by time t
+    [[nodiscard]] static constexpr Vec4<uint8_t> GetRainbowColorsA(const float t, uint8_t alpha = 255)
+    {
+        const auto rgb = GetRainbowColors(t);
+        return {rgb.x(), rgb.y(), rgb.z(), alpha};
+    }
+
     [[nodiscard]] inline static Mat2f MakeRotationMatrix(const float radians)
     {
         auto s = std::sin(radians);
