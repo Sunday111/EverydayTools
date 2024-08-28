@@ -255,6 +255,14 @@ public:
         return copy;
     }
 
+    constexpr Matrix operator-() const
+        requires(!std::unsigned_integral<T>)
+    {
+        Matrix copy = *this;
+        for (size_t i = 0; i != data_.size(); ++i) copy.data_[i] = -copy.data_[i];
+        return copy;
+    }
+
     [[nodiscard]] friend constexpr Matrix operator-(const T& value, const Matrix& m)
     {
         auto copy = m;

@@ -67,6 +67,12 @@ public:
         return v;
     }
 
+    template <std::floating_point T>
+    [[nodiscard]] static constexpr T DegToRad(T degrees)
+    {
+        return degrees * kPi<T> / 180;
+    }
+
     template <typename T, const size_t rows, const size_t columns>
     [[nodiscard]] static constexpr edt::Matrix<T, rows, columns>
     Clamp(const edt::Matrix<T, rows, columns>& v, T min, T max)
@@ -96,6 +102,15 @@ public:
         auto m = edt::Mat3f::Identity();
         m(0, 0) = scale.x();
         m(1, 1) = scale.y();
+        return m;
+    }
+
+    static constexpr edt::Mat4f ScaleMatrix(const Vec3f scale)
+    {
+        auto m = edt::Mat4f::Identity();
+        m(0, 0) = scale.x();
+        m(1, 1) = scale.y();
+        m(2, 2) = scale.z();
         return m;
     }
 
