@@ -114,6 +114,48 @@ public:
         return m;
     }
 
+    [[nodiscard]] static constexpr Mat4f RotationMatrix3dX(const float angle_radians)
+    {
+        float s = std::sin(angle_radians);
+        float c = std::cos(angle_radians);
+        Mat4f m{};
+        m(0, 0) = 1.f;
+        m(1, 1) = c;
+        m(1, 2) = -s;
+        m(2, 1) = s;
+        m(2, 2) = c;
+        m(3, 3) = 1.f;
+        return m;
+    }
+
+    [[nodiscard]] static constexpr Mat4f RotationMatrix3dY(const float angle_radians)
+    {
+        float s = std::sin(angle_radians);
+        float c = std::cos(angle_radians);
+        Mat4f m{};
+        m(0, 0) = c;
+        m(0, 2) = s;
+        m(1, 1) = 1.f;
+        m(2, 0) = -s;
+        m(2, 2) = c;
+        m(3, 3) = 1.f;
+        return m;
+    }
+
+    [[nodiscard]] static constexpr Mat4f RotationMatrix3dZ(const float angle_radians)
+    {
+        float s = std::sin(angle_radians);
+        float c = std::cos(angle_radians);
+        Mat4f m{};
+        m(0, 0) = c;
+        m(0, 1) = -s;
+        m(1, 0) = s;
+        m(1, 1) = c;
+        m(2, 2) = 1.f;
+        m(3, 3) = 1.f;
+        return m;
+    }
+
     [[nodiscard]] static constexpr Vec2f TransformPos(const Mat3f& mat, const Vec2f& pos)
     {
         Vec3f v3 = mat.MatMul(Vec3f{{pos.x(), pos.y(), 1.f}});
@@ -124,6 +166,18 @@ public:
     {
         Vec3f v3 = mat.MatMul(Vec3f{{vec.x(), vec.y(), 0.f}});
         return Vec2f{{v3.x(), v3.y()}};
+    }
+
+    [[nodiscard]] static constexpr Vec3f TransformPos(const Mat4f& mat, const Vec3f& pos)
+    {
+        Vec4f v4 = mat.MatMul(Vec4f{{pos.x(), pos.y(), pos.z(), 1.f}});
+        return Vec3f{{v4.x(), v4.y(), v4.z()}};
+    }
+
+    [[nodiscard]] static constexpr Vec3f TransformVector(const Mat4f& mat, const Vec3f& vec)
+    {
+        Vec4f v4 = mat.MatMul(Vec4f{{vec.x(), vec.y(), vec.z(), 0.f}});
+        return Vec3f{{v4.x(), v4.y(), v4.z()}};
     }
 };
 
