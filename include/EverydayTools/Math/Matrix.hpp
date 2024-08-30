@@ -179,6 +179,13 @@ public:
         return std::views::iota(0uz, Size());
     }
 
+    template <size_t row, size_t column, typename Self>
+        requires(row < num_rows, column < num_columns)
+    [[nodiscard]] constexpr auto&& At(this Self&& self)
+    {
+        return std::forward<Self>(self).data_[row * num_columns + column];
+    }
+
     template <size_t other_rows, size_t other_columns>
         requires(NumColumns() == other_rows)
     [[nodiscard]] constexpr Matrix<T, NumRows(), other_columns> MatMul(

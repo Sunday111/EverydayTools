@@ -1,5 +1,7 @@
 #include "EverydayTools/Math/Matrix.hpp"
 
+#include <xmmintrin.h>
+
 namespace edt
 {
 
@@ -327,4 +329,92 @@ static_assert(
         return true;
     }(),
     "Scalar divided by matrix test");
+
+// void M4x4_SSE(const float* a, const float* b, float* c)
+// {
+//     __m128 row1 = _mm_load_ps(&b[0]);
+//     __m128 row2 = _mm_load_ps(&b[4]);
+//     __m128 row3 = _mm_load_ps(&b[8]);
+//     __m128 row4 = _mm_load_ps(&b[12]);
+//     for (int i = 0; i < 4; i++)
+//     {
+//         __m128 brod1 = _mm_set1_ps(a[4 * i + 0]);
+//         __m128 brod2 = _mm_set1_ps(a[4 * i + 1]);
+//         __m128 brod3 = _mm_set1_ps(a[4 * i + 2]);
+//         __m128 brod4 = _mm_set1_ps(a[4 * i + 3]);
+//         __m128 row = _mm_add_ps(
+//             _mm_add_ps(_mm_mul_ps(brod1, row1), _mm_mul_ps(brod2, row2)),
+//             _mm_add_ps(_mm_mul_ps(brod3, row3), _mm_mul_ps(brod4, row4)));
+//         _mm_store_ps(&c[4 * i], row);
+//     }
+// }
+
+// [[nodiscard]] edt::Mat4f M4x4_SSE(const edt::Mat4f& a, const edt::Mat4f& b)
+// {
+//     edt::Mat4f mc;
+//     __m128 r0 = _mm_load_ps(&b.At<0, 0>());
+//     __m128 r1 = _mm_load_ps(&b.At<1, 0>());
+//     __m128 r3 = _mm_load_ps(&b.At<2, 0>());
+//     __m128 r4 = _mm_load_ps(&b.At<3, 0>());
+
+//     _mm_store_ps(
+//         &mc.At<0, 0>(),
+//         _mm_add_ps(
+//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<0, 0>()), r0), _mm_mul_ps(_mm_set1_ps(a.At<0, 1>()), r1)),
+//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<0, 2>()), r3), _mm_mul_ps(_mm_set1_ps(a.At<0, 3>()), r4))));
+
+//     _mm_store_ps(
+//         &mc.At<1, 0>(),
+//         _mm_add_ps(
+//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<1, 0>()), r0), _mm_mul_ps(_mm_set1_ps(a.At<1, 1>()), r1)),
+//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<1, 2>()), r3), _mm_mul_ps(_mm_set1_ps(a.At<1, 3>()), r4))));
+
+//     _mm_store_ps(
+//         &mc.At<2, 0>(),
+//         _mm_add_ps(
+//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<2, 0>()), r0), _mm_mul_ps(_mm_set1_ps(a.At<2, 1>()), r1)),
+//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<2, 2>()), r3), _mm_mul_ps(_mm_set1_ps(a.At<2, 3>()), r4))));
+
+//     _mm_store_ps(
+//         &mc.At<3, 0>(),
+//         _mm_add_ps(
+//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<3, 0>()), r0), _mm_mul_ps(_mm_set1_ps(a.At<3, 1>()), r1)),
+//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<3, 2>()), r3), _mm_mul_ps(_mm_set1_ps(a.At<3, 3>()), r4))));
+
+//     return mc;
+// }
+
+// TEST(MatrixTest, MultiplicationSSE)
+// {
+//     static constexpr unsigned kSeed = 12345;
+//     std::mt19937 rnd(kSeed);  // NOLINT
+//     std::uniform_real_distribution<float> distr(-1.f, 1.f);
+
+//     edt::Mat4f a;
+//     edt::Mat4f b;
+//     edt::Mat4f expected;
+//     edt::Mat4f actual;
+
+//     auto rnd_mtx = [&](edt::Mat4f& m)
+//     {
+//         for (size_t i = 0; i != m.data_.size(); ++i)
+//         {
+//             m.data_[i] = distr(rnd);
+//         }
+//     };
+
+//     for (size_t i = 0; i != 1000; ++i)
+//     {
+//         rnd_mtx(a);
+//         rnd_mtx(b);
+
+//         expected = a.MatMul(b);
+//         actual = M4x4_SSE(a, b);
+
+//         for (size_t j = 0; j != a.data_.size(); ++j)
+//         {
+//             ASSERT_NEAR(expected.data_[j], actual.data_[j], 0.0001f);
+//         }
+//     }
+// }
 }  // namespace edt
