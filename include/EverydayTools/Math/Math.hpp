@@ -97,6 +97,15 @@ public:
         return m;
     }
 
+    static constexpr edt::Mat4f TranslationMatrix(const Vec3f translation)
+    {
+        auto m = edt::Mat4f::Identity();
+        m(0, 3) = translation.x();
+        m(1, 3) = translation.y();
+        m(2, 3) = translation.z();
+        return m;
+    }
+
     static constexpr edt::Mat3f ScaleMatrix(const Vec2f scale)
     {
         auto m = edt::Mat3f::Identity();
@@ -202,6 +211,14 @@ public:
         m(2, 2) = 1.f;
         m(3, 3) = 1.f;
         return m;
+    }
+
+    static constexpr void
+    ToBasisVectors(const Mat4f& m, Vec3f* x = nullptr, Vec3f* y = nullptr, Vec3f* z = nullptr) noexcept
+    {
+        if (x) *x = TransformVector(m, {1, 0, 0});
+        if (y) *y = TransformVector(m, {0, 1, 0});
+        if (z) *z = TransformVector(m, {1, 0, 1});
     }
 
     [[nodiscard]] static constexpr Vec2f TransformPos(const Mat3f& mat, const Vec2f& pos)

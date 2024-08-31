@@ -379,6 +379,20 @@ public:
         return row;
     }
 
+    template <size_t nr, size_t nc>
+    [[nodiscard]] constexpr Matrix<T, nr, nc> Sub() const noexcept
+    {
+        Matrix<T, nr, nc> result;
+        for (size_t r = 0; r != nr; ++r)
+        {
+            for (size_t c = 0; c != nc; ++c)
+            {
+                result(r, c) = (*this)(r, c);
+            }
+        }
+        return result;
+    }
+
     template <size_t other_rows, size_t other_columns>
         requires(Matrix<T, other_rows, other_columns>::IsVector())
     void SetRow(const size_t row_index, const Matrix<T, other_rows, other_columns>& values)
