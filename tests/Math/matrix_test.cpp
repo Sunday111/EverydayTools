@@ -2,6 +2,8 @@
 
 #include <xmmintrin.h>
 
+#include <EverydayTools/Math/Math.hpp>
+
 namespace edt
 {
 
@@ -329,6 +331,73 @@ static_assert(
         return true;
     }(),
     "Scalar divided by matrix test");
+
+static_assert(
+    []
+    {
+        auto m = edt::Matrix<int, 4, 4>::Identity();
+        m(0, 3) = 5;
+        m(1, 3) = 8;
+        m(2, 3) = 19;
+        edt::Vec4<int> v{0, 0, 0, 1};
+        auto translated = m.MatMul(v);
+        return translated == Vec4<int>{5, 8, 19, 1};
+    }(),
+    "Translation matrix test");
+
+// Rotation around axis X, CCW
+static_assert(
+    []
+    {
+        const auto m = edt::Math::RotationMatrix3dX(edt::Math::DegToRad(90.f));
+        const auto v = edt::Math::TransformVector(m, {0, 1, 0});
+        return std::abs(v.x()) < 0.1f && std::abs(v.y()) < 0.1f && std::abs(v.z() - 1) < 0.1f;
+    }(),
+    "Rotation around X axis test");
+
+// Rotation around axis Y, CCW
+static_assert(
+    []
+    {
+        const auto m = edt::Math::RotationMatrix3dY(edt::Math::DegToRad(90.f));
+        const auto v = edt::Math::TransformVector(m, {1, 0, 0});
+        return std::abs(v.x()) < 0.1f && std::abs(v.y()) < 0.1f && std::abs(v.z() + 1) < 0.1f;
+    }(),
+    "Rotation around Y axis test");
+
+// Rotation around axis Z, CCW
+static_assert(
+    []
+    {
+        const auto m = edt::Math::RotationMatrix3dZ(edt::Math::DegToRad(90.f));
+        const auto v = edt::Math::TransformVector(m, {1, 0, 0});
+        return std::abs(v.x()) < 0.1f && std::abs(v.y() - 1) < 0.1f && std::abs(v.z()) < 0.1f;
+    }(),
+    "Rotation around Y axis test");
+
+// Rotation around axis X, CCW and then translation
+// Translation part should be ignored for vector operation
+static_assert(
+    []
+    {
+        const auto m = edt::Math::TranslationMatrix(Vec3f{41, 21, 13})
+                           .MatMul(edt::Math::RotationMatrix3dX(edt::Math::DegToRad(90.f)));
+        const auto v = edt::Math::TransformVector(m, {0, 1, 0});
+        return std::abs(v.x()) < 0.1f && std::abs(v.y()) < 0.1f && std::abs(v.z() - 1) < 0.1f;
+    }(),
+    "Rotation around X axis test");
+
+// Rotation around axis X, CCW and then translation
+// Translation part should not be ignored for vector operation
+static_assert(
+    []
+    {
+        const auto m = edt::Math::TranslationMatrix(Vec3f{41, 21, 13})
+                           .MatMul(edt::Math::RotationMatrix3dX(edt::Math::DegToRad(90.f)));
+        const auto v = edt::Math::TransformPos(m, {0, 1, 0});
+        return std::abs(v.x() - 41.f) < 0.1f && std::abs(v.y() - 21.f) < 0.1f && std::abs(v.z() - 14.f) < 0.1f;
+    }(),
+    "Rotation around X axis test");
 
 // void M4x4_SSE(const float* a, const float* b, float* c)
 // {

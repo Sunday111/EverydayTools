@@ -352,7 +352,7 @@ public:
         Matrix<T, num_rows, 1> column;
         for (const size_t row_index : RowIndices())
         {
-            column(row_index, 0) = this->operator()(row_index, column_index);
+            column[row_index] = this->operator()(row_index, column_index);
         }
 
         return column;
@@ -364,7 +364,7 @@ public:
     {
         for (const size_t row_index : RowIndices())
         {
-            (*this)(row_index, column_index) = values(column_index);
+            (*this)(row_index, column_index) = values[row_index];
         }
     }
 
@@ -391,6 +391,19 @@ public:
             }
         }
         return result;
+    }
+
+    template <typename F, typename R = decltype(std::declval<F>()(std::declval<T>()))>
+        requires(std::invocable<F, T>)
+    [[nodiscard]] constexpr Matrix<R, num_rows, num_columns> Transform(F&& f) noexcept
+    {
+        Matrix<R, num_rows, num_columns> r = *this;
+        for (size_t i : r.Indices())
+        {
+            r.data_[i] = f(r.data_[i]);
+        }
+
+        return r;
     }
 
     template <size_t other_rows, size_t other_columns>

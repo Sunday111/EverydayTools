@@ -170,6 +170,21 @@ public:
         scalar_cos = sign * p;
     }
 
+    [[nodiscard]] static constexpr Mat3f RotationMatrix2d(const float angle_radians) noexcept
+    {
+        float s, c;  // NOLINT
+        SinCos(angle_radians, s, c);
+
+        Mat3f m{};
+        m(0, 0) = c;
+        m(0, 1) = -s;
+        m(1, 0) = s;
+        m(1, 1) = c;
+        m(2, 2) = 1;
+
+        return m;
+    }
+
     [[nodiscard]] static constexpr Mat4f RotationMatrix3dX(const float angle_radians)
     {
         float s, c;  // NOLINT
@@ -218,7 +233,7 @@ public:
     {
         if (x) *x = TransformVector(m, {1, 0, 0});
         if (y) *y = TransformVector(m, {0, 1, 0});
-        if (z) *z = TransformVector(m, {1, 0, 1});
+        if (z) *z = TransformVector(m, {0, 0, 1});
     }
 
     [[nodiscard]] static constexpr Vec2f TransformPos(const Mat3f& mat, const Vec2f& pos)
