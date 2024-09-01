@@ -45,7 +45,12 @@ public:
     {
         auto s = std::sin(radians);
         auto c = std::cos(radians);
-        return Mat2f{{c, -s, s, c}};
+        Mat2f m{};
+        m.At<0, 0>() = c;
+        m.At<0, 1>() = -s;
+        m.At<1, 0>() = s;
+        m.At<1, 1>() = c;
+        return m;
     }
 
     template <typename T, const size_t rows, const size_t columns>
@@ -231,33 +236,33 @@ public:
     static constexpr void
     ToBasisVectors(const Mat4f& m, Vec3f* x = nullptr, Vec3f* y = nullptr, Vec3f* z = nullptr) noexcept
     {
-        if (x) *x = TransformVector(m, {1, 0, 0});
-        if (y) *y = TransformVector(m, {0, 1, 0});
-        if (z) *z = TransformVector(m, {0, 0, 1});
+        if (x) *x = TransformVector(m, Vec3f::AxisX());
+        if (y) *y = TransformVector(m, Vec3f::AxisY());
+        if (z) *z = TransformVector(m, Vec3f::AxisZ());
     }
 
     [[nodiscard]] static constexpr Vec2f TransformPos(const Mat3f& mat, const Vec2f& pos)
     {
-        Vec3f v3 = mat.MatMul(Vec3f{{pos.x(), pos.y(), 1.f}});
-        return Vec2f{{v3.x(), v3.y()}};
+        Vec3f v3 = mat.MatMul(Vec3f{pos.x(), pos.y(), 1.f});
+        return Vec2f{v3.x(), v3.y()};
     }
 
     [[nodiscard]] static constexpr Vec2f TransformVector(const Mat3f& mat, const Vec2f& vec)
     {
-        Vec3f v3 = mat.MatMul(Vec3f{{vec.x(), vec.y(), 0.f}});
-        return Vec2f{{v3.x(), v3.y()}};
+        Vec3f v3 = mat.MatMul(Vec3f{vec.x(), vec.y(), 0.f});
+        return Vec2f{v3.x(), v3.y()};
     }
 
     [[nodiscard]] static constexpr Vec3f TransformPos(const Mat4f& mat, const Vec3f& pos)
     {
-        Vec4f v4 = mat.MatMul(Vec4f{{pos.x(), pos.y(), pos.z(), 1.f}});
-        return Vec3f{{v4.x(), v4.y(), v4.z()}};
+        Vec4f v4 = mat.MatMul(Vec4f{pos.x(), pos.y(), pos.z(), 1.f});
+        return Vec3f{v4.x(), v4.y(), v4.z()};
     }
 
     [[nodiscard]] static constexpr Vec3f TransformVector(const Mat4f& mat, const Vec3f& vec)
     {
-        Vec4f v4 = mat.MatMul(Vec4f{{vec.x(), vec.y(), vec.z(), 0.f}});
-        return Vec3f{{v4.x(), v4.y(), v4.z()}};
+        Vec4f v4 = mat.MatMul(Vec4f{vec.x(), vec.y(), vec.z(), 0.f});
+        return Vec3f{v4.x(), v4.y(), v4.z()};
     }
 };
 

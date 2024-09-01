@@ -61,7 +61,7 @@ public:
     {
         return x.Contains(vx) && y.Contains(vy);
     }
-    [[nodiscard]] constexpr Vec2<T> Extent() const noexcept { return Vec2<T>{{x.Extent(), y.Extent()}}; }
+    [[nodiscard]] constexpr Vec2<T> Extent() const noexcept { return Vec2<T>{x.Extent(), y.Extent()}; }
 
     [[nodiscard]] constexpr Vec2<T> Min() const noexcept { return {x.begin, y.begin}; }
 

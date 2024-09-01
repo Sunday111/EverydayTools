@@ -23,6 +23,66 @@ template <typename T, size_t num_rows, size_t num_columns>
 class Matrix
 {
 public:
+    [[nodiscard]] static constexpr size_t NumRows() noexcept { return num_rows; }
+    [[nodiscard]] static constexpr size_t NumColumns() noexcept { return num_columns; }
+    [[nodiscard]] static constexpr size_t Size() noexcept { return NumRows() * NumColumns(); }
+    [[nodiscard]] static constexpr bool IsVector() { return NumRows() == 1 or NumColumns() == 1; }
+
+    constexpr Matrix() noexcept = default;
+    constexpr Matrix(Matrix&&) noexcept = default;
+    constexpr Matrix(const Matrix&) noexcept = default;
+    Matrix& operator=(Matrix&&) noexcept = default;
+    Matrix& operator=(const Matrix&) noexcept = default;
+    constexpr ~Matrix() noexcept = default;
+
+    constexpr Matrix(std::array<T, Size()> data)  // NOLINT
+        requires(!IsVector())
+        : data_(data)
+    {
+    }
+
+    constexpr Matrix(T x, T y)
+        requires(IsVector() && Size() == 2)
+        : data_({x, y})
+    {
+    }
+
+    constexpr Matrix(T x, T y, T z)
+        requires(IsVector() && Size() == 3)
+        : data_({x, y, z})
+    {
+    }
+
+    constexpr Matrix(T x, T y, T z, T w)
+        requires(IsVector() && Size() == 4)
+        : data_({x, y, z, w})
+    {
+    }
+
+    [[nodiscard]] static constexpr Matrix AxisX() noexcept
+        requires(IsVector() && Size() > 0 && Size() <= 4)
+    {
+        Matrix m;
+        m[0] = 1.f;
+        return m;
+    }
+
+    [[nodiscard]] static constexpr Matrix AxisY() noexcept
+        requires(IsVector() && Size() > 1 && Size() <= 4)
+    {
+        Matrix m;
+        m[1] = 1.f;
+        return m;
+    }
+
+    [[nodiscard]] static constexpr Matrix AxisZ() noexcept
+        requires(IsVector() && Size() > 2 && Size() <= 4)
+    {
+        Matrix m;
+        m[2] = 1.f;
+        return m;
+    }
+
     // Deducing this covers const/non-const (mainly)
     template <typename Self>
     [[nodiscard]] constexpr auto&& operator()(this Self&& self, size_t row, size_t column)
@@ -87,14 +147,6 @@ public:
         return m;
     }
 
-    [[nodiscard]] static constexpr size_t NumRows() noexcept { return num_rows; }
-
-    [[nodiscard]] static constexpr size_t NumColumns() noexcept { return num_columns; }
-
-    [[nodiscard]] static constexpr bool IsVector() { return NumRows() == 1 or NumColumns() == 1; }
-
-    [[nodiscard]] static constexpr size_t Size() noexcept { return NumRows() * NumColumns(); }
-
     template <size_t other_rows, size_t other_columns>
         requires(kVectorsWithSameSize<Matrix<T, other_rows, other_columns>, Matrix>)
     [[nodiscard]] constexpr T Dot(const Matrix<T, other_rows, other_columns>& other) const
@@ -116,11 +168,11 @@ public:
     {
         auto& a = *this;
         auto& b = other;
-        return Matrix{{
+        return Matrix{
             a[1] * b[2] - a[2] * b[1],
             a[2] * b[0] - a[0] * b[2],
             a[0] * b[1] - a[1] * b[0],
-        }};
+        };
     }
 
     [[nodiscard]] constexpr T* data() { return data_.data(); }

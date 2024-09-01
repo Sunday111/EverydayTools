@@ -53,8 +53,8 @@ static_assert(
 static_assert(
     []
     {
-        Vec3i a{{1, 2, 3}};
-        Vec3i b{{4, 5, 6}};
+        Vec3i a{1, 2, 3};
+        Vec3i b{4, 5, 6};
         return a.Dot(b) == 1 * 4 + 2 * 5 + 3 * 6;
     }(),
     "Dot product test");
@@ -62,9 +62,9 @@ static_assert(
 static_assert(
     []
     {
-        Vec3i a{{1, 2, 3}};
-        Vec3i b{{4, 5, 6}};
-        return a.Cross(b) == Vec3i{{-3, 6, -3}};
+        Vec3i a{1, 2, 3};
+        Vec3i b{4, 5, 6};
+        return a.Cross(b) == Vec3i{-3, 6, -3};
     }(),
     "Cross product test");
 
@@ -100,14 +100,14 @@ static_assert(
     []
     {
         // clang-format off
-        Matrix<int, 3, 4> m{{
+        Matrix<int, 3, 4> m{std::array{
             0, 1, 2, 3,
             4, 5, 6, 7,
             8, 9, 10, 11
         }};
-        Matrix<int, 1, 4> expected{{
+        Matrix<int, 1, 4> expected{
             4, 5, 6, 7,
-        }};
+        };
         // clang-format on
 
         Matrix<int, 1, 4> actual = m.GetRow(1);
@@ -119,14 +119,14 @@ static_assert(
     []
     {
         // clang-format off
-        Matrix<int, 3, 4> m{{
+        Matrix<int, 3, 4> m{std::array{
             0, 1, 2, 3,
             4, 5, 6, 7,
             8, 9, 10, 11
         }};
-        Matrix<int, 3, 1> expected{{
+        Matrix<int, 3, 1> expected{
             1, 5, 9
-        }};
+        };
         // clang-format on
 
         Matrix<int, 3, 1> actual = m.GetColumn(1);
