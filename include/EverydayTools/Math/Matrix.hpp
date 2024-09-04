@@ -53,9 +53,29 @@ public:
     {
     }
 
+    template <size_t other_rows, size_t other_columns>
+    constexpr Matrix(const Matrix<T, other_rows, other_columns> xy, T z)
+        requires(
+            (other_rows == 1 || other_columns == 1) &&  // xy is a vector
+            (other_rows * other_columns == 2) &&        // xy is a 2d vector
+            IsVector() && Size() == 3)
+        : data_({xy.x(), xy.y(), z})
+    {
+    }
+
     constexpr Matrix(T x, T y, T z, T w)
         requires(IsVector() && Size() == 4)
         : data_({x, y, z, w})
+    {
+    }
+
+    template <size_t other_rows, size_t other_columns>
+    constexpr Matrix(const Matrix<T, other_rows, other_columns> xyz, T w)
+        requires(
+            (other_rows == 1 || other_columns == 1) &&  // xyz is a vector
+            (other_rows * other_columns == 3) &&        // xyz is a 3d vector
+            IsVector() && Size() == 4)
+        : data_({xyz.x(), xyz.y(), xyz.z(), w})
     {
     }
 
@@ -411,8 +431,8 @@ public:
     }
 
     template <size_t other_rows, size_t other_columns>
-        requires(Matrix<T, other_rows, other_columns>::IsVector())
-    void SetColumn(const size_t column_index, const Matrix<T, other_rows, other_columns>& values)
+        requires(Matrix<T, other_rows, other_columns>::IsVector() && (other_rows * other_columns == num_rows))
+    constexpr void SetColumn(const size_t column_index, const Matrix<T, other_rows, other_columns>& values)
     {
         for (const size_t row_index : RowIndices())
         {
@@ -459,8 +479,8 @@ public:
     }
 
     template <size_t other_rows, size_t other_columns>
-        requires(Matrix<T, other_rows, other_columns>::IsVector())
-    void SetRow(const size_t row_index, const Matrix<T, other_rows, other_columns>& values)
+        requires(Matrix<T, other_rows, other_columns>::IsVector() && (other_rows * other_columns == num_columns))
+    constexpr void SetRow(const size_t row_index, const Matrix<T, other_rows, other_columns>& values)
     {
         for (const size_t column_index : ColumnIndices())
         {

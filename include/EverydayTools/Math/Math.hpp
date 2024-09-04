@@ -16,7 +16,7 @@ public:
     template <std::integral T>
     [[nodiscard]] static constexpr bool InRange(const T& x, const T& begin, const T& end)
     {
-        return x >= begin and x < end;
+        return x >= begin && x < end;
     }
 
     template <typename T>
@@ -37,20 +37,7 @@ public:
     // Get rainbow colors by time t
     [[nodiscard]] static constexpr Vec4<uint8_t> GetRainbowColorsA(const float t, uint8_t alpha = 255)
     {
-        const auto rgb = GetRainbowColors(t);
-        return {rgb.x(), rgb.y(), rgb.z(), alpha};
-    }
-
-    [[nodiscard]] inline static Mat2f MakeRotationMatrix(const float radians)
-    {
-        auto s = std::sin(radians);
-        auto c = std::cos(radians);
-        Mat2f m{};
-        m.At<0, 0>() = c;
-        m.At<0, 1>() = -s;
-        m.At<1, 0>() = s;
-        m.At<1, 1>() = c;
-        return m;
+        return {GetRainbowColors(t), alpha};
     }
 
     template <typename T, const size_t rows, const size_t columns>
@@ -97,17 +84,14 @@ public:
     static constexpr edt::Mat3f TranslationMatrix(const Vec2f translation)
     {
         auto m = edt::Mat3f::Identity();
-        m(0, 2) = translation.x();
-        m(1, 2) = translation.y();
+        m.SetColumn(2, Vec3f{translation, 1});
         return m;
     }
 
     static constexpr edt::Mat4f TranslationMatrix(const Vec3f translation)
     {
         auto m = edt::Mat4f::Identity();
-        m(0, 3) = translation.x();
-        m(1, 3) = translation.y();
-        m(2, 3) = translation.z();
+        m.SetColumn(3, Vec4f{translation, 1});
         return m;
     }
 
@@ -181,11 +165,9 @@ public:
         SinCos(angle_radians, s, c);
 
         Mat3f m{};
-        m(0, 0) = c;
-        m(0, 1) = -s;
-        m(1, 0) = s;
-        m(1, 1) = c;
-        m(2, 2) = 1;
+        m.SetRow(0, Vec3f{c, -s, 0});
+        m.SetRow(1, Vec3f{s, c, 0});
+        m.SetRow(2, Vec3f{0, 0, 1});
 
         return m;
     }
@@ -196,12 +178,10 @@ public:
         SinCos(angle_radians, s, c);
 
         Mat4f m{};
-        m(0, 0) = 1.f;
-        m(1, 1) = c;
-        m(1, 2) = -s;
-        m(2, 1) = s;
-        m(2, 2) = c;
-        m(3, 3) = 1.f;
+        m.SetRow(0, Vec4f{1, 0, 0, 0});
+        m.SetRow(1, Vec4f{0, c, -s, 0});
+        m.SetRow(2, Vec4f{0, s, c, 0});
+        m.SetRow(3, Vec4f{0, 0, 0, 1});
         return m;
     }
 
