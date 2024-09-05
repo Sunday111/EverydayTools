@@ -23,6 +23,8 @@ template <typename T, size_t num_rows, size_t num_columns>
 class Matrix
 {
 public:
+    using Component = T;
+
     [[nodiscard]] static constexpr size_t NumRows() noexcept { return num_rows; }
     [[nodiscard]] static constexpr size_t NumColumns() noexcept { return num_columns; }
     [[nodiscard]] static constexpr size_t Size() noexcept { return NumRows() * NumColumns(); }
@@ -526,6 +528,19 @@ public:
     std::array<T, Size()> data_{};
 };
 
+template <typename T>
+struct IsMatrixT : std::false_type
+{
+};
+
+template <typename T, size_t R, size_t C>
+struct IsMatrixT<Matrix<T, R, C>> : std::true_type
+{
+};
+
+template <typename T>
+concept IsMatrix = IsMatrixT<T>::value;
+
 namespace lazy_matrix_aliases
 {
 
@@ -551,6 +566,7 @@ using Vec2f = Vec2<float>;
 using Vec2i = Vec2<int>;
 using Vec3f = Vec3<float>;
 using Vec3i = Vec3<int>;
+using Vec4u8 = Vec4<uint8_t>;
 using Vec4f = Vec4<float>;
 using Vec4i = Vec4<int>;
 using Mat2f = Mat2<float>;
