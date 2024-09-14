@@ -1,6 +1,7 @@
 #pragma once
 
-namespace edt {
+namespace edt
+{
 template <typename... Types>
 class TypesList;
 

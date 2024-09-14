@@ -1,7 +1,8 @@
 #include "EverydayTools/Math/Math.hpp"
 
-#include "TestTools.hpp"
 #include <numbers>
+
+#include "TestTools.hpp"
 
 namespace edt
 {

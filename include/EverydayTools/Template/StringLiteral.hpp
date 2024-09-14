@@ -3,15 +3,15 @@
 #include <algorithm>
 #include <string_view>
 
-namespace edt {
+namespace edt
+{
 template <size_t N>
-struct StringLiteral {
-  constexpr StringLiteral(const char (&str)[N]) { std::copy_n(str, N, value); }
+struct StringLiteral
+{
+    constexpr StringLiteral(const char (&str)[N]) { std::copy_n(str, N, value); }
 
-  [[nodiscard]] inline constexpr std::string_view GetView() const {
-    return value;
-  }
+    [[nodiscard]] inline constexpr std::string_view GetView() const { return value; }
 
-  char value[N];
+    char value[N];
 };
 }  // namespace edt

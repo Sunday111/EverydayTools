@@ -98,30 +98,15 @@ public:
         return tmp;
     }
 
-    [[nodiscard]] friend bool operator<(const TFinal& a, const TFinal b) noexcept
-    {
-        return a.GetData() < b.GetData();
-    }
+    [[nodiscard]] friend bool operator<(const TFinal& a, const TFinal b) noexcept { return a.GetData() < b.GetData(); }
 
-    [[nodiscard]] reference operator*() const noexcept
-    {
-        return *CastThis().GetData();
-    }
+    [[nodiscard]] reference operator*() const noexcept { return *CastThis().GetData(); }
 
-    [[nodiscard]] pointer operator->() const noexcept
-    {
-        return CastThis().GetData();
-    }
+    [[nodiscard]] pointer operator->() const noexcept { return CastThis().GetData(); }
 
 private:
-    TFinal& CastThis() noexcept
-    {
-        return *static_cast<TFinal*>(this);
-    }
-    const TFinal& CastThis() const noexcept
-    {
-        return *static_cast<const TFinal*>(this);
-    }
+    TFinal& CastThis() noexcept { return *static_cast<TFinal*>(this); }
+    const TFinal& CastThis() const noexcept { return *static_cast<const TFinal*>(this); }
 };
 
 template <typename T, bool direct>
@@ -130,35 +115,20 @@ class SparseRandomAccessIterator : public RandomAccessIterator<T, direct, Sparse
 public:
     constexpr SparseRandomAccessIterator(T* ptr, size_t stride) noexcept : m_p(ptr), m_stride(stride) {}
 
-    void Advance(int n)
-    {
-        m_p = array_view_details::AdvancePointer<direct>(m_p, n, m_stride);
-    }
+    void Advance(int n) { m_p = array_view_details::AdvancePointer<direct>(m_p, n, m_stride); }
 
-    void Increment() noexcept
-    {
-        m_p = array_view_details::AdvancePointer<direct>(m_p, 1, m_stride);
-    }
+    void Increment() noexcept { m_p = array_view_details::AdvancePointer<direct>(m_p, 1, m_stride); }
 
-    void Decrement() noexcept
-    {
-        m_p = array_view_details::AdvancePointer<!direct>(m_p, 1, m_stride);
-    }
+    void Decrement() noexcept { m_p = array_view_details::AdvancePointer<!direct>(m_p, 1, m_stride); }
 
     [[nodiscard]] bool TheSame(const SparseRandomAccessIterator& another) const noexcept
     {
         return m_p == another.m_p && m_stride == another.m_stride;
     }
 
-    [[nodiscard]] T* GetData() const noexcept
-    {
-        return m_p;
-    }
+    [[nodiscard]] T* GetData() const noexcept { return m_p; }
 
-    [[nodiscard]] bool operator==(const SparseRandomAccessIterator& another) const noexcept
-    {
-        return TheSame(another);
-    }
+    [[nodiscard]] bool operator==(const SparseRandomAccessIterator& another) const noexcept { return TheSame(another); }
 
     [[nodiscard]] bool operator!=(const SparseRandomAccessIterator& another) const noexcept
     {
@@ -176,35 +146,20 @@ class DenseRandomAccessIterator : public RandomAccessIterator<T, direct, DenseRa
 public:
     explicit constexpr DenseRandomAccessIterator(T* ptr) noexcept : m_p(ptr) {}
 
-    void Advance(int n)
-    {
-        m_p = array_view_details::AdvancePointer<direct>(m_p, n);
-    }
+    void Advance(int n) { m_p = array_view_details::AdvancePointer<direct>(m_p, n); }
 
-    void Increment() noexcept
-    {
-        m_p = array_view_details::AdvancePointer<direct>(m_p, 1);
-    }
+    void Increment() noexcept { m_p = array_view_details::AdvancePointer<direct>(m_p, 1); }
 
-    void Decrement() noexcept
-    {
-        m_p = array_view_details::AdvancePointer<!direct>(m_p, 1);
-    }
+    void Decrement() noexcept { m_p = array_view_details::AdvancePointer<!direct>(m_p, 1); }
 
     [[nodiscard]] constexpr bool TheSame(const DenseRandomAccessIterator& another) const noexcept
     {
         return m_p == another.m_p;
     }
 
-    [[nodiscard]] constexpr T* GetData() const noexcept
-    {
-        return m_p;
-    }
+    [[nodiscard]] constexpr T* GetData() const noexcept { return m_p; }
 
-    [[nodiscard]] bool operator==(const DenseRandomAccessIterator& another) const noexcept
-    {
-        return TheSame(another);
-    }
+    [[nodiscard]] bool operator==(const DenseRandomAccessIterator& another) const noexcept { return TheSame(another); }
 
     [[nodiscard]] bool operator!=(const DenseRandomAccessIterator& another) const noexcept
     {
@@ -221,36 +176,18 @@ class ArrayView
     using TFinal = Final<T>;
 
 public:
-    [[nodiscard]] decltype(auto) begin() const noexcept
-    {
-        return Cast().template Begin<true>();
-    }
+    [[nodiscard]] decltype(auto) begin() const noexcept { return Cast().template Begin<true>(); }
 
-    [[nodiscard]] decltype(auto) end() const noexcept
-    {
-        return Cast().template End<true>();
-    }
+    [[nodiscard]] decltype(auto) end() const noexcept { return Cast().template End<true>(); }
 
-    [[nodiscard]] decltype(auto) rbegin() const noexcept
-    {
-        return Cast().template Begin<false>();
-    }
+    [[nodiscard]] decltype(auto) rbegin() const noexcept { return Cast().template Begin<false>(); }
 
-    [[nodiscard]] decltype(auto) rend() const noexcept
-    {
-        return Cast().template End<false>();
-    }
+    [[nodiscard]] decltype(auto) rend() const noexcept { return Cast().template End<false>(); }
 
 private:
-    [[nodiscard]] TFinal& Cast() noexcept
-    {
-        return *static_cast<TFinal*>(this);
-    }
+    [[nodiscard]] TFinal& Cast() noexcept { return *static_cast<TFinal*>(this); }
 
-    [[nodiscard]] const TFinal& Cast() const noexcept
-    {
-        return *static_cast<const TFinal*>(this);
-    }
+    [[nodiscard]] const TFinal& Cast() const noexcept { return *static_cast<const TFinal*>(this); }
 };
 
 template <typename T>
@@ -279,7 +216,8 @@ public:
     template <
         typename U,
         typename Enable = std::enable_if_t<
-            (std::is_same_v<std::decay_t<T>, std::decay_t<U>> || std::is_base_of_v<T, U>)&&std::is_convertible_v<U, T>>>
+            (std::is_same_v<std::decay_t<T>, std::decay_t<U>> || std::is_base_of_v<T, U>) &&
+            std::is_convertible_v<U, T>>>
     constexpr SparseArrayView(const SparseArrayView<U>& another) noexcept
         : SparseArrayView(another.GetData(), another.GetSize(), another.GetStride())
     {
@@ -305,28 +243,19 @@ public:
     /**
         @return viewed objects count
      */
-    [[nodiscard]] constexpr size_t GetSize() const noexcept
-    {
-        return m_size;
-    }
+    [[nodiscard]] constexpr size_t GetSize() const noexcept { return m_size; }
 
     /// Returns stride
     /**
         @return stride between objects in view
      */
-    [[nodiscard]] constexpr size_t GetStride() const noexcept
-    {
-        return m_stride;
-    }
+    [[nodiscard]] constexpr size_t GetStride() const noexcept { return m_stride; }
 
     /// Returns internal pointer
     /**
         @return pointer to the first object
      */
-    [[nodiscard]] constexpr T* GetData() const noexcept
-    {
-        return m_p;
-    }
+    [[nodiscard]] constexpr T* GetData() const noexcept { return m_p; }
 
     /// Constructs sparse array view to member
     /**
@@ -467,19 +396,13 @@ public:
     /**
         @return viewed elements count
      */
-    [[nodiscard]] constexpr size_t GetSize() const noexcept
-    {
-        return m_size;
-    }
+    [[nodiscard]] constexpr size_t GetSize() const noexcept { return m_size; }
 
     /// Pointer to the first element
     /**
         @return pointer to the first element of viewed collection
      */
-    [[nodiscard]] constexpr T* GetData() const noexcept
-    {
-        return m_p;
-    }
+    [[nodiscard]] constexpr T* GetData() const noexcept { return m_p; }
 
     /// Constructs sparse array view to member
     /**
@@ -571,7 +494,7 @@ template <typename T, size_t size>
 }
 
 template <typename T, typename Member, size_t size>
-[[nodiscard]] inline constexpr SparseArrayView<Member> MakeArrayView(T (&arr)[size], Member T::*member) noexcept
+[[nodiscard]] inline constexpr SparseArrayView<Member> MakeArrayView(T (&arr)[size], Member T::* member) noexcept
 {
     return SparseArrayView<Member>(&(*arr.*member), size, sizeof(T));
 }

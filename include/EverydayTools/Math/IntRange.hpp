@@ -13,15 +13,9 @@ template <std::integral T>
 class IntRange
 {
 public:
-    [[nodiscard]] constexpr bool Contains(const T& value) const noexcept
-    {
-        return InRange(value, begin, end);
-    }
+    [[nodiscard]] constexpr bool Contains(const T& value) const noexcept { return InRange(value, begin, end); }
 
-    [[nodiscard]] constexpr T Extent() const
-    {
-        return end - begin;
-    }
+    [[nodiscard]] constexpr T Extent() const { return end - begin; }
 
     [[nodiscard]] constexpr std::tuple<IntRange, IntRange> Split(size_t left_side_size) const
     {
@@ -48,10 +42,7 @@ public:
         return x.Contains(vx) && y.Contains(vy);
     }
 
-    [[nodiscard]] constexpr Vec2<T> Extent() const
-    {
-        return {x.Extent(), y.Extent()};
-    }
+    [[nodiscard]] constexpr Vec2<T> Extent() const { return {x.Extent(), y.Extent()}; }
 
     [[nodiscard]] static constexpr IntRange2D FromBeginAndExtent(const Vec2<T>& begin, const Vec2<T>& extent)
     {

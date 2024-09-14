@@ -3,6 +3,7 @@
 #include <xmmintrin.h>
 
 #include <EverydayTools/Math/Math.hpp>
+
 #include "TestTools.hpp"
 
 namespace edt

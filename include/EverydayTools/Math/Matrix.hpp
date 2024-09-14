@@ -511,8 +511,7 @@ public:
         return [&]<size_t... indices>(std::index_sequence<indices...>)
         {
             return std::forward_as_tuple(std::forward<Self>(self).data_[indices]...);
-        }
-        (std::make_index_sequence<Size()>{});
+        }(std::make_index_sequence<Size()>{});
     }
 
     template <typename Self>
@@ -521,8 +520,7 @@ public:
         return [&]<size_t... indices>(std::index_sequence<indices...>)
         {
             return std::make_tuple(std::forward<Self>(self).data_[indices]...);
-        }
-        (std::make_index_sequence<Size()>{});
+        }(std::make_index_sequence<Size()>{});
     }
 
     std::array<T, Size()> data_{};

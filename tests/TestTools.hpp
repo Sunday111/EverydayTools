@@ -46,7 +46,7 @@ std::vector<T> GenerateRandomArray(size_t minSize, size_t maxSize, T minValue, T
     return result;
 }
 
-template<typename T>
+template <typename T>
 [[nodiscard]] constexpr T CAbs(T v)
 {
     return v < 0 ? -v : v;

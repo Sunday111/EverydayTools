@@ -40,10 +40,7 @@ struct ViewHelpers<T, edt::DenseArrayView>
             maxValue<T>,
             collection.size(),
             mt,
-            [&](T value)
-            {
-                collection[index++] = value;
-            });
+            [&](T value) { collection[index++] = value; });
     }
 
     static Final MakeView(std::vector<T>& collection)
@@ -64,10 +61,7 @@ struct ViewHelpers<T, edt::DenseArrayView>
         }
     }
 
-    static const char* GetViewName()
-    {
-        return "DenseArrayView";
-    }
+    static const char* GetViewName() { return "DenseArrayView"; }
 };
 
 template <typename T>
@@ -103,10 +97,7 @@ struct ViewHelpers<T, edt::SparseArrayView>
             maxValue<T>,
             collection.size(),
             mt,
-            [&](T value)
-            {
-                collection[index++].value = value;
-            });
+            [&](T value) { collection[index++].value = value; });
     }
 
     static Final MakeView(std::vector<Dummy>& collection)
@@ -127,10 +118,7 @@ struct ViewHelpers<T, edt::SparseArrayView>
         }
     }
 
-    static const char* GetViewName()
-    {
-        return "SparseArrayView";
-    }
+    static const char* GetViewName() { return "SparseArrayView"; }
 };
 
 template <typename T, template <typename T_> typename ViewType>

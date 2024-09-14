@@ -2,9 +2,10 @@
 
 #include <memory>
 
-
 template <class T>
-class ClassTemplate {};
+class ClassTemplate
+{
+};
 
 static_assert(edt::isSpecialization<ClassTemplate<int>, ClassTemplate>);
 static_assert(!edt::isSpecialization<ClassTemplate<float>, std::shared_ptr>);

@@ -1,10 +1,10 @@
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <span>
 #include <tuple>
-#include <array>
 
 #include "BitsetArrayAdapter.hpp"
 
@@ -25,8 +25,7 @@ inline constexpr size_t BiggestPartTypeIndexWithNoWaste(const size_t bytes_requi
     [&]<size_t... type_index>(std::index_sequence<type_index...>)
     {
         ((values[type_index] = get_wasted_space(std::tuple<std::tuple_element_t<type_index, AllParts>>{})), ...);
-    }
-    (std::make_index_sequence<count>());
+    }(std::make_index_sequence<count>());
 
     size_t min_index = 0;
     for (size_t i = 1; i != values.size(); ++i)
