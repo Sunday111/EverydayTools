@@ -243,14 +243,14 @@ public:
         return copy;
     }
 
-    [[nodiscard]] constexpr auto RowIndices() const { return std::views::iota(0uz, NumRows()); }
+    [[nodiscard]] constexpr auto RowIndices() const { return std::views::iota(size_t{0}, NumRows()); }
 
-    [[nodiscard]] constexpr auto ColumnIndices() const { return std::views::iota(0uz, NumColumns()); }
+    [[nodiscard]] constexpr auto ColumnIndices() const { return std::views::iota(size_t{0}, NumColumns()); }
 
     [[nodiscard]] constexpr auto Indices() const
         requires(IsVector())
     {
-        return std::views::iota(0uz, Size());
+        return std::views::iota(size_t{0}, Size());
     }
 
     template <size_t row, size_t column, typename Self>

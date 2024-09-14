@@ -46,10 +46,19 @@ std::vector<T> GenerateRandomArray(size_t minSize, size_t maxSize, T minValue, T
     return result;
 }
 
+template<typename T>
+[[nodiscard]] constexpr T CAbs(T v)
+{
+    return v < 0 ? -v : v;
+}
+
 template <std::floating_point T1, std::convertible_to<T1> T2>
 constexpr void ExpectEq(T1 a, T2 b, T1 precision = T1{0.0001})
 {
-    if (std::abs(a - b) < precision) return;
+    auto delta = a - b;
+    if (delta < 0) delta = -delta;
+
+    if (delta < precision) return;
     throw std::runtime_error("Check failed");
 }
 

@@ -3,6 +3,7 @@
 #include <xmmintrin.h>
 
 #include <EverydayTools/Math/Math.hpp>
+#include "TestTools.hpp"
 
 namespace edt
 {
@@ -227,13 +228,13 @@ static_assert(
     {
         Matrix<size_t, 5, 3> a{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}};
 
-        auto b = 10uz - a;
+        auto b = size_t{10} - a;
 
         for (const size_t row : b.RowIndices())
         {
             for (const size_t column : b.ColumnIndices())
             {
-                if (b(row, column) != 10uz - (row * b.NumColumns() + column))
+                if (b(row, column) != size_t{10} - (row * b.NumColumns() + column))
                 {
                     return false;
                 }
@@ -351,7 +352,7 @@ static_assert(
     {
         const auto m = edt::Math::RotationMatrix3dX(edt::Math::DegToRad(90.f));
         const auto v = edt::Math::TransformVector(m, {0, 1, 0});
-        return std::abs(v.x()) < 0.1f && std::abs(v.y()) < 0.1f && std::abs(v.z() - 1) < 0.1f;
+        return CAbs(v.x()) < 0.1f && CAbs(v.y()) < 0.1f && CAbs(v.z() - 1) < 0.1f;
     }(),
     "Rotation around X axis test");
 
@@ -361,7 +362,7 @@ static_assert(
     {
         const auto m = edt::Math::RotationMatrix3dY(edt::Math::DegToRad(90.f));
         const auto v = edt::Math::TransformVector(m, {1, 0, 0});
-        return std::abs(v.x()) < 0.1f && std::abs(v.y()) < 0.1f && std::abs(v.z() + 1) < 0.1f;
+        return CAbs(v.x()) < 0.1f && CAbs(v.y()) < 0.1f && CAbs(v.z() + 1) < 0.1f;
     }(),
     "Rotation around Y axis test");
 
@@ -371,7 +372,7 @@ static_assert(
     {
         const auto m = edt::Math::RotationMatrix3dZ(edt::Math::DegToRad(90.f));
         const auto v = edt::Math::TransformVector(m, {1, 0, 0});
-        return std::abs(v.x()) < 0.1f && std::abs(v.y() - 1) < 0.1f && std::abs(v.z()) < 0.1f;
+        return CAbs(v.x()) < 0.1f && CAbs(v.y() - 1) < 0.1f && CAbs(v.z()) < 0.1f;
     }(),
     "Rotation around Y axis test");
 
@@ -383,7 +384,7 @@ static_assert(
         const auto m = edt::Math::TranslationMatrix(Vec3f{41, 21, 13})
                            .MatMul(edt::Math::RotationMatrix3dX(edt::Math::DegToRad(90.f)));
         const auto v = edt::Math::TransformVector(m, {0, 1, 0});
-        return std::abs(v.x()) < 0.1f && std::abs(v.y()) < 0.1f && std::abs(v.z() - 1) < 0.1f;
+        return CAbs(v.x()) < 0.1f && CAbs(v.y()) < 0.1f && CAbs(v.z() - 1) < 0.1f;
     }(),
     "Rotation around X axis test");
 
@@ -395,7 +396,7 @@ static_assert(
         const auto m = edt::Math::TranslationMatrix(Vec3f{41, 21, 13})
                            .MatMul(edt::Math::RotationMatrix3dX(edt::Math::DegToRad(90.f)));
         const auto v = edt::Math::TransformPos(m, {0, 1, 0});
-        return std::abs(v.x() - 41.f) < 0.1f && std::abs(v.y() - 21.f) < 0.1f && std::abs(v.z() - 14.f) < 0.1f;
+        return CAbs(v.x() - 41.f) < 0.1f && CAbs(v.y() - 21.f) < 0.1f && CAbs(v.z() - 14.f) < 0.1f;
     }(),
     "Rotation around X axis test");
 

@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <span>
 #include <tuple>
+#include <array>
 
 #include "BitsetArrayAdapter.hpp"
 
