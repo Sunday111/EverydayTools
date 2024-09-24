@@ -105,6 +105,7 @@ public:
         return m;
     }
 
+#if __cplusplus >= 202302L
     // Deducing this covers const/non-const (mainly)
     template <typename Self>
     [[nodiscard]] constexpr auto&& operator()(this Self&& self, size_t row, size_t column)
@@ -133,7 +134,7 @@ public:
     }
 
     template <typename Self, typename PureSelf = std::decay_t<Self>>
-        requires(PureSelf::IsVector() && PureSelf::Size() > 2)
+        requires(PureSelf::IsVector() && PureSelf::Size() > 3)
     [[nodiscard]] constexpr auto&& w(this Self&& self)
     {
         return std::forward<Self>(self)[3];
@@ -145,6 +146,91 @@ public:
     {
         return std::forward<Self>(self).data_[index];
     }
+
+    template <size_t row, size_t column, typename Self>
+        requires(row < num_rows, column < num_columns)
+    [[nodiscard]] constexpr auto&& At(this Self&& self)
+    {
+        return std::forward<Self>(self).data_[row * num_columns + column];
+    }
+#else
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const
+        requires(IsVector())
+    {
+        return data_[index];
+    }
+
+    [[nodiscard]] constexpr T& operator[](const size_t index)
+        requires(IsVector())
+    {
+        return data_[index];
+    }
+
+    [[nodiscard]] constexpr const T& operator()(size_t row, size_t column) const
+    {
+        return data_[row * num_columns + column];
+    }
+
+    [[nodiscard]] constexpr T& operator()(size_t row, size_t column)
+    {
+        return data_[row * num_columns + column];
+    }
+
+    template <size_t row, size_t column>
+        requires(row < num_rows, column < num_columns)
+    [[nodiscard]] constexpr T& At()
+    {
+        return data_[row * num_columns + column];
+    }
+
+    template <size_t row, size_t column>
+        requires(row < num_rows, column < num_columns)
+    [[nodiscard]] constexpr const T& At() const
+    {
+        return data_[row * num_columns + column];
+    }
+
+    [[nodiscard]] constexpr T& x() requires(IsVector() && Size() > 0)
+    {
+        return this->operator[](0);
+    }
+
+    [[nodiscard]] constexpr const T& x() const requires(IsVector() && Size() > 0)
+    {
+        return this->operator[](0);
+    }
+
+    [[nodiscard]] constexpr T& y() requires(IsVector() && Size() > 1)
+    {
+        return this->operator[](1);
+    }
+
+    [[nodiscard]] constexpr const T& y() const requires(IsVector() && Size() > 1)
+    {
+        return this->operator[](1);
+    }
+
+    [[nodiscard]] constexpr T& z() requires(IsVector() && Size() > 2)
+    {
+        return this->operator[](2);
+    }
+
+    [[nodiscard]] constexpr const T& z() const requires(IsVector() && Size() > 2)
+    {
+        return this->operator[](2);
+    }
+
+    [[nodiscard]] constexpr T& w() requires(IsVector() && Size() > 3)
+    {
+        return this->operator[](3);
+    }
+
+    [[nodiscard]] constexpr const T& w() const requires(IsVector() && Size() > 3)
+    {
+        return this->operator[](3);
+    }
+
+#endif
 
     template <std::convertible_to<T> U>
     [[nodiscard]] constexpr Matrix<U, num_rows, num_columns> Cast() const
@@ -253,12 +339,7 @@ public:
         return std::views::iota(size_t{0}, Size());
     }
 
-    template <size_t row, size_t column, typename Self>
-        requires(row < num_rows, column < num_columns)
-    [[nodiscard]] constexpr auto&& At(this Self&& self)
-    {
-        return std::forward<Self>(self).data_[row * num_columns + column];
-    }
+
 
     template <size_t other_rows, size_t other_columns>
         requires(NumColumns() == other_rows)
@@ -432,16 +513,6 @@ public:
         return column;
     }
 
-    template <size_t other_rows, size_t other_columns>
-        requires(Matrix<T, other_rows, other_columns>::IsVector() && (other_rows * other_columns == num_rows))
-    constexpr void SetColumn(const size_t column_index, const Matrix<T, other_rows, other_columns>& values)
-    {
-        for (const size_t row_index : RowIndices())
-        {
-            (*this)(row_index, column_index) = values[row_index];
-        }
-    }
-
     [[nodiscard]] constexpr Matrix<T, 1, num_columns> GetRow(const size_t row_index) const
     {
         Matrix<T, 1, num_columns> row;
@@ -480,16 +551,6 @@ public:
         return r;
     }
 
-    template <size_t other_rows, size_t other_columns>
-        requires(Matrix<T, other_rows, other_columns>::IsVector() && (other_rows * other_columns == num_columns))
-    constexpr void SetRow(const size_t row_index, const Matrix<T, other_rows, other_columns>& values)
-    {
-        for (const size_t column_index : ColumnIndices())
-        {
-            (*this)(row_index, column_index) = values[column_index];
-        }
-    }
-
     [[nodiscard]] constexpr Matrix<T, num_columns, num_rows> Transposed() const
     {
         Matrix<T, num_columns, num_rows> r;
@@ -503,6 +564,27 @@ public:
 
         return r;
     }
+
+    template <size_t other_rows, size_t other_columns>
+        requires(Matrix<T, other_rows, other_columns>::IsVector() && (other_rows * other_columns == num_rows))
+    constexpr void SetColumn(const size_t column_index, const Matrix<T, other_rows, other_columns>& values)
+    {
+        for (const size_t row_index : RowIndices())
+        {
+            (*this)(row_index, column_index) = values[row_index];
+        }
+    }
+
+    template <size_t other_rows, size_t other_columns>
+        requires(Matrix<T, other_rows, other_columns>::IsVector() && (other_rows * other_columns == num_columns))
+    constexpr void SetRow(const size_t row_index, const Matrix<T, other_rows, other_columns>& values)
+    {
+        for (const size_t column_index : ColumnIndices())
+        {
+            (*this)(row_index, column_index) = values[column_index];
+        }
+    }
+#if __cplusplus >= 202302L
 
     template <typename Self>
         requires(std::is_lvalue_reference_v<Self>)
@@ -522,6 +604,7 @@ public:
             return std::make_tuple(std::forward<Self>(self).data_[indices]...);
         }(std::make_index_sequence<Size()>{});
     }
+#endif
 
     std::array<T, Size()> data_{};
 };
