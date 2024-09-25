@@ -604,6 +604,14 @@ public:
             return std::make_tuple(std::forward<Self>(self).data_[indices]...);
         }(std::make_index_sequence<Size()>{});
     }
+#else
+    [[nodiscard]] constexpr auto Tuple() const
+    {
+        return [&]<size_t... indices>(std::index_sequence<indices...>)
+        {
+            return std::make_tuple(data_[indices]...);
+        }(std::make_index_sequence<Size()>{});
+    }
 #endif
 
     std::array<T, Size()> data_{};
