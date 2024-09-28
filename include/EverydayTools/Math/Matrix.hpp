@@ -148,7 +148,7 @@ public:
     }
 
     template <size_t row, size_t column, typename Self>
-        requires(row < num_rows, column < num_columns)
+        requires(row < num_rows && column < num_columns)
     [[nodiscard]] constexpr auto&& At(this Self&& self)
     {
         return std::forward<Self>(self).data_[row * num_columns + column];
@@ -177,14 +177,14 @@ public:
     }
 
     template <size_t row, size_t column>
-        requires(row < num_rows, column < num_columns)
+        requires(row < num_rows && column < num_columns)
     [[nodiscard]] constexpr T& At()
     {
         return data_[row * num_columns + column];
     }
 
     template <size_t row, size_t column>
-        requires(row < num_rows, column < num_columns)
+        requires(row < num_rows && column < num_columns)
     [[nodiscard]] constexpr const T& At() const
     {
         return data_[row * num_columns + column];
