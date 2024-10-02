@@ -171,10 +171,7 @@ public:
         return data_[row * num_columns + column];
     }
 
-    [[nodiscard]] constexpr T& operator()(size_t row, size_t column)
-    {
-        return data_[row * num_columns + column];
-    }
+    [[nodiscard]] constexpr T& operator()(size_t row, size_t column) { return data_[row * num_columns + column]; }
 
     template <size_t row, size_t column>
         requires(row < num_rows && column < num_columns)
@@ -190,42 +187,50 @@ public:
         return data_[row * num_columns + column];
     }
 
-    [[nodiscard]] constexpr T& x() requires(IsVector() && Size() > 0)
+    [[nodiscard]] constexpr T& x()
+        requires(IsVector() && Size() > 0)
     {
         return this->operator[](0);
     }
 
-    [[nodiscard]] constexpr const T& x() const requires(IsVector() && Size() > 0)
+    [[nodiscard]] constexpr const T& x() const
+        requires(IsVector() && Size() > 0)
     {
         return this->operator[](0);
     }
 
-    [[nodiscard]] constexpr T& y() requires(IsVector() && Size() > 1)
+    [[nodiscard]] constexpr T& y()
+        requires(IsVector() && Size() > 1)
     {
         return this->operator[](1);
     }
 
-    [[nodiscard]] constexpr const T& y() const requires(IsVector() && Size() > 1)
+    [[nodiscard]] constexpr const T& y() const
+        requires(IsVector() && Size() > 1)
     {
         return this->operator[](1);
     }
 
-    [[nodiscard]] constexpr T& z() requires(IsVector() && Size() > 2)
+    [[nodiscard]] constexpr T& z()
+        requires(IsVector() && Size() > 2)
     {
         return this->operator[](2);
     }
 
-    [[nodiscard]] constexpr const T& z() const requires(IsVector() && Size() > 2)
+    [[nodiscard]] constexpr const T& z() const
+        requires(IsVector() && Size() > 2)
     {
         return this->operator[](2);
     }
 
-    [[nodiscard]] constexpr T& w() requires(IsVector() && Size() > 3)
+    [[nodiscard]] constexpr T& w()
+        requires(IsVector() && Size() > 3)
     {
         return this->operator[](3);
     }
 
-    [[nodiscard]] constexpr const T& w() const requires(IsVector() && Size() > 3)
+    [[nodiscard]] constexpr const T& w() const
+        requires(IsVector() && Size() > 3)
     {
         return this->operator[](3);
     }
@@ -338,8 +343,6 @@ public:
     {
         return std::views::iota(size_t{0}, Size());
     }
-
-
 
     template <size_t other_rows, size_t other_columns>
         requires(NumColumns() == other_rows)
@@ -584,6 +587,10 @@ public:
             (*this)(row_index, column_index) = values[column_index];
         }
     }
+
+    [[nodiscard]] constexpr T Min() const { return *std::ranges::min_element(data_); }
+    [[nodiscard]] constexpr T Max() const { return *std::ranges::max_element(data_); }
+
 #if __cplusplus >= 202302L
 
     template <typename Self>
