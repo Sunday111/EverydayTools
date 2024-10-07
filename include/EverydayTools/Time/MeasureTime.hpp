@@ -25,7 +25,7 @@ auto MeasureTime_AlwaysReturn(F&& f, Args&&... args)
     }
     else
     {
-        auto result = std::invoke_r<R>(std::forward<F>(f), std::forward<Args>(args)...);
+        R result = std::invoke<R>(std::forward<F>(f), std::forward<Args>(args)...);
         return std::tuple{get_duration(), std::move(result)};
     }
 }
@@ -48,7 +48,7 @@ auto MeasureTime(F&& f, Args&&... args)
     }
     else
     {
-        auto result = std::invoke_r<R>(std::forward<F>(f), std::forward<Args>(args)...);
+        auto result = std::invoke<R>(std::forward<F>(f), std::forward<Args>(args)...);
         return std::tuple{get_duration(), std::move(result)};
     }
 }
