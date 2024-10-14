@@ -25,6 +25,8 @@ public:
         };
     }
 
+    [[nodiscard]] constexpr auto Iterable() const { return std::views::iota(begin, end); }
+
     T begin = std::numeric_limits<T>::lowest();
     T end = std::numeric_limits<T>::max();
 };
