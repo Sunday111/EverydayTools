@@ -244,6 +244,18 @@ public:
         Vec4f v4 = mat.MatMul(Vec4f{vec.x(), vec.y(), vec.z(), 0.f});
         return Vec3f{v4.x(), v4.y(), v4.z()};
     }
+
+    template <typename A, typename B>
+    [[nodiscard]] static constexpr auto MatMul(A&& a, B&& b)
+    {
+        return std::forward<A>(a).MatMul(std::forward<B>(b));
+    }
+
+    template <typename A, typename B, typename C>
+    [[nodiscard]] static constexpr auto MatMul(A&& a, B&& b, C&& c)
+    {
+        return (std::forward<A>(a).MatMul(std::forward<B>(b))).MatMul(std::forward<C>(c));
+    }
 };
 
 }  // namespace edt
