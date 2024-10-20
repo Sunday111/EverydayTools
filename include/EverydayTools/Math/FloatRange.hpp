@@ -74,6 +74,10 @@ public:
     {
         return {{min.x(), max.x()}, {min.y(), max.y()}};
     }
+    [[nodiscard]] static constexpr FloatRange2D FromMinMax(T min, T max)
+    {
+        return FromMinMax(Vec2<T>{} + min, Vec2<T>{} + max);
+    }
 
     constexpr void Shift(const Vec2f value)
     {
