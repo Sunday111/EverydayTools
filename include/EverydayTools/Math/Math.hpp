@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <concepts>
+#include <cstdint>
 
 #include "Constants.hpp"
 #include "Matrix.hpp"
