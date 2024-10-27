@@ -17,11 +17,11 @@ constexpr uint64_t MakeByte(size_t byteIndex, uint8_t byteValue)
 class GUID
 {
 public:
-    friend bool operator==(const GUID& a, const GUID& b) { return a.part1 == b.part1 && a.part2 == b.part2; }
+    friend constexpr bool operator==(const GUID& a, const GUID& b) { return a.part1 == b.part1 && a.part2 == b.part2; }
 
-    friend bool operator!=(const GUID& a, const GUID& b) { return !(a == b); }
+    friend constexpr bool operator!=(const GUID& a, const GUID& b) { return !(a == b); }
 
-    bool operator<(const GUID& another) const
+    constexpr bool operator<(const GUID& another) const
     {
         if (part1 == another.part1)
         {
