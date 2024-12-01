@@ -82,6 +82,22 @@ public:
         return v;
     }
 
+    template <std::floating_point T, size_t rows, size_t columns>
+    [[nodiscard]] static constexpr edt::Matrix<T, rows, columns>
+    Lerp(const edt::Matrix<T, rows, columns>& a, const edt::Matrix<T, rows, columns>& b, T t)
+    {
+        edt::Matrix<T, rows, columns> r;
+        for (size_t row : r.RowIndices())
+        {
+            for (size_t column : r.ColumnIndices())
+            {
+                r(row, column) = std::lerp(a(row, column), b(row, column), t);
+            }
+        }
+
+        return r;
+    }
+
     static constexpr edt::Mat3f TranslationMatrix(const Vec2f translation)
     {
         auto m = edt::Mat3f::Identity();
