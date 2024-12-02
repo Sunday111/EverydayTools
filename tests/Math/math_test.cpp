@@ -126,4 +126,19 @@ static_assert(
         return true;
     }(),
     "3d rotation matrix around axis x");
+
+static_assert(
+    []
+    {
+        Vec2f a{-100.f, 200.f};
+        Vec2f b{-200.f, 100.f};
+
+        ExpectEq(edt::Math::Lerp(a, b, 0.5f), {-150.f, 150.f});
+        ExpectEq(edt::Math::Lerp(a, b, 0.f), a);
+        ExpectEq(edt::Math::Lerp(a, b, 1.f), b);
+        ExpectEq(edt::Math::Lerp(a, b, 2.f), {-300, 0});
+
+        return true;
+    }(),
+    "Vector lerp");
 }  // namespace edt
