@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 include(FetchContent)
 
 option(EDT_FETCH_GOOGLE_TESTS "Disable it if you already have google tests in your project" ON)
+option(EDT_FIND_GTEST_PACKAGE "Enable to make the script look for google tests in the system" ON)
 
 if (EDT_FETCH_GOOGLE_TESTS)
   FetchContent_Declare(
@@ -12,7 +13,7 @@ if (EDT_FETCH_GOOGLE_TESTS)
     )
     
   FetchContent_MakeAvailable(googletest)
-else()
+elseif(EDT_FIND_GTEST_PACKAGE)
   find_package(GTest REQUIRED)
   add_library(gtest ALIAS GTest::gtest)
   add_library(gtest_main ALIAS GTest::gtest_main)
