@@ -141,4 +141,17 @@ static_assert(
         return true;
     }(),
     "Vector lerp");
+
+static_assert(
+    []
+    {
+        Vec2f x{-1.f, 2.f};
+        Vec2f min{0.f, 0.f};
+        Vec2f max{1.f, 1.f};
+        ExpectEq(edt::Math::Clamp(x, min, max), {0.f, 1.f});
+
+        return true;
+    }(),
+    "Vector Clamp");
+
 }  // namespace edt

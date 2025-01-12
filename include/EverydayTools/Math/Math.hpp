@@ -57,7 +57,7 @@ public:
             }
         }
 
-        return v;
+        return r;
     }
 
     template <std::floating_point T>
