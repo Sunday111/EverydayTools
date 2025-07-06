@@ -4,6 +4,8 @@
 #include <cmath>
 #include <concepts>
 #include <cstdint>
+#include <numbers>
+#include <vector>
 
 #include "Constants.hpp"
 #include "Matrix.hpp"
@@ -278,6 +280,69 @@ public:
     [[nodiscard]] static constexpr auto MatMul(A&& a, B&& b, C&& c)
     {
         return (std::forward<A>(a).MatMul(std::forward<B>(b))).MatMul(std::forward<C>(c));
+    }
+
+    [[nodiscard]] static constexpr std::vector<Vec2f>
+    GenerateSpiralPoints(size_t num_points, Vec2f size, float phase = 0.f) noexcept
+    {
+        std::vector<Vec2f> points;
+        points.reserve(num_points);
+
+        const float max_r = size.Max() / 2;
+        const float nf = static_cast<float>(num_points);
+        float delta_angle = 4 * std::numbers::pi_v<float> / nf;
+
+        for (size_t i = 0; i != num_points; ++i)
+        {
+            const float fi = static_cast<float>(i);
+            const float t = fi / (nf - 1);
+            float x, y;  // NOLINT
+            edt::Math::SinCos(delta_angle * fi + phase, y, x);
+
+            float r = t * max_r;
+            points.emplace_back(Vec2f{x, y} * r);
+        }
+
+        return points;
+    }
+
+    [[nodiscard]] static constexpr Vec2f
+    CatmullRom(const Vec2f& p0, const Vec2f& p1, const Vec2f& p2, const Vec2f& p3, float t) noexcept
+    {
+        float t2 = t * t;
+        float t3 = t2 * t;
+        return 0.5f * ((2.0f * p1) + (-p0 + p2) * t + (2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2 +
+                       (-p0 + 3.0f * p1 - 3.0f * p2 + p3) * t3);
+    }
+
+    [[nodiscard]] static constexpr Vec2f CatmullRom(std::span<const Vec2f, 4> segment, float t) noexcept
+    {
+        return CatmullRom(segment[0], segment[1], segment[2], segment[3], t);
+    }
+
+    constexpr void SampleCatmullRomPoints(
+        std::span<const Vec2f> control_points,
+        std::vector<Vec2f>& curve_points,
+        size_t samples_per_segment) noexcept
+    {
+        curve_points.clear();
+
+        const auto n = control_points.size();
+        if (n < 4) return;
+
+        curve_points.reserve((n - 3) * samples_per_segment);
+
+        auto i_end = control_points.end() - 3;
+        float nf = static_cast<float>(samples_per_segment);
+        for (auto i = control_points.begin(); i < i_end; ++i)
+        {
+            const std::span<const Vec2f, 4> segment{i, i + 4};
+            for (size_t j = 0; j <= samples_per_segment; ++j)
+            {
+                float t = static_cast<float>(j) / nf;
+                curve_points.push_back(CatmullRom(segment, t));
+            }
+        }
     }
 };
 
