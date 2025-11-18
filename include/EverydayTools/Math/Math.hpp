@@ -5,6 +5,7 @@
 #include <concepts>
 #include <cstdint>
 #include <numbers>
+#include <optional>
 #include <vector>
 
 #include "Constants.hpp"
@@ -343,6 +344,67 @@ public:
                 curve_points.push_back(CatmullRom(segment, t));
             }
         }
+    }
+
+    [[nodiscard]] static constexpr edt::Vec2f ComplexMult(edt::Vec2f a, edt::Vec2f b) noexcept
+    {
+        return {a.x() * b.x() - a.y() * b.y(), a.x() * b.y() + a.y() * b.x()};
+    }
+
+    [[nodiscard]] static Vec2f ComplexExp(Vec2f z) noexcept
+    {
+        return std::exp(z.x()) * Vec2f{std::cos(z.y()), std::sin(z.y())};
+    }
+
+    [[nodiscard]] static Vec2f ComplexPower(Vec2f base, Vec2f power) noexcept
+    {
+        float r = base.Length();
+        float base_theta = std::atan2(base.y(), base.x());
+        Vec2f log_z = {std::log(r), base_theta};
+        Vec2f exponent = ComplexMult(power, log_z);
+        return ComplexExp(exponent);
+    }
+
+    template <typename Callback>
+    static void ComplexPowerN(Vec2f base, Vec2f power, size_t branches, Callback cb) noexcept
+    {
+        float r = base.Length();
+        float base_theta = std::atan2(base.y(), base.x());
+        float log_r = std::log(r);
+
+        int half = static_cast<int>(branches / 2);
+        for (int n = -half / 2; n <= half / 2; ++n)
+        {
+            float theta_n = base_theta + 2 * std::numbers::pi_v<float> * static_cast<float>(n);
+            Vec2f log_z = {log_r, theta_n};
+            Vec2f exponent = ComplexMult(power, log_z);
+            cb(ComplexExp(exponent));
+        }
+    }
+
+    [[nodiscard]] static std::optional<Vec2f> ComplexPower(Vec2f z, float a) noexcept
+    {
+        // Handle zero base
+        if (z.x() == 0 && z.y() == 0)
+        {
+            if (a > 0)
+            {
+                return std::optional<Vec2f>{std::in_place, Vec2f{0, 0}};
+            }
+
+            return std::nullopt;
+        }
+
+        // Convert to polar form
+        float r = z.Length();
+        float theta = std::atan2(z.y(), z.x());  // angle
+
+        // Compute r^a and a*theta
+        float r_pow_a = std::pow(r, a);
+        float a_theta = a * theta;
+
+        // Convert back to rectangular form
+        return std::optional<Vec2f>{std::in_place, Vec2f{r_pow_a * std::cos(a_theta), r_pow_a * std::sin(a_theta)}};
     }
 };
 
