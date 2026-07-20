@@ -545,12 +545,12 @@ public:
 
     template <typename F, typename R = decltype(std::declval<F>()(std::declval<T>()))>
         requires(std::invocable<F, T>)
-    [[nodiscard]] constexpr Matrix<R, num_rows, num_columns> Transform(F&& f) noexcept
+    [[nodiscard]] constexpr Matrix<R, num_rows, num_columns> Transform(F&& f) const noexcept
     {
-        Matrix<R, num_rows, num_columns> r = *this;
-        for (size_t i : r.Indices())
+        Matrix<R, num_rows, num_columns> r;
+        for (size_t i = 0; i != Size(); ++i)
         {
-            r.data_[i] = f(r.data_[i]);
+            r.data_[i] = f(data_[i]);
         }
 
         return r;

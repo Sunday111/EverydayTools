@@ -1,500 +1,275 @@
 #include "EverydayTools/Math/Matrix.hpp"
 
-#include <xmmintrin.h>
+#include <gtest/gtest.h>
 
-#include <EverydayTools/Math/Math.hpp>
-
-#include "TestTools.hpp"
+#include <concepts>
+#include <tuple>
+#include <type_traits>
+#include <utility>
 
 namespace edt
 {
+namespace
+{
+
+template <typename A, typename B>
+concept CanDot = requires(const A& a, const B& b) { a.Dot(b); };
+
+template <typename A, typename B>
+concept CanCross = requires(const A& a, const B& b) { a.Cross(b); };
+
+static_assert(Matrix<int, 2, 3>::NumRows() == 2);
+static_assert(Matrix<int, 2, 3>::NumColumns() == 3);
+static_assert(Matrix<int, 2, 3>::Size() == 6);
+static_assert(!Matrix<int, 2, 3>::IsVector());
+static_assert(Matrix<int, 1, 3>::IsVector());
+static_assert(Matrix<int, 3, 1>::IsVector());
+static_assert(IsMatrix<Mat4f>);
+static_assert(!IsMatrix<int>);
+static_assert(std::same_as<Vec2i, Matrix<int, 2, 1>>);
+static_assert(std::same_as<Mat3f, Matrix<float, 3, 3>>);
 
 static_assert(
     []
     {
-        Matrix<int, 3, 3> m;
-        for (size_t r = 0; r != 3; ++r)
+        const Vec2i xy{1, 2};
+        const Vec3i xyz{xy, 3};
+        const Vec4i xyzw{xyz, 4};
+        const Matrix<int, 2, 2> matrix{{1, 2, 3, 4}};
+        return xy == Vec2i{1, 2} && xyz == Vec3i{1, 2, 3} && xyzw == Vec4i{1, 2, 3, 4} && matrix(1, 0) == 3;
+    }(),
+    "Constructors preserve component order");
+
+static_assert(
+    []
+    {
+        Matrix<int, 2, 3> matrix;
+        for (const size_t row : matrix.RowIndices())
         {
-            for (size_t c = 0; c != 3; ++c)
+            for (const size_t column : matrix.ColumnIndices())
             {
-                if (m(r, c) != 0)
-                {
-                    return false;
-                }
+                if (matrix(row, column) != 0) return false;
             }
         }
-
-        m(0, 1) = 42;
-        m(1, 0) = 24;
-
-        if (m(0, 1) != 42) return false;
-        if (m(1, 0) != 24) return false;
-
-        return true;
-    }());
-
-static_assert(
-    []
-    {
-        auto m = Matrix<int, 5, 3>::Identity();
-
-        int s = 0;
-        for (size_t c = 0; c != m.NumColumns(); ++c)
-        {
-            for (size_t r = 0; r != m.NumRows(); ++r)
-            {
-                s += m(r, c);
-                if (c == r && m(r, c) != 1) return false;
-            }
-        }
-
-        return s == 3;
-    }(),
-    "Identity test");
-
-static_assert(
-    []
-    {
-        Vec3i a{1, 2, 3};
-        Vec3i b{4, 5, 6};
-        return a.Dot(b) == 1 * 4 + 2 * 5 + 3 * 6;
-    }(),
-    "Dot product test");
-
-static_assert(
-    []
-    {
-        Vec3i a{1, 2, 3};
-        Vec3i b{4, 5, 6};
-        return a.Cross(b) == Vec3i{-3, 6, -3};
-    }(),
-    "Cross product test");
-
-static_assert(
-    []
-    {
-        Vec2i a{1, 2};
-        Vec2i b{4, 5};
-        return a.Cross(b) == -3;
-    }(),
-    "2D cross product test");
-
-static_assert(
-    []
-    {
-        // clang-format off
-        Matrix<int, 4, 3> a{{
-            0, 1, 2,
-            3, 4, 5,
-            6, 7, 8,
-            9, 10, 11
-        }};
-        Matrix<int, 3, 5> b{{
-            14, 13, 12, 11, 10,
-            9, 8, 7, 6, 5,
-            4, 3, 2, 1, 0
-        }};
-        Matrix<int, 4, 5> expected{{
-            17, 14, 11, 8, 5,
-            98, 86, 74, 62, 50,
-            179, 158, 137, 116, 95,
-            260, 230, 200, 170, 140
-        }};
-        // clang-format on
-
-        Matrix<int, 4, 5> actual = a.MatMul(b);
-        return actual == expected;
-    }(),
-    "Matrix multiplication test");
-
-static_assert(
-    []
-    {
-        // clang-format off
-        Matrix<int, 3, 4> m{std::array{
-            0, 1, 2, 3,
-            4, 5, 6, 7,
-            8, 9, 10, 11
-        }};
-        Matrix<int, 1, 4> expected{
-            4, 5, 6, 7,
-        };
-        // clang-format on
-
-        Matrix<int, 1, 4> actual = m.GetRow(1);
-        return actual == expected;
-    }(),
-    "GetRow Test");
-
-static_assert(
-    []
-    {
-        // clang-format off
-        Matrix<int, 3, 4> m{std::array{
-            0, 1, 2, 3,
-            4, 5, 6, 7,
-            8, 9, 10, 11
-        }};
-        Matrix<int, 3, 1> expected{
-            1, 5, 9
-        };
-        // clang-format on
-
-        Matrix<int, 3, 1> actual = m.GetColumn(1);
-        return actual == expected;
-    }(),
-    "GetColumn Test");
-
-static_assert(
-    []
-    {
-        // clang-format off
-        Matrix<int, 3, 4> m{{
-            0, 1, 2, 3,
-            4, 5, 6, 7,
-            8, 9, 10, 11
-        }};
-        Matrix<int, 4, 3> expected{{
-            0, 4, 8,
-            1, 5, 9,
-            2, 6, 10,
-            3, 7, 11
-        }};
-        // clang-format on
-
-        Matrix<int, 4, 3> actual = m.Transposed();
-        return actual == expected;
-    }(),
-    "Transposed Test");
-
-static_assert(
-    []
-    {
-        Matrix<int, 5, 3> a{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}};
-
-        auto b = a + 10;
-
-        for (const size_t row : b.RowIndices())
-        {
-            for (const size_t column : b.ColumnIndices())
-            {
-                if (b(row, column) != static_cast<int>(row * b.NumColumns() + column) + 10)
-                {
-                    return false;
-                }
-            }
-        }
-
         return true;
     }(),
-    "Matrix + scalar test");
+    "Default construction zero-initializes every cell");
 
 static_assert(
     []
     {
-        Matrix<int, 5, 3> a{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}};
+        Vec4i vector{1, 2, 3, 4};
+        vector.x() = 5;
+        vector.y() = 6;
+        vector.z() = 7;
+        vector.w() = 8;
+        vector[2] = 9;
+        return vector == Vec4i{5, 6, 9, 8};
+    }(),
+    "Named and indexed vector access is mutable");
 
-        auto b = 10 + a;
+static_assert(
+    []
+    {
+        Matrix<int, 2, 3> matrix{{0, 1, 2, 3, 4, 5}};
+        matrix.At<0, 2>() = 20;
+        matrix(1, 0) = 30;
+        const auto& const_matrix = matrix;
+        return const_matrix.At<0, 2>() == 20 && const_matrix(1, 0) == 30;
+    }(),
+    "Matrix cell access supports const and mutable matrices");
 
-        for (const size_t row : b.RowIndices())
+static_assert(Vec3i::AxisX() == Vec3i{1, 0, 0});
+static_assert(Vec3i::AxisY() == Vec3i{0, 1, 0});
+static_assert(Vec3i::AxisZ() == Vec3i{0, 0, 1});
+
+static_assert(
+    []
+    {
+        const auto identity = Matrix<int, 3, 5>::Identity();
+        for (const size_t row : identity.RowIndices())
         {
-            for (const size_t column : b.ColumnIndices())
+            for (const size_t column : identity.ColumnIndices())
             {
-                if (b(row, column) != static_cast<int>(row * b.NumColumns() + column) + 10)
-                {
-                    return false;
-                }
+                if (identity(row, column) != static_cast<int>(row == column)) return false;
             }
         }
-
         return true;
     }(),
-    "Scalar + matrix test");
+    "Rectangular identity matrices initialize their full diagonal");
+
+static_assert(Vec3i{1, 2, 3}.Cast<float>() == Vec3f{1.f, 2.f, 3.f});
+static_assert(CanDot<Vec3i, Matrix<int, 1, 3>>);
+static_assert(!CanDot<Vec2i, Vec3i>);
+static_assert(Vec3i{1, 2, 3}.Dot(Matrix<int, 1, 3>{4, 5, 6}) == 32);
+static_assert(CanCross<Vec2i, Matrix<int, 1, 2>>);
+static_assert(CanCross<Vec3i, Matrix<int, 1, 3>>);
+static_assert(!CanCross<Vec4i, Vec4i>);
+static_assert(Vec2i{1, 2}.Cross(Matrix<int, 1, 2>{4, 5}) == -3);
+static_assert(Vec3i{1, 2, 3}.Cross(Matrix<int, 1, 3>{4, 5, 6}) == Vec3i{-3, 6, -3});
+static_assert(Vec3i{1, 2, 3}.Magnitude() == 14);
+static_assert(Vec3i{1, 2, 3}.SquaredLength() == 14);
 
 static_assert(
     []
     {
-        Matrix<int, 5, 3> a{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}};
+        const Matrix<int, 2, 3> lhs{{1, 2, 3, 4, 5, 6}};
+        const Matrix<int, 3, 2> rhs{{7, 8, 9, 10, 11, 12}};
+        return lhs.MatMul(rhs) == Matrix<int, 2, 2>{{58, 64, 139, 154}};
+    }(),
+    "Rectangular matrix multiplication");
 
-        auto b = a - 10;
+static_assert(
+    []
+    {
+        const Matrix<int, 2, 3> matrix{{1, 2, 3, 4, 5, 6}};
+        const Vec3i vector{7, 8, 9};
+        return matrix.MatMul(vector) == Vec2i{50, 122};
+    }(),
+    "Matrix-vector multiplication");
 
-        for (const size_t row : b.RowIndices())
+static_assert(
+    []
+    {
+        Matrix<int, 2, 2> matrix{{1, 2, 3, 4}};
+        matrix += 2;
+        matrix -= 1;
+        matrix *= 3;
+        matrix /= 2;
+        return matrix == Matrix<int, 2, 2>{{3, 4, 6, 7}};
+    }(),
+    "Compound scalar arithmetic");
+
+static_assert(
+    []
+    {
+        const Matrix<int, 2, 2> matrix{{1, 2, 4, 5}};
+        return matrix + 2 == Matrix<int, 2, 2>{{3, 4, 6, 7}} && 2 + matrix == Matrix<int, 2, 2>{{3, 4, 6, 7}} &&
+               matrix - 2 == Matrix<int, 2, 2>{{-1, 0, 2, 3}} && 10 - matrix == Matrix<int, 2, 2>{{9, 8, 6, 5}} &&
+               matrix * 2 == Matrix<int, 2, 2>{{2, 4, 8, 10}} && 2 * matrix == Matrix<int, 2, 2>{{2, 4, 8, 10}} &&
+               matrix / 2 == Matrix<int, 2, 2>{{0, 1, 2, 2}} && 20 / matrix == Matrix<int, 2, 2>{{20, 10, 5, 4}};
+    }(),
+    "Binary scalar arithmetic works from both sides");
+
+static_assert(
+    []
+    {
+        Matrix<int, 2, 2> matrix{{2, 4, 6, 8}};
+        const Matrix<int, 2, 2> other{{1, 2, 3, 4}};
+        matrix += other;
+        matrix -= other;
+        matrix *= other;
+        matrix /= other;
+        return matrix == Matrix<int, 2, 2>{{2, 4, 6, 8}};
+    }(),
+    "Compound component-wise matrix arithmetic");
+
+static_assert(
+    []
+    {
+        const Matrix<int, 2, 2> lhs{{2, 4, 6, 8}};
+        const Matrix<int, 2, 2> rhs{{1, 2, 3, 4}};
+        return lhs + rhs == Matrix<int, 2, 2>{{3, 6, 9, 12}} && lhs - rhs == Matrix<int, 2, 2>{{1, 2, 3, 4}} &&
+               lhs * rhs == Matrix<int, 2, 2>{{2, 8, 18, 32}} && lhs / rhs == Matrix<int, 2, 2>{{2, 2, 2, 2}} &&
+               -rhs == Matrix<int, 2, 2>{{-1, -2, -3, -4}};
+    }(),
+    "Binary component-wise matrix arithmetic and negation");
+
+static_assert(
+    []
+    {
+        Matrix<int, 3, 4> matrix{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}};
+        if (matrix.GetRow(1) != Matrix<int, 1, 4>{4, 5, 6, 7}) return false;
+        if (matrix.GetColumn(2) != Vec3i{2, 6, 10}) return false;
+        matrix.SetRow(0, Vec4i{20, 21, 22, 23});
+        matrix.SetColumn(1, Matrix<int, 1, 3>{30, 31, 32});
+        return matrix.GetRow(0) == Matrix<int, 1, 4>{20, 30, 22, 23} && matrix.GetColumn(1) == Vec3i{30, 31, 32};
+    }(),
+    "Rows and columns can be read and replaced with either vector orientation");
+
+static_assert(
+    []
+    {
+        const Matrix<int, 3, 4> matrix{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}};
+        return matrix.Sub<2, 3>() == Matrix<int, 2, 3>{{0, 1, 2, 4, 5, 6}} &&
+               matrix.Transposed() == Matrix<int, 4, 3>{{0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7, 11}};
+    }(),
+    "Submatrices and transposition preserve row-major ordering");
+
+static_assert(
+    []
+    {
+        Matrix<int, 2, 3> matrix{{-2, 3, 8, 1, 0, 5}};
+        const auto transformed = matrix.Transform([](int value) { return static_cast<float>(value) * 0.5f; });
+        return transformed == Matrix<float, 2, 3>{{-1.f, 1.5f, 4.f, 0.5f, 0.f, 2.5f}};
+    }(),
+    "Transform supports matrices and changing component type");
+
+static_assert(
+    []
+    {
+        const Matrix<int, 2, 3> matrix{{-2, 3, 8, 1, 0, 5}};
+        return matrix.Min() == -2 && matrix.Max() == 8 && matrix.Tuple() == std::tuple{-2, 3, 8, 1, 0, 5};
+    }(),
+    "Reduction and tuple conversion include every component");
+
+static_assert(
+    []
+    {
+        const Vec4i vector{5, 6, 7, 8};
+        size_t expected = 0;
+        for (const size_t index : vector.Indices())
         {
-            for (const size_t column : b.ColumnIndices())
-            {
-                if (b(row, column) != static_cast<int>(row * b.NumColumns() + column) - 10)
-                {
-                    return false;
-                }
-            }
+            if (index != expected++) return false;
         }
-
-        return true;
+        return expected == vector.Size();
     }(),
-    "Matrix minus scalar test");
+    "Vector indices span every component");
 
-static_assert(
-    []
-    {
-        Matrix<size_t, 5, 3> a{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}};
+TEST(MatrixTest, DataProvidesContiguousMutableStorage)
+{
+    Matrix<int, 2, 3> matrix{{1, 2, 3, 4, 5, 6}};
+    int* data = matrix.data();
+    EXPECT_EQ(data[0], 1);
+    EXPECT_EQ(data[5], 6);
+    data[3] = 40;
 
-        auto b = size_t{10} - a;
+    const auto& const_matrix = matrix;
+    EXPECT_EQ(const_matrix.data()[3], 40);
+    EXPECT_EQ(const_matrix(1, 0), 40);
+}
 
-        for (const size_t row : b.RowIndices())
-        {
-            for (const size_t column : b.ColumnIndices())
-            {
-                if (b(row, column) != size_t{10} - (row * b.NumColumns() + column))
-                {
-                    return false;
-                }
-            }
-        }
+TEST(MatrixTest, FloatingPointLengthAndNormalization)
+{
+    const Vec2f vector{3.f, 4.f};
+    EXPECT_FLOAT_EQ(vector.Length(), 5.f);
+    EXPECT_EQ(vector, (Vec2f{3.f, 4.f}));
 
-        return true;
-    }(),
-    "Scalar minus matrix test");
+    const Vec2f normalized = vector.Normalized();
+    EXPECT_NEAR(normalized.x(), 0.6f, 0.0001f);
+    EXPECT_NEAR(normalized.y(), 0.8f, 0.0001f);
+    EXPECT_NEAR(normalized.Length(), 1.f, 0.0001f);
 
-static_assert(
-    []
-    {
-        Matrix<int, 5, 3> a{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}};
+    Vec2f mutable_vector = vector;
+    mutable_vector.Normalize();
+    EXPECT_NEAR(mutable_vector.x(), 0.6f, 0.0001f);
+    EXPECT_NEAR(mutable_vector.y(), 0.8f, 0.0001f);
+}
 
-        auto b = a * 10;
+TEST(MatrixTest, CopyAndMovePreserveValues)
+{
+    const Matrix<int, 2, 2> original{{1, 2, 3, 4}};
+    Matrix<int, 2, 2> copied = original;
+    Matrix<int, 2, 2> moved = std::move(copied);
+    EXPECT_EQ(moved, original);
 
-        for (const size_t row : b.RowIndices())
-        {
-            for (const size_t column : b.ColumnIndices())
-            {
-                if (b(row, column) != static_cast<int>(row * b.NumColumns() + column) * 10)
-                {
-                    return false;
-                }
-            }
-        }
+    Matrix<int, 2, 2> copy_assigned;
+    copy_assigned = original;
+    Matrix<int, 2, 2> move_assigned;
+    move_assigned = std::move(copy_assigned);
+    EXPECT_EQ(move_assigned, original);
+    EXPECT_NE(move_assigned, (Matrix<int, 2, 2>{{4, 3, 2, 1}}));
+}
 
-        return true;
-    }(),
-    "Matrix times scalar test");
-
-static_assert(
-    []
-    {
-        Matrix<int, 5, 3> a{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}};
-
-        auto b = 10 * a;
-
-        for (const size_t row : b.RowIndices())
-        {
-            for (const size_t column : b.ColumnIndices())
-            {
-                if (b(row, column) != 10 * static_cast<int>(row * b.NumColumns() + column))
-                {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }(),
-    "Scalar times matrix test");
-
-static_assert(
-    []
-    {
-        Matrix<int, 5, 3> a{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}};
-
-        auto b = a / 10;
-
-        for (const size_t row : b.RowIndices())
-        {
-            for (const size_t column : b.ColumnIndices())
-            {
-                if (b(row, column) != static_cast<int>(row * b.NumColumns() + column) / 10)
-                {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }(),
-    "Matrix divided by scalar test");
-
-static_assert(
-    []
-    {
-        Matrix<int, 5, 3> a{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}};
-
-        auto b = 10 / a;
-
-        for (const size_t row : b.RowIndices())
-        {
-            for (const size_t column : b.ColumnIndices())
-            {
-                if (b(row, column) != 10 / static_cast<int>(row * b.NumColumns() + column + 1))
-                {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }(),
-    "Scalar divided by matrix test");
-
-static_assert(
-    []
-    {
-        auto m = edt::Matrix<int, 4, 4>::Identity();
-        m(0, 3) = 5;
-        m(1, 3) = 8;
-        m(2, 3) = 19;
-        edt::Vec4<int> v{0, 0, 0, 1};
-        auto translated = m.MatMul(v);
-        return translated == Vec4<int>{5, 8, 19, 1};
-    }(),
-    "Translation matrix test");
-
-// Rotation around axis X, CCW
-static_assert(
-    []
-    {
-        const auto m = edt::Math::RotationMatrix3dX(edt::Math::DegToRad(90.f));
-        const auto v = edt::Math::TransformVector(m, {0, 1, 0});
-        return CAbs(v.x()) < 0.1f && CAbs(v.y()) < 0.1f && CAbs(v.z() - 1) < 0.1f;
-    }(),
-    "Rotation around X axis test");
-
-// Rotation around axis Y, CCW
-static_assert(
-    []
-    {
-        const auto m = edt::Math::RotationMatrix3dY(edt::Math::DegToRad(90.f));
-        const auto v = edt::Math::TransformVector(m, {1, 0, 0});
-        return CAbs(v.x()) < 0.1f && CAbs(v.y()) < 0.1f && CAbs(v.z() + 1) < 0.1f;
-    }(),
-    "Rotation around Y axis test");
-
-// Rotation around axis Z, CCW
-static_assert(
-    []
-    {
-        const auto m = edt::Math::RotationMatrix3dZ(edt::Math::DegToRad(90.f));
-        const auto v = edt::Math::TransformVector(m, {1, 0, 0});
-        return CAbs(v.x()) < 0.1f && CAbs(v.y() - 1) < 0.1f && CAbs(v.z()) < 0.1f;
-    }(),
-    "Rotation around Y axis test");
-
-// Rotation around axis X, CCW and then translation
-// Translation part should be ignored for vector operation
-static_assert(
-    []
-    {
-        const auto m = edt::Math::TranslationMatrix(Vec3f{41, 21, 13})
-                           .MatMul(edt::Math::RotationMatrix3dX(edt::Math::DegToRad(90.f)));
-        const auto v = edt::Math::TransformVector(m, {0, 1, 0});
-        return CAbs(v.x()) < 0.1f && CAbs(v.y()) < 0.1f && CAbs(v.z() - 1) < 0.1f;
-    }(),
-    "Rotation around X axis test");
-
-// Rotation around axis X, CCW and then translation
-// Translation part should not be ignored for vector operation
-static_assert(
-    []
-    {
-        const auto m = edt::Math::TranslationMatrix(Vec3f{41, 21, 13})
-                           .MatMul(edt::Math::RotationMatrix3dX(edt::Math::DegToRad(90.f)));
-        const auto v = edt::Math::TransformPos(m, {0, 1, 0});
-        return CAbs(v.x() - 41.f) < 0.1f && CAbs(v.y() - 21.f) < 0.1f && CAbs(v.z() - 14.f) < 0.1f;
-    }(),
-    "Rotation around X axis test");
-
-// void M4x4_SSE(const float* a, const float* b, float* c)
-// {
-//     __m128 row1 = _mm_load_ps(&b[0]);
-//     __m128 row2 = _mm_load_ps(&b[4]);
-//     __m128 row3 = _mm_load_ps(&b[8]);
-//     __m128 row4 = _mm_load_ps(&b[12]);
-//     for (int i = 0; i < 4; i++)
-//     {
-//         __m128 brod1 = _mm_set1_ps(a[4 * i + 0]);
-//         __m128 brod2 = _mm_set1_ps(a[4 * i + 1]);
-//         __m128 brod3 = _mm_set1_ps(a[4 * i + 2]);
-//         __m128 brod4 = _mm_set1_ps(a[4 * i + 3]);
-//         __m128 row = _mm_add_ps(
-//             _mm_add_ps(_mm_mul_ps(brod1, row1), _mm_mul_ps(brod2, row2)),
-//             _mm_add_ps(_mm_mul_ps(brod3, row3), _mm_mul_ps(brod4, row4)));
-//         _mm_store_ps(&c[4 * i], row);
-//     }
-// }
-
-// [[nodiscard]] edt::Mat4f M4x4_SSE(const edt::Mat4f& a, const edt::Mat4f& b)
-// {
-//     edt::Mat4f mc;
-//     __m128 r0 = _mm_load_ps(&b.At<0, 0>());
-//     __m128 r1 = _mm_load_ps(&b.At<1, 0>());
-//     __m128 r3 = _mm_load_ps(&b.At<2, 0>());
-//     __m128 r4 = _mm_load_ps(&b.At<3, 0>());
-
-//     _mm_store_ps(
-//         &mc.At<0, 0>(),
-//         _mm_add_ps(
-//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<0, 0>()), r0), _mm_mul_ps(_mm_set1_ps(a.At<0, 1>()), r1)),
-//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<0, 2>()), r3), _mm_mul_ps(_mm_set1_ps(a.At<0, 3>()), r4))));
-
-//     _mm_store_ps(
-//         &mc.At<1, 0>(),
-//         _mm_add_ps(
-//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<1, 0>()), r0), _mm_mul_ps(_mm_set1_ps(a.At<1, 1>()), r1)),
-//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<1, 2>()), r3), _mm_mul_ps(_mm_set1_ps(a.At<1, 3>()), r4))));
-
-//     _mm_store_ps(
-//         &mc.At<2, 0>(),
-//         _mm_add_ps(
-//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<2, 0>()), r0), _mm_mul_ps(_mm_set1_ps(a.At<2, 1>()), r1)),
-//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<2, 2>()), r3), _mm_mul_ps(_mm_set1_ps(a.At<2, 3>()), r4))));
-
-//     _mm_store_ps(
-//         &mc.At<3, 0>(),
-//         _mm_add_ps(
-//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<3, 0>()), r0), _mm_mul_ps(_mm_set1_ps(a.At<3, 1>()), r1)),
-//             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(a.At<3, 2>()), r3), _mm_mul_ps(_mm_set1_ps(a.At<3, 3>()), r4))));
-
-//     return mc;
-// }
-
-// TEST(MatrixTest, MultiplicationSSE)
-// {
-//     static constexpr unsigned kSeed = 12345;
-//     std::mt19937 rnd(kSeed);  // NOLINT
-//     std::uniform_real_distribution<float> distr(-1.f, 1.f);
-
-//     edt::Mat4f a;
-//     edt::Mat4f b;
-//     edt::Mat4f expected;
-//     edt::Mat4f actual;
-
-//     auto rnd_mtx = [&](edt::Mat4f& m)
-//     {
-//         for (size_t i = 0; i != m.data_.size(); ++i)
-//         {
-//             m.data_[i] = distr(rnd);
-//         }
-//     };
-
-//     for (size_t i = 0; i != 1000; ++i)
-//     {
-//         rnd_mtx(a);
-//         rnd_mtx(b);
-
-//         expected = a.MatMul(b);
-//         actual = M4x4_SSE(a, b);
-
-//         for (size_t j = 0; j != a.data_.size(); ++j)
-//         {
-//             ASSERT_NEAR(expected.data_[j], actual.data_[j], 0.0001f);
-//         }
-//     }
-// }
+}  // namespace
 }  // namespace edt
