@@ -154,4 +154,14 @@ static_assert(
     }(),
     "Vector Clamp");
 
+static_assert(
+    []
+    {
+        Vec2f x{-1.f, 2.f};
+        ExpectEq(edt::Math::Clamp(x, 0.f, 1.f), {0.f, 1.f});
+
+        return true;
+    }(),
+    "Vector clamp with scalar bounds");
+
 }  // namespace edt

@@ -88,7 +88,7 @@ public:
             }
         }
 
-        return v;
+        return r;
     }
 
     template <std::floating_point T, size_t rows, size_t columns>

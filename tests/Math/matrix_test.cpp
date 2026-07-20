@@ -73,6 +73,15 @@ static_assert(
 static_assert(
     []
     {
+        Vec2i a{1, 2};
+        Vec2i b{4, 5};
+        return a.Cross(b) == -3;
+    }(),
+    "2D cross product test");
+
+static_assert(
+    []
+    {
         // clang-format off
         Matrix<int, 4, 3> a{{
             0, 1, 2,

@@ -297,7 +297,7 @@ public:
     // Two-dimensional "cross product". A hack to obtain a magnitude of 3-dimensional cross product
     template <size_t other_rows, size_t other_columns>
         requires(kVectorsWithSameSize<Matrix<T, other_rows, other_columns>, Matrix> && Size() == 2)
-    [[nodiscard]] constexpr Matrix Cross(const Matrix<T, other_rows, other_columns>& other) const
+    [[nodiscard]] constexpr T Cross(const Matrix<T, other_rows, other_columns>& other) const
     {
         auto& a = *this;
         auto& b = other;
