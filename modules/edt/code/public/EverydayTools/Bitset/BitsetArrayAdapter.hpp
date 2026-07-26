@@ -36,7 +36,7 @@ public:
 
         const size_t part_begin = begin / kPartSizeBits;
         const size_t part_end = end / kPartSizeBits;
-        assert(part_begin < parts_.size() && part_end <= parts_.size());  // NOLINT(misc-static-assert): runtime guard, only constant in the constexpr tests
+        assert(part_begin < parts_.size() && part_end <= parts_.size());  // NOLINT
 
         const size_t rem_begin = begin % kPartSizeBits;
         const size_t rem_end = end % kPartSizeBits;

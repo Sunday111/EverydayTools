@@ -25,7 +25,7 @@ public:
 
     constexpr void Set(const size_t index, const bool value) const
     {
-        assert(index < kBitsCount);  // NOLINT(misc-static-assert): runtime guard, only constant in the constexpr tests
+        assert(index < kBitsCount);  // NOLINT
         Mask mask = 1;
         LeftShift(mask, index);
         SetMasked(mask, value);
@@ -42,7 +42,7 @@ public:
 
     [[nodiscard]] constexpr bool Get(const size_t index) const noexcept
     {
-        assert(index < kBitsCount);  // NOLINT(misc-static-assert): runtime guard, only constant in the constexpr tests
+        assert(index < kBitsCount);  // NOLINT
         Mask mask = 1;
         LeftShift(mask, index);
         return (*bitset_ & mask) != 0;
@@ -50,7 +50,7 @@ public:
 
     constexpr void SetN(const size_t begin, const size_t count, const bool value) const noexcept
     {
-        assert(begin < kBitsCount && (begin + count) <= kBitsCount);  // NOLINT(misc-static-assert): runtime guard, only constant in the constexpr tests
+        assert(begin < kBitsCount && (begin + count) <= kBitsCount);  // NOLINT
         Mask mask = kFullMask;
         RightShift(mask, kBitsCount - count);
         LeftShift(mask, begin);
@@ -59,7 +59,7 @@ public:
 
     constexpr void SetRange(const size_t begin, const size_t end, const bool value) const noexcept
     {
-        assert(begin < kBitsCount && end <= kBitsCount);  // NOLINT(misc-static-assert): runtime guard, only constant in the constexpr tests
+        assert(begin < kBitsCount && end <= kBitsCount);  // NOLINT
         const size_t count = end - begin;
         Mask mask = kFullMask;
         RightShift(mask, kBitsCount - count);
