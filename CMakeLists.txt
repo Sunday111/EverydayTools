@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(EverydayTools)
+project(EverydayTools LANGUAGES CXX)
 
 set(edt_include_dir ${CMAKE_CURRENT_SOURCE_DIR}/include)
 file(GLOB_RECURSE edt_heders_headers ${edt_include_dir})
