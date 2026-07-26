@@ -11,7 +11,7 @@ def main():
     llvm_install = llvm_root / "llvm-install"
 
     subprocess.check_call(["cmake", *("--build", build_dir)])
-    executable = build_dir / "tests/EverydayToolsTests"
+    executable = build_dir / "EverydayToolsTests"
     profraw = build_dir / "profile.profraw"
     subprocess.check_call(
         [

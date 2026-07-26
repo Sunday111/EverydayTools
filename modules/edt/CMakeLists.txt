@@ -1,0 +1,65 @@
+cmake_minimum_required(VERSION 3.20)
+include(set_compiler_options)
+set(module_source_files
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Algorithm/Clamp.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Algorithm/Compare.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Algorithm/Sort/BubbleSort.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Algorithm/Sort/InsertionSort.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Array/ArrayView.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Array/ArrayViewVector.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Bitset/BitIterator.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Bitset/BitsetAdapter.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Bitset/BitsetArrayAdapter.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Bitset/BitsetUtilities.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Bitset/DynamicBitset.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Bitset/EnumBitset.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Bitset/FixedBitset.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Branchless/IntIf.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Branchless/SwapIf.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Concepts/Callable.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Constexpr/HexToDec.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Constexpr/ToLower.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Delegate.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Exception/CallAndRethrow.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Exception/CheckedCast.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Exception/PrintException.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Exception/ThrowIfFailed.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/FrameRateCounter.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Functional/CallForEachArg.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Functional/Wrap.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/GUID.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/GUID_fmtlib.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Math/Constants.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Math/FloatRange.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Math/IntRange.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Math/Math.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Math/Matrix.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Math/SurfacePoints.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Observable.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Pointer/IntrusivePtr.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Preprocessor/EmptyBases.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Preprocessor/ExpotImport.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Preprocessor/Stringify.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Ranges/ArrayIndices2d.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Size.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/AllTypesMatchCondition.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/AnyTypeMatchCondition.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/ApplyIf.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/FwdDecl.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/IsSpecialization.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/Overload.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/PureSameTypes.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/Signature.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/StaticFor.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/StringLiteral.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/TaggedIdentifier.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/TaggedTypeId.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/TypesList.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/ValuesList.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/WorstQualifiers.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Template/WorstReference.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Time/MeasureTime.hpp)
+add_library(edt INTERFACE ${module_source_files})
+set_generic_compiler_options(edt INTERFACE)
+target_include_directories(edt INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/code/public)
+target_include_directories(edt INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/code/private)

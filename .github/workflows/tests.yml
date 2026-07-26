@@ -7,17 +7,44 @@ on:
 jobs:
   linux:
     runs-on: ubuntu-latest
+    env:
+      # Where yae clones dependencies (yae-support, googletest, ...) and writes
+      # its registry.json. The checked-out project supplies the EverydayTools
+      # package itself, so the code under test is what gets built.
+      YAE_REPOS: ${{ github.workspace }}/.yae-repos
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out EverydayTools
+        uses: actions/checkout@v4
+        with:
+          path: project
 
-      - name: Configure
+      - name: Check out the yae build tool
+        uses: actions/checkout@v4
+        with:
+          repository: Sunday111/yae
+          path: yae
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      # yae generates a Ninja build. ubuntu-latest ships Ninja, but install it
+      # explicitly so the workflow does not depend on the runner image contents.
+      - name: Install Ninja
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      # Options must precede the target: `yae run` forwards everything after the
+      # run target to the executable (argparse REMAINDER), so flags placed after
+      # it would be swallowed instead of parsed by yae.
+      - name: Build tests
         run: >
-          cmake -S . -B build
-          -DCMAKE_BUILD_TYPE=Release
-          -DEDT_WITH_TESTS=ON
+          uv run --project yae yae build
+          --project_dir project
+          --cloned_repositories_dir "$YAE_REPOS"
+          EverydayToolsTests
 
-      - name: Build
-        run: cmake --build build --parallel
-
-      - name: Test
-        run: ctest --test-dir build --output-on-failure
+      - name: Run tests
+        run: >
+          uv run --project yae yae run
+          --project_dir project
+          --cloned_repositories_dir "$YAE_REPOS"
+          EverydayToolsTests

@@ -53,9 +53,9 @@ template <typename T>
 }
 
 template <std::floating_point T1, std::convertible_to<T1> T2>
-constexpr void ExpectEq(T1 a, T2 b, T1 precision = T1{0.0001})
+constexpr void ExpectEq(T1 a, T2 b, T1 precision = static_cast<T1>(0.0001))
 {
-    auto delta = a - b;
+    T1 delta = a - static_cast<T1>(b);
     if (delta < 0) delta = -delta;
 
     if (delta < precision) return;
@@ -63,7 +63,7 @@ constexpr void ExpectEq(T1 a, T2 b, T1 precision = T1{0.0001})
 }
 
 template <std::floating_point T, size_t rows, size_t columns>
-constexpr void ExpectEq(edt::Matrix<T, rows, columns> a, edt::Matrix<T, rows, columns> b, T precision = T{0.0001})
+constexpr void ExpectEq(edt::Matrix<T, rows, columns> a, edt::Matrix<T, rows, columns> b, T precision = static_cast<T>(0.0001))
 {
     for (size_t r = 0; r != rows; ++r)
     {

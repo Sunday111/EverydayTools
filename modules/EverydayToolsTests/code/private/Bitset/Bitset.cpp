@@ -53,10 +53,10 @@ TEST(FixedBitsetTest, SetGet)  // NOLINT
         edt_bitset.Set(index, new_value);
         ASSERT_EQ(edt_bitset.Get(index), new_value);
 
-        for (size_t index = 0; index != std_bitset.size(); ++index)
+        for (size_t check_index = 0; check_index != std_bitset.size(); ++check_index)
         {
-            ASSERT_EQ(std_bitset[index], edt_bitset.Get(index))
-                << "bit_index = " << index << ", flip index = " << index;
+            ASSERT_EQ(std_bitset[check_index], edt_bitset.Get(check_index))
+                << "bit_index = " << check_index << ", flip index = " << check_index;
         }
     }
 }
@@ -108,10 +108,11 @@ TEST(DynamicBitsetTest, ResizeSetGet)  // NOLINT
             bitset.Set(index, new_value);
             ASSERT_EQ(bitset.Get(index), new_value);
 
-            for (size_t index = 0; index != vector.size(); ++index)
+            for (size_t check_index = 0; check_index != vector.size(); ++check_index)
             {
-                ASSERT_EQ(vector[index], bitset.Get(index))
-                    << "resize_index = " << resize_index << ", bit_index = " << index << ", flip index = " << index;
+                ASSERT_EQ(vector[check_index], bitset.Get(check_index))
+                    << "resize_index = " << resize_index << ", bit_index = " << check_index
+                    << ", flip index = " << check_index;
             }
         }
     }
@@ -135,11 +136,11 @@ TEST(BitsetAdapterTest, ForEach)  // NOLINT
         expected.clear();
         actual.clear();
 
-        for (size_t i = 0; i != adapter.kBitsCount; ++i)
+        for (size_t bit = 0; bit != adapter.kBitsCount; ++bit)
         {
-            if (adapter.Get(i))
+            if (adapter.Get(bit))
             {
-                expected.push_back(i);
+                expected.push_back(bit);
             }
         }
 
@@ -172,11 +173,11 @@ TEST(BitIteratorTest, Test)  // NOLINT
             actual.push_back(*opt);
         }
 
-        for (size_t i = 0; i != adapter.kBitsCount; ++i)
+        for (size_t bit = 0; bit != adapter.kBitsCount; ++bit)
         {
-            if (adapter.Get(i))
+            if (adapter.Get(bit))
             {
-                expected.push_back(i);
+                expected.push_back(bit);
             }
         }
 

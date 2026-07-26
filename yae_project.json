@@ -1,0 +1,13 @@
+{
+    "name": "EverydayTools",
+    "default_configuration": {
+        "build_dir": "build",
+        "build_targets": [
+            "EverydayToolsTests"
+        ],
+        "run_target": "EverydayToolsTests"
+    },
+    "cpp": {
+        "standard": "20"
+    }
+}
