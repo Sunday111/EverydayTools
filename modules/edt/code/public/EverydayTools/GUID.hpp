@@ -102,9 +102,10 @@ private:
             return parseBytes(0, 1, 2, 3, 4, 5, 6, 7);
         };
 
-        return GUID{//                              0  1  2  3   4  5  6   7
-                    parsePart(std::array<size_t, 8>{6, 4, 2, 0, 11, 9, 16, 14}),
-                    parsePart(std::array<size_t, 8>{19, 21, 24, 26, 28, 30, 32, 34})};
+        return GUID{
+            //                              0  1  2  3   4  5  6   7
+            parsePart(std::array<size_t, 8>{6, 4, 2, 0, 11, 9, 16, 14}),
+            parsePart(std::array<size_t, 8>{19, 21, 24, 26, 28, 30, 32, 34})};
     }
 
 public:

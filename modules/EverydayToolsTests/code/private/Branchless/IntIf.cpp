@@ -1,7 +1,8 @@
+#include "EverydayTools/Branchless/IntIf.hpp"
+
 #include <cstdint>
 #include <limits>
 
-#include "EverydayTools/Branchless/IntIf.hpp"
 #include "gtest/gtest.h"
 
 using edt::IntIf;

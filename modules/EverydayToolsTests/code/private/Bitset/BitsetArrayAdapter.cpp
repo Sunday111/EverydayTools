@@ -1,9 +1,10 @@
+#include "EverydayTools/Bitset/BitsetArrayAdapter.hpp"
+
 #include <array>
 #include <cstdint>
 #include <span>
 #include <utility>
 
-#include "EverydayTools/Bitset/BitsetArrayAdapter.hpp"
 #include "gtest/gtest.h"
 
 namespace
@@ -24,9 +25,9 @@ void CheckSetRange(const bool initial, const size_t begin, const size_t end, con
     for (size_t i = 0; i != kBits; ++i)
     {
         const bool expected = (i >= begin && i < end) ? value : initial;
-        ASSERT_EQ(adapter.Get(i), expected) << "part_bytes=" << sizeof(Part) << " nparts=" << NParts
-                                            << " initial=" << initial << " value=" << value << " range=[" << begin
-                                            << "," << end << ") bit=" << i;
+        ASSERT_EQ(adapter.Get(i), expected)
+            << "part_bytes=" << sizeof(Part) << " nparts=" << NParts << " initial=" << initial << " value=" << value
+            << " range=[" << begin << "," << end << ") bit=" << i;
     }
 }
 
@@ -71,11 +72,13 @@ constexpr uint32_t ConstexprArraySetRange()
 static_assert(ConstexprArraySetRange() == 0x1007F8u);
 
 // PartsCount()/Size() are constexpr for a static-extent adapter.
-static_assert([] {
-    std::array<uint16_t, 4> arr{};
-    edt::BitsetArrayAdapter adapter{std::span(arr)};
-    return adapter.PartsCount() == 4 && adapter.Size() == 64;
-}());
+static_assert(
+    []
+    {
+        std::array<uint16_t, 4> arr{};
+        edt::BitsetArrayAdapter adapter{std::span(arr)};
+        return adapter.PartsCount() == 4 && adapter.Size() == 64;
+    }());
 static_assert(edt::BitsetArrayAdapter<uint16_t, 4>::kStaticExtent);
 
 // 8-bit parts exercise every part-boundary combination cheaply: single-part,
@@ -99,9 +102,24 @@ TEST(BitsetArrayAdapterTest, SetRange64BitPartBoundaries)  // NOLINT
     using Part = uint64_t;
     constexpr size_t kBits = 3 * 64;
     const std::pair<size_t, size_t> ranges[] = {
-        {0, 0},    {0, 1},     {0, 64},   {0, 65},   {0, 128},  {0, 192}, {64, 128}, {64, 192},
-        {63, 64},  {63, 65},   {64, 65},  {127, 129}, {1, 191}, {10, 190}, {128, 192}, {191, 192},
-        {100, 100}, {96, 160},
+        {0, 0},
+        {0, 1},
+        {0, 64},
+        {0, 65},
+        {0, 128},
+        {0, 192},
+        {64, 128},
+        {64, 192},
+        {63, 64},
+        {63, 65},
+        {64, 65},
+        {127, 129},
+        {1, 191},
+        {10, 190},
+        {128, 192},
+        {191, 192},
+        {100, 100},
+        {96, 160},
     };
     for (const bool initial : {false, true})
     {

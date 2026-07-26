@@ -63,7 +63,8 @@ constexpr void ExpectEq(T1 a, T2 b, T1 precision = static_cast<T1>(0.0001))
 }
 
 template <std::floating_point T, size_t rows, size_t columns>
-constexpr void ExpectEq(edt::Matrix<T, rows, columns> a, edt::Matrix<T, rows, columns> b, T precision = static_cast<T>(0.0001))
+constexpr void
+ExpectEq(edt::Matrix<T, rows, columns> a, edt::Matrix<T, rows, columns> b, T precision = static_cast<T>(0.0001))
 {
     for (size_t r = 0; r != rows; ++r)
     {

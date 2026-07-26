@@ -2,9 +2,9 @@
 
 #include <bit>
 #include <cassert>
+#include <concepts>
 #include <cstddef>
 #include <type_traits>
-#include <concepts>
 
 #include "EverydayTools/Branchless/IntIf.hpp"
 
@@ -40,7 +40,7 @@ public:
         *bitset_ = static_cast<T>(keep | set_bits);
     }
 
-    constexpr bool Get(const size_t index) const noexcept
+    [[nodiscard]] constexpr bool Get(const size_t index) const noexcept
     {
         assert(index < kBitsCount);
         Mask mask = 1;
@@ -85,7 +85,7 @@ public:
 
     constexpr void Fill(const bool value) const noexcept { SetMasked(kFullMask, value); }
 
-    size_t NextBitAfter(const size_t ignore_count) const
+    [[nodiscard]] size_t NextBitAfter(const size_t ignore_count) const
     {
         Mask copy = *bitset_;
         copy &= LeftShifted(kFullMask, ignore_count);

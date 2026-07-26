@@ -39,6 +39,6 @@ static_assert(ConstexprFixedBitset());
 
 // Static geometry queries are constant expressions too.
 static_assert(edt::FixedBitset<40>::Size() == 40);
-static_assert(edt::FixedBitset<40>::PartsCount() == 5);   // 40 bits => 5 uint8_t parts
+static_assert(edt::FixedBitset<40>::PartsCount() == 5);  // 40 bits => 5 uint8_t parts
 static_assert(edt::FixedBitset<64>::Size() == 64);
-static_assert(edt::FixedBitset<64>::PartsCount() == 1);   // one uint64_t part
+static_assert(edt::FixedBitset<64>::PartsCount() == 1);  // one uint64_t part

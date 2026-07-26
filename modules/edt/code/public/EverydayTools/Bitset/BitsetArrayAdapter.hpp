@@ -72,7 +72,7 @@ public:
         Part(part_index).Set(index_in_part, value);
     }
 
-    constexpr bool Get(const size_t index) const noexcept
+    [[nodiscard]] constexpr bool Get(const size_t index) const noexcept
     {
         const size_t part_index = index / kPartSizeBits;
         const size_t index_in_part = index % kPartSizeBits;

@@ -1,6 +1,7 @@
+#include "EverydayTools/Bitset/BitsetAdapter.hpp"
+
 #include <cstdint>
 
-#include "EverydayTools/Bitset/BitsetAdapter.hpp"
 #include "gtest/gtest.h"
 
 namespace

@@ -1,7 +1,8 @@
+#include "EverydayTools/Branchless/SwapIf.hpp"
+
 #include <cstdint>
 #include <limits>
 
-#include "EverydayTools/Branchless/SwapIf.hpp"
 #include "gtest/gtest.h"
 
 using edt::SwapIf;
