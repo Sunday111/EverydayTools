@@ -9,5 +9,6 @@ target_include_directories(edt INTERFACE ${edt_include_dir})
 
 option(EDT_WITH_TESTS "Build EverydayTools library tests" OFF)
 if (EDT_WITH_TESTS)
+    enable_testing()
     add_subdirectory(tests)
 endif()

@@ -53,7 +53,10 @@ TEST(ArrayViewTest, Constructors)
             }
         }
 
-        for (size_t i = 0; i < instancesCount; ++i)
+        // i indexes a column within values[collectionSize], so it must stay
+        // below collectionSize - iterating to instancesCount formed pointers
+        // past the end of the sub-array (UB).
+        for (size_t i = 0; i < collectionSize; ++i)
         {
             SparseArrayView<size_t> view(&instances[0].values[i], instancesCount, sizeof(Tst));
 
