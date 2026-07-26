@@ -107,7 +107,7 @@ TEST(BitsetArrayAdapterTest, SetRange64BitPartBoundaries)  // NOLINT
     {
         for (const bool value : {false, true})
         {
-            for (const auto [begin, end] : ranges)
+            for (const auto& [begin, end] : ranges)
             {
                 CheckSetRange<Part, 3>(initial, begin, end, value);
             }
