@@ -43,8 +43,11 @@ public:
             // Patch the first part
             Part(part_begin).SetLastN(kPartSizeBits - rem_begin, value);
 
-            // fill middle parts
-            std::fill(&parts_[part_begin + 1], &parts_[part_end], value ? kFullMask : kEmptyMask);
+            // fill middle parts. Address via data() rather than operator[]:
+            // part_end may equal parts_.size() (range ends on a part boundary),
+            // and forming the one-past-the-end iterator through the bounds-checked
+            // span::operator[] is undefined behaviour.
+            std::fill(parts_.data() + part_begin + 1, parts_.data() + part_end, value ? kFullMask : kEmptyMask);
 
             // Patch the last part
             if (end < parts_.size())
