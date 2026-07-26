@@ -1,58 +1,91 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(EverydayTools LANGUAGES CXX)
+project(EverydayTools)
 
-file(GLOB_RECURSE edt_headers CONFIGURE_DEPENDS
-    "modules/edt/code/public/*.hpp")
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+# Set output directories for binaries
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+# Set output directories for archives
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
+# Set output directories for libraries
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
-add_library(edt INTERFACE)
-target_sources(edt INTERFACE ${edt_headers})
-target_include_directories(edt INTERFACE modules/edt/code/public)
-target_compile_features(edt INTERFACE cxx_std_20)
+# Set path to cloned repositories sources
+set(YAE_CLONED_REPOSITORIES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cloned_repositories" CACHE PATH "Path to YAE cloned repository checkouts")
 
-option(EDT_WITH_TESTS "Build EverydayTools library tests" OFF)
-if(EDT_WITH_TESTS)
-    include(FetchContent)
+set(YAE_SUPPORT_ROOT "${YAE_CLONED_REPOSITORIES_DIR}/Sunday111/yae-support/main")
+set(YAE_PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${YAE_SUPPORT_ROOT}/cmake")
 
-    option(EDT_FETCH_GOOGLE_TESTS "Disable it if you already have google tests in your project" ON)
-    option(EDT_FIND_GTEST_PACKAGE "Enable to make the script look for google tests in the system" ON)
 
-    if(EDT_FETCH_GOOGLE_TESTS)
-        FetchContent_Declare(
-            googletest
-            GIT_REPOSITORY https://github.com/google/googletest
-            GIT_TAG        "v1.17.0"
-        )
-        FetchContent_MakeAvailable(googletest)
-    elseif(EDT_FIND_GTEST_PACKAGE)
-        find_package(GTest REQUIRED)
-        add_library(gtest ALIAS GTest::gtest)
-        add_library(gtest_main ALIAS GTest::gtest_main)
-    endif()
 
-    file(GLOB_RECURSE edt_test_sources CONFIGURE_DEPENDS
-        "modules/EverydayToolsTests/code/private/*.cpp"
-        "modules/EverydayToolsTests/code/private/*.hpp")
 
-    add_executable(EverydayToolsTests ${edt_test_sources})
-    target_link_libraries(EverydayToolsTests PRIVATE edt gtest_main)
-    target_include_directories(EverydayToolsTests PRIVATE modules/EverydayToolsTests/code/private)
-    target_compile_features(EverydayToolsTests PRIVATE cxx_std_20)
+set(YAE_edt_SOURCES modules/edt)
+add_subdirectory(${YAE_edt_SOURCES} yae_modules/modules/edt SYSTEM)
 
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        option(EDT_TESTS_WITH_COVERAGE "Instrument test executable with clang's coverage data" ON)
-        if(EDT_TESTS_WITH_COVERAGE)
-            set(coverage_flags -fprofile-instr-generate -fcoverage-mapping -fcoverage-mcdc)
-            target_compile_options(EverydayToolsTests PRIVATE ${coverage_flags})
-            target_link_options(EverydayToolsTests PRIVATE ${coverage_flags})
-        endif()
-    endif()
+# https://github.com/google/googletest v1.15.2
+set(YAE_gtest_main_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/google/googletest/v1.15.2)
+option(INSTALL_GTEST "" OFF)
+option(BUILD_GMOCK "" OFF)
+add_subdirectory(${YAE_gtest_main_SOURCES} yae_modules/google/googletest/v1.15.2 SYSTEM)
 
-    if(MSVC)
-        target_compile_options(EverydayToolsTests PRIVATE "/bigobj")
-    endif()
+set(YAE_EverydayToolsTests_SOURCES modules/EverydayToolsTests)
+add_subdirectory(${YAE_EverydayToolsTests_SOURCES} yae_modules/modules/EverydayToolsTests SYSTEM)
 
-    enable_testing()
-    include(GoogleTest)
-    gtest_discover_tests(EverydayToolsTests)
-endif()
+# https://github.com/fmtlib/fmt 11.1.1
+set(YAE_fmt_header_only_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/fmtlib/fmt/11.1.1)
+add_subdirectory(${YAE_fmt_header_only_SOURCES} yae_modules/fmtlib/fmt/11.1.1 SYSTEM)
+
+# https://github.com/google/benchmark v1.9.4
+set(YAE_gbench_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/google/benchmark/v1.9.4)
+option(BENCHMARK_ENABLE_TESTING "" OFF)
+add_subdirectory(${YAE_gbench_SOURCES} yae_modules/google/benchmark/v1.9.4 SYSTEM)
+
+include(${YAE_CLONED_REPOSITORIES_DIR}/Sunday111/yae-support/main/modules/third_party/gbench.module.cmake)
+# https://github.com/martinus/unordered_dense v4.1.2
+set(YAE_unordered_dense_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/martinus/unordered_dense/v4.1.2)
+add_subdirectory(${YAE_unordered_dense_SOURCES} yae_modules/martinus/unordered_dense/v4.1.2 SYSTEM)
+
+set(YAE_yae_example_benchmark_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/Sunday111/yae-support/main/modules/examples/yae_example_benchmark)
+add_subdirectory(${YAE_yae_example_benchmark_SOURCES} yae_modules/Sunday111/yae-support/main/modules/examples/yae_example_benchmark SYSTEM)
+
+set(YAE_yae_example_benchmark_main_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/Sunday111/yae-support/main/modules/examples/yae_example_benchmark_main)
+add_subdirectory(${YAE_yae_example_benchmark_main_SOURCES} yae_modules/Sunday111/yae-support/main/modules/examples/yae_example_benchmark_main SYSTEM)
+
+set(YAE_yae_example_library_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/Sunday111/yae-support/main/modules/examples/yae_example_library)
+add_subdirectory(${YAE_yae_example_library_SOURCES} yae_modules/Sunday111/yae-support/main/modules/examples/yae_example_library SYSTEM)
+
+set(YAE_yae_example_header_only_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/Sunday111/yae-support/main/modules/examples/yae_example_header_only)
+add_subdirectory(${YAE_yae_example_header_only_SOURCES} yae_modules/Sunday111/yae-support/main/modules/examples/yae_example_header_only SYSTEM)
+
+set(YAE_yae_example_executable_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/Sunday111/yae-support/main/modules/examples/yae_example_executable)
+add_subdirectory(${YAE_yae_example_executable_SOURCES} yae_modules/Sunday111/yae-support/main/modules/examples/yae_example_executable SYSTEM)
+
+set(YAE_yae_example_tests_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/Sunday111/yae-support/main/modules/examples/yae_example_tests)
+add_subdirectory(${YAE_yae_example_tests_SOURCES} yae_modules/Sunday111/yae-support/main/modules/examples/yae_example_tests SYSTEM)
+
+set(YAE_yae_example_tests_main_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/Sunday111/yae-support/main/modules/examples/yae_example_tests_main)
+add_subdirectory(${YAE_yae_example_tests_main_SOURCES} yae_modules/Sunday111/yae-support/main/modules/examples/yae_example_tests_main SYSTEM)
+
+set(YAE_CppReflection_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/Sunday111/CppReflection/main/modules/CppReflection)
+add_subdirectory(${YAE_CppReflection_SOURCES} yae_modules/Sunday111/CppReflection/main/modules/CppReflection SYSTEM)
+
+set(YAE_CppReflectionTests_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/Sunday111/CppReflection/main/modules/CppReflectionTests)
+add_subdirectory(${YAE_CppReflectionTests_SOURCES} yae_modules/Sunday111/CppReflection/main/modules/CppReflectionTests SYSTEM)
+
+
+enable_testing()
