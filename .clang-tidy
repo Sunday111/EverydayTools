@@ -1,0 +1,36 @@
+Checks: "-*,\
+google-*,\
+performance-*,\
+portability-*,\
+cert-*,\
+clang-analyzer-*,\
+cppcoreguidelines-*,\
+modernize-*,\
+-modernize-use-trailing-return-type,\
+-cppcoreguidelines-non-private-member-variables-in-classes,\
+-cppcoreguidelines-pro-bounds-array-to-pointer-decay,\
+-cppcoreguidelines-avoid-magic-numbers,\
+-cppcoreguidelines-macro-usage,\
+-cppcoreguidelines-pro-bounds-constant-array-index,\
+-cppcoreguidelines-special-member-functions,\
+-cppcoreguidelines-prefer-member-initializer,\
+-cppcoreguidelines-pro-type-static-cast-downcast,\
+-cppcoreguidelines-missing-std-forward,\
+-google-readability-avoid-underscore-in-googletest-name,\
+-cppcoreguidelines-avoid-do-while,\
+-cert-err58-cpp,\
+-cert-msc51-cpp,\
+-cert-msc32-c,\
+-cppcoreguidelines-pro-type-reinterpret-cast,\
+-cppcoreguidelines-avoid-c-arrays,\
+-cppcoreguidelines-pro-bounds-pointer-arithmetic,\
+-cppcoreguidelines-pro-bounds-avoid-unchecked-container-access,\
+-cppcoreguidelines-avoid-const-or-ref-data-members,\
+-google-runtime-int,\
+-performance-avoid-endl,\
+-portability-avoid-pragma-once,\
+"
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*/modules/CppReflection/code/public/CppReflection/.*'
+# Use clang-format
+FormatStyle: file
