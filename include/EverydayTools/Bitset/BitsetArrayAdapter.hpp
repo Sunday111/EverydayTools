@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <concepts>
 #include <cstddef>
 #include <span>
 #include <type_traits>
@@ -12,7 +13,7 @@
 namespace edt
 {
 
-template <typename T, size_t Extent = std::dynamic_extent, typename Enable = std::enable_if_t<std::is_unsigned_v<T>>>
+template <std::unsigned_integral T, size_t Extent = std::dynamic_extent>
 class BitsetArrayAdapter
 {
 public:
@@ -20,9 +21,14 @@ public:
     static constexpr size_t kPartSizeBits = sizeof(T) * 8;
     static constexpr Mask kEmptyMask = Mask{};
     static constexpr Mask kFullMask = ~kEmptyMask;
+    static constexpr bool kStaticExtent = (Extent != std::dynamic_extent);
 
 public:
-    explicit BitsetArrayAdapter(std::span<T, Extent> parts) : parts_(parts) {}
+    constexpr explicit BitsetArrayAdapter(std::span<T, Extent> parts) : parts_(parts) {}
+
+    [[nodiscard]] constexpr size_t PartsCount() const noexcept { return parts_.size(); }
+
+    [[nodiscard]] constexpr size_t Size() const noexcept { return parts_.size() * kPartSizeBits; }
 
     constexpr void SetRange(const size_t begin, const size_t end, const bool value) const noexcept
     {

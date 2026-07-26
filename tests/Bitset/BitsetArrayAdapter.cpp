@@ -49,7 +49,34 @@ void ExhaustiveSetRange()
         }
     }
 }
+
+// The constexpr constructor lets a whole build-set-read sequence run at compile
+// time over a std::array backing wrapped in a static-extent span.
+constexpr uint32_t ConstexprArraySetRange()
+{
+    std::array<uint8_t, 3> arr{};
+    edt::BitsetArrayAdapter adapter{std::span(arr)};
+    adapter.SetRange(3, 11, true);  // spans the first part boundary
+    adapter.Set(20, true);          // single-bit set in the last part
+    uint32_t result = 0;
+    for (size_t i = 0; i != 24; ++i)
+    {
+        if (adapter.Get(i)) result |= (uint32_t{1} << i);
+    }
+    return result;
+}
 }  // namespace
+
+// Bits [3, 11) set (0x7F8) plus bit 20 set (0x100000) => 0x1007F8.
+static_assert(ConstexprArraySetRange() == 0x1007F8u);
+
+// PartsCount()/Size() are constexpr for a static-extent adapter.
+static_assert([] {
+    std::array<uint16_t, 4> arr{};
+    edt::BitsetArrayAdapter adapter{std::span(arr)};
+    return adapter.PartsCount() == 4 && adapter.Size() == 64;
+}());
+static_assert(edt::BitsetArrayAdapter<uint16_t, 4>::kStaticExtent);
 
 // 8-bit parts exercise every part-boundary combination cheaply: single-part,
 // spanning 2-5 parts, boundary-aligned and mid-part starts and ends.

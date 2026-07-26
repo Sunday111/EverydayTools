@@ -94,6 +94,14 @@ public:
         return Adapter().Get(index);
     }
 
+    constexpr void SetRange(const size_t begin, const size_t end, const bool value) noexcept
+    {
+        assert(end <= Size());
+        Adapter().SetRange(begin, end, value);
+    }
+
+    constexpr void Fill(const bool value) noexcept { Adapter().SetRange(0, Size(), value); }
+
 private:
     constexpr auto Adapter() noexcept { return BitsetArrayAdapter(std::span(parts_)); }
 
