@@ -7,6 +7,7 @@
 #include <type_traits>
 
 #include "BitsetAdapter.hpp"
+#include "EverydayTools/Branchless/IntIf.hpp"
 
 namespace edt
 {
@@ -37,34 +38,35 @@ public:
         if (part_begin == part_end)
         {
             Part(part_begin).SetRange(rem_begin, rem_end, value);
+            return;
         }
-        else
+
+        // Leading partial part: bits [rem_begin, kPartSizeBits).
+        Part(part_begin).SetLastN(kPartSizeBits - rem_begin, value);
+
+        // Whole middle parts: [part_begin + 1, part_end). Address via data()
+        // rather than operator[]: part_end equals parts_.size() when the range
+        // ends on a part boundary, and forming the one-past-the-end iterator
+        // through the bounds-checked span::operator[] is undefined behaviour.
+        std::fill(parts_.data() + part_begin + 1, parts_.data() + part_end, IntIf(value, kFullMask, kEmptyMask));
+
+        // Trailing partial part: bits [0, rem_end). Present only when the range
+        // does not end on a part boundary - and precisely then part_end is a
+        // valid index (part_end < parts_.size()).
+        if (rem_end != 0)
         {
-            // Patch the first part
-            Part(part_begin).SetLastN(kPartSizeBits - rem_begin, value);
-
-            // fill middle parts. Address via data() rather than operator[]:
-            // part_end may equal parts_.size() (range ends on a part boundary),
-            // and forming the one-past-the-end iterator through the bounds-checked
-            // span::operator[] is undefined behaviour.
-            std::fill(parts_.data() + part_begin + 1, parts_.data() + part_end, value ? kFullMask : kEmptyMask);
-
-            // Patch the last part
-            if (end < parts_.size())
-            {
-                Part(part_begin).SetFirstN(rem_end, value);
-            }
+            Part(part_end).SetFirstN(rem_end, value);
         }
     }
 
-    void Set(const size_t index, const bool value)
+    constexpr void Set(const size_t index, const bool value) const noexcept
     {
         const size_t part_index = index / kPartSizeBits;
         const size_t index_in_part = index % kPartSizeBits;
         Part(part_index).Set(index_in_part, value);
     }
 
-    bool Get(const size_t index) const
+    constexpr bool Get(const size_t index) const noexcept
     {
         const size_t part_index = index / kPartSizeBits;
         const size_t index_in_part = index % kPartSizeBits;

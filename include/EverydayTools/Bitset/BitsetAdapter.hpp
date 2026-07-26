@@ -4,11 +4,14 @@
 #include <cassert>
 #include <cstddef>
 #include <type_traits>
+#include <concepts>
+
+#include "EverydayTools/Branchless/IntIf.hpp"
 
 namespace edt
 {
 
-template <typename T, typename Enable = std::enable_if_t<std::is_unsigned_v<T>>>
+template <std::unsigned_integral T>
 class BitsetAdapter
 {
 public:
@@ -28,16 +31,13 @@ public:
         SetMasked(mask, value);
     }
 
-    constexpr void SetMasked(const T& mask, const bool value) const
+    constexpr void SetMasked(const Mask mask, const bool value) const noexcept
     {
-        if (value)
-        {
-            *bitset_ |= mask;
-        }
-        else
-        {
-            *bitset_ &= ~mask;
-        }
+        // Branchless: keep the bits outside the mask, then set the masked bits to
+        // `value` (IntIf yields all-ones when value is set, all-zeros otherwise).
+        const Mask keep = static_cast<Mask>(*bitset_ & static_cast<Mask>(~mask));
+        const Mask set_bits = static_cast<Mask>(mask & IntIf(value, kFullMask, kEmptyMask));
+        *bitset_ = static_cast<T>(keep | set_bits);
     }
 
     constexpr bool Get(const size_t index) const noexcept
@@ -83,7 +83,7 @@ public:
         SetMasked(mask, value);
     }
 
-    constexpr void Fill(const bool value) const noexcept { SetMasked(value ? kFullMask : kEmptyMask); }
+    constexpr void Fill(const bool value) const noexcept { SetMasked(kFullMask, value); }
 
     size_t NextBitAfter(const size_t ignore_count) const
     {
@@ -124,21 +124,24 @@ public:
     }
 
 private:
-    static Mask LeftShifted(const Mask mask, const size_t count) noexcept
+    // Shifting by >= the operand width is UB, so the shift amount is masked into
+    // range (kBitsCount is a power of two) and IntIf then discards the result
+    // when the real count would have shifted every bit out. Branchless.
+    static constexpr Mask LeftShifted(const Mask mask, const size_t count) noexcept
     {
-        if (count < kBitsCount) return mask << count;
-        return kEmptyMask;
+        const Mask shifted = static_cast<Mask>(mask << (count & (kBitsCount - 1)));
+        return IntIf(count < kBitsCount, shifted, kEmptyMask);
     }
 
-    static void LeftShift(Mask& mask, size_t count) noexcept { mask = LeftShifted(mask, count); }
+    static constexpr void LeftShift(Mask& mask, const size_t count) noexcept { mask = LeftShifted(mask, count); }
 
-    static Mask RightShifted(const Mask mask, const size_t count) noexcept
+    static constexpr Mask RightShifted(const Mask mask, const size_t count) noexcept
     {
-        if (count < kBitsCount) return mask >> count;
-        return kEmptyMask;
+        const Mask shifted = static_cast<Mask>(mask >> (count & (kBitsCount - 1)));
+        return IntIf(count < kBitsCount, shifted, kEmptyMask);
     }
 
-    static void RightShift(Mask& mask, size_t count) noexcept { mask = RightShifted(mask, count); }
+    static constexpr void RightShift(Mask& mask, const size_t count) noexcept { mask = RightShifted(mask, count); }
 
 private:
     T* bitset_ = nullptr;
