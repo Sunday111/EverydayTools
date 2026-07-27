@@ -2,9 +2,10 @@
 
 #include <cassert>
 #include <cstdint>
+#include <span>
 #include <vector>
 
-#include "BitsetArrayAdapter.hpp"
+#include "BitsetAdapter.hpp"
 
 namespace edt
 {
@@ -59,9 +60,9 @@ public:
     size_t Size() const { return size_; }
 
 private:
-    BitsetArrayAdapter<Part> Adapter() { return BitsetArrayAdapter(std::span(parts_)); }
+    BitsetAdapter<Part, std::dynamic_extent> Adapter() { return BitsetAdapter(std::span(parts_)); }
 
-    BitsetArrayAdapter<const Part> Adapter() const { return BitsetArrayAdapter(std::span(parts_)); }
+    BitsetAdapter<const Part, std::dynamic_extent> Adapter() const { return BitsetAdapter(std::span(parts_)); }
 
 private:
     std::vector<Part> parts_;

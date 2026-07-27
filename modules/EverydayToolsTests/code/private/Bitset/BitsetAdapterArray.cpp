@@ -1,10 +1,9 @@
-#include "EverydayTools/Bitset/BitsetArrayAdapter.hpp"
-
 #include <array>
 #include <cstdint>
 #include <span>
 #include <utility>
 
+#include "EverydayTools/Bitset/BitsetAdapter.hpp"
 #include "gtest/gtest.h"
 
 namespace
@@ -19,7 +18,7 @@ void CheckSetRange(const bool initial, const size_t begin, const size_t end, con
     std::array<Part, NParts> parts{};
     parts.fill(initial ? static_cast<Part>(~Part{0}) : Part{0});
 
-    edt::BitsetArrayAdapter adapter{std::span(parts)};
+    edt::BitsetAdapter adapter{std::span(parts)};
     adapter.SetRange(begin, end, value);
 
     for (size_t i = 0; i != kBits; ++i)
@@ -56,7 +55,7 @@ void ExhaustiveSetRange()
 constexpr uint32_t ConstexprArraySetRange()
 {
     std::array<uint8_t, 3> arr{};
-    edt::BitsetArrayAdapter adapter{std::span(arr)};
+    edt::BitsetAdapter adapter{std::span(arr)};
     adapter.SetRange(3, 11, true);  // spans the first part boundary
     adapter.Set(20, true);          // single-bit set in the last part
     uint32_t result = 0;
@@ -76,20 +75,20 @@ static_assert(
     []
     {
         std::array<uint16_t, 4> arr{};
-        edt::BitsetArrayAdapter adapter{std::span(arr)};
+        edt::BitsetAdapter adapter{std::span(arr)};
         return adapter.PartsCount() == 4 && adapter.Size() == 64;
     }());
-static_assert(edt::BitsetArrayAdapter<uint16_t, 4>::kStaticExtent);
+static_assert(edt::BitsetAdapter<uint16_t, 4>::kStaticExtent);
 
 // 8-bit parts exercise every part-boundary combination cheaply: single-part,
 // spanning 2-5 parts, boundary-aligned and mid-part starts and ends.
-TEST(BitsetArrayAdapterTest, SetRangeExhaustive8BitParts)  // NOLINT
+TEST(BitsetAdapterTest, SetRangeExhaustive8BitParts)  // NOLINT
 {
     ExhaustiveSetRange<uint8_t, 5>();
 }
 
 // Wider parts confirm the logic is independent of part width.
-TEST(BitsetArrayAdapterTest, SetRangeExhaustive16BitParts)  // NOLINT
+TEST(BitsetAdapterTest, SetRangeExhaustive16BitParts)  // NOLINT
 {
     ExhaustiveSetRange<uint16_t, 3>();
 }
@@ -97,11 +96,11 @@ TEST(BitsetArrayAdapterTest, SetRangeExhaustive16BitParts)  // NOLINT
 // 64-bit parts: hit part-aligned ends (64, 128), mid-part ends, spanning ranges,
 // and single-bit ranges straddling a boundary. A boundary-aligned end is exactly
 // the case that used to skip the trailing-part patch.
-TEST(BitsetArrayAdapterTest, SetRange64BitPartBoundaries)  // NOLINT
+TEST(BitsetAdapterTest, SetRange64BitPartBoundaries)  // NOLINT
 {
     using Part = uint64_t;
     constexpr size_t kBits = 3 * 64;
-    const std::pair<size_t, size_t> ranges[] = {
+    const auto ranges = std::to_array<std::pair<size_t, size_t>>({
         {0, 0},
         {0, 1},
         {0, 64},
@@ -120,7 +119,7 @@ TEST(BitsetArrayAdapterTest, SetRange64BitPartBoundaries)  // NOLINT
         {191, 192},
         {100, 100},
         {96, 160},
-    };
+    });
     for (const bool initial : {false, true})
     {
         for (const bool value : {false, true})
@@ -134,10 +133,10 @@ TEST(BitsetArrayAdapterTest, SetRange64BitPartBoundaries)  // NOLINT
     static_cast<void>(kBits);
 }
 
-TEST(BitsetArrayAdapterTest, SetGetRoundTrip)  // NOLINT
+TEST(BitsetAdapterTest, SetGetRoundTrip)  // NOLINT
 {
     std::array<uint32_t, 4> parts{};
-    edt::BitsetArrayAdapter adapter{std::span(parts)};
+    edt::BitsetAdapter adapter{std::span(parts)};
     constexpr size_t kBits = 4 * 32;
 
     for (size_t i = 0; i != kBits; ++i)

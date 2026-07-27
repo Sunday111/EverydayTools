@@ -9,7 +9,7 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/Array/ArrayView/Iteration.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/Bitset/Bitset.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/Bitset/BitsetAdapter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/Bitset/BitsetArrayAdapter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/Bitset/BitsetAdapterArray.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/Bitset/FixedBitsetConstexpr.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/Branchless/IntIf.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/Branchless/SwapIf.cpp

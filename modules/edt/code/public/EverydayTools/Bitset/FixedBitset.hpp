@@ -6,7 +6,7 @@
 #include <span>
 #include <tuple>
 
-#include "BitsetArrayAdapter.hpp"
+#include "BitsetAdapter.hpp"
 
 namespace edt::fixed_bitset_internals
 {
@@ -103,9 +103,9 @@ public:
     constexpr void Fill(const bool value) noexcept { Adapter().SetRange(0, Size(), value); }
 
 private:
-    constexpr auto Adapter() noexcept { return BitsetArrayAdapter(std::span(parts_)); }
+    constexpr auto Adapter() noexcept { return BitsetAdapter(std::span(parts_)); }
 
-    constexpr auto Adapter() const noexcept { return BitsetArrayAdapter(std::span(parts_)); }
+    constexpr auto Adapter() const noexcept { return BitsetAdapter(std::span(parts_)); }
 
 private:
     std::array<Part, PartsCount()> parts_{};

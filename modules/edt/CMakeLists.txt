@@ -9,7 +9,6 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Array/ArrayViewVector.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Bitset/BitIterator.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Bitset/BitsetAdapter.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Bitset/BitsetArrayAdapter.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Bitset/BitsetUtilities.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Bitset/DynamicBitset.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/EverydayTools/Bitset/EnumBitset.hpp
