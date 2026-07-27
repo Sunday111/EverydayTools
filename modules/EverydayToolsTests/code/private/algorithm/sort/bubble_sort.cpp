@@ -3,7 +3,7 @@
 #include <array>
 
 #include "edt/algorithm/sort/insertion_sort.hpp"
-#include "TestTools.hpp"
+#include "test_tools.hpp"
 #include "gtest/gtest.h"
 
 template <typename T, typename V>

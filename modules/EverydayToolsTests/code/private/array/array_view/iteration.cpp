@@ -1,5 +1,5 @@
 #include "edt/array/array_view.hpp"
-#include "TestTools.hpp"
+#include "test_tools.hpp"
 #include "gtest/gtest.h"
 
 constexpr size_t minSize = 0;
