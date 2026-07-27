@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(EverydayTools)
+project(edt)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -43,8 +43,8 @@ option(INSTALL_GTEST "" OFF)
 option(BUILD_GMOCK "" OFF)
 add_subdirectory(${YAE_gtest_main_SOURCES} yae_modules/google/googletest/v1.15.2 SYSTEM)
 
-set(YAE_EverydayToolsTests_SOURCES modules/EverydayToolsTests)
-add_subdirectory(${YAE_EverydayToolsTests_SOURCES} yae_modules/modules/EverydayToolsTests SYSTEM)
+set(YAE_edt_tests_SOURCES modules/edt_tests)
+add_subdirectory(${YAE_edt_tests_SOURCES} yae_modules/modules/edt_tests SYSTEM)
 
 # https://github.com/fmtlib/fmt 11.1.1
 set(YAE_fmt_header_only_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/fmtlib/fmt/11.1.1)

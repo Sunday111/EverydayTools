@@ -28,12 +28,12 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/worst_qualifiers.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/worst_reference.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/test_tools.hpp)
-add_executable(EverydayToolsTests ${module_source_files})
-set_generic_compiler_options(EverydayToolsTests PRIVATE)
-target_link_libraries(EverydayToolsTests PRIVATE edt
-                                                 gtest_main)
-target_include_directories(EverydayToolsTests PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/code/public)
-target_include_directories(EverydayToolsTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/code/private)
+add_executable(edt_tests ${module_source_files})
+set_generic_compiler_options(edt_tests PRIVATE)
+target_link_libraries(edt_tests PRIVATE edt
+                                        gtest_main)
+target_include_directories(edt_tests PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/code/public)
+target_include_directories(edt_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/code/private)
 enable_testing()
 include(GoogleTest)
-gtest_discover_tests(EverydayToolsTests)
+gtest_discover_tests(edt_tests)

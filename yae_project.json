@@ -1,11 +1,11 @@
 {
-    "name": "EverydayTools",
+    "name": "edt",
     "default_configuration": {
         "build_dir": "build",
         "build_targets": [
-            "EverydayToolsTests"
+            "edt_tests"
         ],
-        "run_target": "EverydayToolsTests"
+        "run_target": "edt_tests"
     },
     "cpp": {
         "standard": "20"

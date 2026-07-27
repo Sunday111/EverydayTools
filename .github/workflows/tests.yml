@@ -9,11 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Where yae clones dependencies (yae-support, googletest, ...) and writes
-      # its registry.json. The checked-out project supplies the EverydayTools
+      # its registry.json. The checked-out project supplies the edt
       # package itself, so the code under test is what gets built.
       YAE_REPOS: ${{ github.workspace }}/.yae-repos
     steps:
-      - name: Check out EverydayTools
+      - name: Check out edt
         uses: actions/checkout@v4
         with:
           path: project
@@ -40,11 +40,11 @@ jobs:
           uv run --project yae yae build
           --project_dir project
           --cloned_repositories_dir "$YAE_REPOS"
-          EverydayToolsTests
+          edt_tests
 
       - name: Run tests
         run: >
           uv run --project yae yae run
           --project_dir project
           --cloned_repositories_dir "$YAE_REPOS"
-          EverydayToolsTests
+          edt_tests
