@@ -1,4 +1,4 @@
-#include "EverydayTools/Array/ArrayView.hpp"
+#include "edt/array/array_view.hpp"
 #include "gtest/gtest.h"
 
 TEST(ArrayViewTest, Constructors)

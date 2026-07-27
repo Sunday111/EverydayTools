@@ -1,4 +1,4 @@
-#include "EverydayTools/Template/Signature.hpp"
+#include "edt/template/signature.hpp"
 
 #ifndef SIGNATURE_TEST_METHOD
 #define SIGNATURE_TEST_METHOD(pre_qualifiers, name, qualifiers) \

@@ -1,4 +1,4 @@
-#include "EverydayTools/Bitset/BitsetAdapter.hpp"
+#include "edt/bitset/bitset_adapter.hpp"
 
 #include <cstdint>
 

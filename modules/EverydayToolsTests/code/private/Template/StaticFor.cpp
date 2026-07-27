@@ -1,4 +1,4 @@
-#include "EverydayTools/Template/StaticFor.hpp"
+#include "edt/template/static_for.hpp"
 
 #include <gtest/gtest.h>
 

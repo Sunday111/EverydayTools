@@ -1,4 +1,4 @@
-#include "EverydayTools/Array/ArrayView.hpp"
+#include "edt/array/array_view.hpp"
 #include "TestTools.hpp"
 #include "gtest/gtest.h"
 

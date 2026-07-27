@@ -1,4 +1,4 @@
-#include "EverydayTools/Math/Math.hpp"
+#include "edt/math/math.hpp"
 
 #include <numbers>
 

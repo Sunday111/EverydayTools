@@ -1,7 +1,7 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "EverydayTools/Bitset/FixedBitset.hpp"
+#include "edt/bitset/fixed_bitset.hpp"
 
 namespace
 {

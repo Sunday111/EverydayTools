@@ -1,4 +1,4 @@
-#include "EverydayTools/Template/WorstReference.hpp"
+#include "edt/template/worst_reference.hpp"
 
 using namespace edt;
 static_assert(std::is_same_v<WorstReference_t<int, int&, int&&>, int>);

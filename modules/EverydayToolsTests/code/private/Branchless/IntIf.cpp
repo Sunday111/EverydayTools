@@ -1,4 +1,4 @@
-#include "EverydayTools/Branchless/IntIf.hpp"
+#include "edt/branchless/int_if.hpp"
 
 #include <cstdint>
 #include <limits>

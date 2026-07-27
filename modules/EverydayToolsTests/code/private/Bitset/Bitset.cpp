@@ -2,9 +2,9 @@
 #include <random>
 #include <vector>
 
-#include "EverydayTools/Bitset/BitIterator.hpp"
-#include "EverydayTools/Bitset/DynamicBitset.hpp"
-#include "EverydayTools/Bitset/FixedBitset.hpp"
+#include "edt/bitset/bit_iterator.hpp"
+#include "edt/bitset/dynamic_bitset.hpp"
+#include "edt/bitset/fixed_bitset.hpp"
 #include "gtest/gtest.h"
 
 using namespace edt;  // NOLINT

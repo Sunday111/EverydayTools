@@ -1,8 +1,8 @@
-#include "EverydayTools/Algorithm/Sort/BubbleSort.hpp"
+#include "edt/algorithm/sort/bubble_sort.hpp"
 
 #include <array>
 
-#include "EverydayTools/Algorithm/Sort/InsertionSort.hpp"
+#include "edt/algorithm/sort/insertion_sort.hpp"
 #include "TestTools.hpp"
 #include "gtest/gtest.h"
 

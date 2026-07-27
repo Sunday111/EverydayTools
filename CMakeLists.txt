@@ -81,11 +81,5 @@ add_subdirectory(${YAE_yae_example_tests_SOURCES} yae_modules/Sunday111/yae-supp
 set(YAE_yae_example_tests_main_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/Sunday111/yae-support/main/modules/examples/yae_example_tests_main)
 add_subdirectory(${YAE_yae_example_tests_main_SOURCES} yae_modules/Sunday111/yae-support/main/modules/examples/yae_example_tests_main SYSTEM)
 
-set(YAE_CppReflection_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/Sunday111/CppReflection/main/modules/CppReflection)
-add_subdirectory(${YAE_CppReflection_SOURCES} yae_modules/Sunday111/CppReflection/main/modules/CppReflection SYSTEM)
-
-set(YAE_CppReflectionTests_SOURCES ${YAE_CLONED_REPOSITORIES_DIR}/Sunday111/CppReflection/main/modules/CppReflectionTests)
-add_subdirectory(${YAE_CppReflectionTests_SOURCES} yae_modules/Sunday111/CppReflection/main/modules/CppReflectionTests SYSTEM)
-
 
 enable_testing()

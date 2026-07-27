@@ -1,4 +1,4 @@
-#include "EverydayTools/Template/AllTypesMatchCondition.hpp"
+#include "edt/template/all_types_match_condition.hpp"
 
 using namespace edt;
 

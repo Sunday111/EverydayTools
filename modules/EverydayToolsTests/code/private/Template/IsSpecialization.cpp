@@ -1,4 +1,4 @@
-#include "EverydayTools/Template/IsSpecialization.hpp"
+#include "edt/template/is_specialization.hpp"
 
 #include <memory>
 

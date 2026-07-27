@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "EverydayTools/Math/Matrix.hpp"
+#include "edt/math/matrix.hpp"
 
 template <typename T>
 using Distribution =

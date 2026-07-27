@@ -1,6 +1,6 @@
-#include "EverydayTools/Template/ValuesList.hpp"
+#include "edt/template/values_list.hpp"
 
-#include "EverydayTools/Template/TypesList.hpp"
+#include "edt/template/types_list.hpp"
 
 using namespace edt;
 

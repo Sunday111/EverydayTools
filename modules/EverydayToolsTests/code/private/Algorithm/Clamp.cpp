@@ -1,4 +1,4 @@
-#include "EverydayTools/Algorithm/Clamp.hpp"
+#include "edt/algorithm/clamp.hpp"
 
 #include "gtest/gtest.h"
 

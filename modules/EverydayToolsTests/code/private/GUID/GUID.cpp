@@ -1,4 +1,4 @@
-#include "EverydayTools/GUID.hpp"
+#include "edt/guid.hpp"
 
 #include "gtest/gtest.h"
 
