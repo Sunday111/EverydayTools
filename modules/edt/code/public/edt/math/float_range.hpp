@@ -1,7 +1,11 @@
 #pragma once
 
 #include <algorithm>
+#include <concepts>
+#include <limits>
+#include <tuple>
 
+#include "../float_aliases.hpp"
 #include "matrix.hpp"
 
 namespace edt
@@ -13,35 +17,35 @@ class FloatRange
 public:
     [[nodiscard]] constexpr T Extent() const { return end - begin; }
 
-    [[nodiscard]] constexpr bool Contains(float v) const { return v >= begin && v <= end; }
+    [[nodiscard]] constexpr bool Contains(T v) const { return v >= begin && v <= end; }
 
-    constexpr void EnlargeLeft(const float v) { begin -= v; }
-    constexpr void EnlargeRight(const float v) { end += v; }
-    constexpr void Enlarge(const float value)
+    constexpr void EnlargeLeft(T v) { begin -= v; }
+    constexpr void EnlargeRight(T v) { end += v; }
+    constexpr void Enlarge(T value)
     {
         EnlargeLeft(value);
         EnlargeRight(value);
     }
-    [[nodiscard]] constexpr FloatRange Enlarged(const float value) const
+    [[nodiscard]] constexpr FloatRange Enlarged(T value) const
     {
         auto copy = *this;
         copy.Enlarge(value);
         return copy;
     }
 
-    [[nodiscard]] constexpr T Clamp(const float value) const { return std::clamp(value, begin, end); }
+    [[nodiscard]] constexpr T Clamp(T value) const { return std::clamp(value, begin, end); }
 
-    constexpr void Shift(const float value)
+    constexpr void Shift(T value)
     {
         begin += value;
         end += value;
     }
 
-    [[nodiscard]] constexpr FloatRange Shifted(const float value) const
+    [[nodiscard]] constexpr FloatRange Shifted(T value) const
     {
         auto copy = *this;
         copy.Shift(value);
-        return copy();
+        return copy;
     }
 
     T begin = std::numeric_limits<T>::lowest();
@@ -66,11 +70,11 @@ public:
 
     [[nodiscard]] constexpr Vec2<T> Max() const noexcept { return {x.end, y.end}; }
 
-    [[nodiscard]] constexpr Vec2<T> Uniform(const float v) const noexcept { return Uniform(Vec2<T>{v, v}); }
+    [[nodiscard]] constexpr Vec2<T> Uniform(T v) const noexcept { return Uniform(Vec2<T>{v, v}); }
 
     [[nodiscard]] constexpr Vec2<T> Uniform(const Vec2<T>& v) const noexcept { return Min() + v * Extent(); }
 
-    [[nodiscard]] static constexpr FloatRange2D FromMinMax(const Vec2<T>& min, const Vec2<T> max)
+    [[nodiscard]] static constexpr FloatRange2D FromMinMax(const Vec2<T>& min, const Vec2<T>& max)
     {
         return {{min.x(), max.x()}, {min.y(), max.y()}};
     }
@@ -79,39 +83,39 @@ public:
         return FromMinMax(Vec2<T>{} + min, Vec2<T>{} + max);
     }
 
-    constexpr void Shift(const Vec2f value)
+    constexpr void Shift(const Vec2<T>& value)
     {
         x.Shift(value.x());
         y.Shift(value.y());
     }
 
-    [[nodiscard]] constexpr FloatRange2D Shifted(const Vec2f value) const
+    [[nodiscard]] constexpr FloatRange2D Shifted(const Vec2<T>& value) const
     {
         auto copy = *this;
         copy.Shift(value);
         return copy;
     }
 
-    constexpr void Enlarge(const float value)
+    constexpr void Enlarge(T value)
     {
         x.Enlarge(value);
         y.Enlarge(value);
     }
 
-    constexpr void Enlarge(const Vec2f value)
+    constexpr void Enlarge(const Vec2<T>& value)
     {
         x.Enlarge(value.x());
         y.Enlarge(value.y());
     }
 
-    [[nodiscard]] constexpr FloatRange2D Enlarged(const float value) const
+    [[nodiscard]] constexpr FloatRange2D Enlarged(T value) const
     {
         auto copy = *this;
         copy.Enlarge(value);
         return copy;
     }
 
-    [[nodiscard]] constexpr FloatRange2D Enlarged(const Vec2f value) const
+    [[nodiscard]] constexpr FloatRange2D Enlarged(const Vec2<T>& value) const
     {
         auto copy = *this;
         copy.Enlarge(value);
@@ -124,5 +128,5 @@ public:
     FloatRange<T> y{};
 };
 
-using FloatRange2Df = FloatRange2D<float>;
+using FloatRange2Df = FloatRange2D<f32>;
 }  // namespace edt

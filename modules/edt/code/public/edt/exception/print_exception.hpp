@@ -1,29 +1,29 @@
 #pragma once
 
+#include <cstddef>
 #include <exception>
+#include <format>
 #include <iterator>
 #include <ostream>
 
-inline void PrintException(std::ostream& output, const std::exception& e, int level = 0)
+namespace edt
 {
-    auto print_level = [&output, level]() -> std::ostream&
-    {
-        std::fill_n(std::ostream_iterator<char>(output), level, ' ');
-        return output;
-    };
-
-    print_level() << "exception: " << e.what() << '\n';
+inline void PrintException(std::ostream& output, const std::exception& e, std::size_t nesting_depth = 0)
+{
+    auto out = std::ostreambuf_iterator<char>(output);
+    std::format_to(out, "{:{}}exception: {}\n", "", nesting_depth, e.what());
 
     try
     {
         std::rethrow_if_nested(e);
     }
-    catch (const std::exception& e)
+    catch (const std::exception& nested)
     {
-        PrintException(output, e, level + 1);
+        PrintException(output, nested, nesting_depth + 1);
     }
     catch (...)
     {
-        print_level() << "exception: unknown\n";
+        std::format_to(out, "{:{}}exception: unknown\n", "", nesting_depth + 1);
     }
 }
+}  // namespace edt

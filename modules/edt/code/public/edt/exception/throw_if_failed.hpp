@@ -1,18 +1,27 @@
 #pragma once
 
-#include <sstream>
-#include <string>
+#include <format>
+#include <stdexcept>
+#include <utility>
 
 namespace edt
 {
-template <typename Exception = std::runtime_error, typename TChar = char, typename... Args>
-void ThrowIfFailed(bool condition, Args&&... args)
+template <typename Exception = std::runtime_error, typename... Args>
+void ThrowIfFailed(bool condition, std::format_string<Args...> fmt, Args&&... args)
 {
     if (!condition)
     {
-        std::basic_stringstream<TChar> stream;
-        std::initializer_list<int>{(stream << std::forward<Args>(args), 0)...};
-        throw Exception(stream.str());
+        throw Exception(std::format(fmt, std::forward<Args>(args)...));
+    }
+}
+
+// Preferred over the format overload for a literal message: braces stay literal.
+template <typename Exception = std::runtime_error>
+constexpr void ThrowIfFailed(bool condition, const char* message)
+{
+    if (!condition)
+    {
+        throw Exception(message);
     }
 }
 }  // namespace edt

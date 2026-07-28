@@ -1,34 +1,36 @@
 #pragma once
 
 #include <array>
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <span>
 #include <tuple>
 
+#include "../int_aliases.hpp"
 #include "bitset_adapter.hpp"
 
 namespace edt::fixed_bitset_internals
 {
-using AllParts = std::tuple<uint64_t, uint32_t, uint16_t, uint8_t>;
+using AllParts = std::tuple<u64, u32, u16, u8>;
 
-inline constexpr size_t BiggestPartTypeIndexWithNoWaste(const size_t bytes_required)
+inline constexpr std::size_t BiggestPartTypeIndexWithNoWaste(std::size_t bytes_required)
 {
-    constexpr size_t count = std::tuple_size_v<AllParts>;
-    std::array<size_t, count> values{};
+    constexpr std::size_t count = std::tuple_size_v<AllParts>;
+    std::array<std::size_t, count> values{};
     auto get_wasted_space = [&]<typename Part>(std::tuple<Part>)
     {
-        size_t parts_count = bytes_required / sizeof(Part);
+        std::size_t parts_count = bytes_required / sizeof(Part);
         if (bytes_required % sizeof(Part)) ++parts_count;
         return parts_count * sizeof(Part) - bytes_required;
     };
-    [&]<size_t... type_index>(std::index_sequence<type_index...>)
+    [&]<std::size_t... type_index>(std::index_sequence<type_index...>)
     {
         ((values[type_index] = get_wasted_space(std::tuple<std::tuple_element_t<type_index, AllParts>>{})), ...);
     }(std::make_index_sequence<count>());
 
-    size_t min_index = 0;
-    for (size_t i = 1; i != values.size(); ++i)
+    std::size_t min_index = 0;
+    for (std::size_t i = 1; i != values.size(); ++i)
     {
         if (values[i] < values[min_index])
         {
@@ -39,30 +41,30 @@ inline constexpr size_t BiggestPartTypeIndexWithNoWaste(const size_t bytes_requi
     return min_index;
 }
 
-template <size_t bytes_required>
+template <std::size_t bytes_required>
 using BiggestPartTypeWithNoWaste_Bytes =
     std::tuple_element_t<BiggestPartTypeIndexWithNoWaste(bytes_required), AllParts>;
 
-static_assert(std::is_same_v<BiggestPartTypeWithNoWaste_Bytes<7>, uint8_t>);
-static_assert(std::is_same_v<BiggestPartTypeWithNoWaste_Bytes<2>, uint16_t>);
-static_assert(std::is_same_v<BiggestPartTypeWithNoWaste_Bytes<4>, uint32_t>);
-static_assert(std::is_same_v<BiggestPartTypeWithNoWaste_Bytes<8>, uint64_t>);
+static_assert(std::is_same_v<BiggestPartTypeWithNoWaste_Bytes<7>, u8>);
+static_assert(std::is_same_v<BiggestPartTypeWithNoWaste_Bytes<2>, u16>);
+static_assert(std::is_same_v<BiggestPartTypeWithNoWaste_Bytes<4>, u32>);
+static_assert(std::is_same_v<BiggestPartTypeWithNoWaste_Bytes<8>, u64>);
 
-inline constexpr size_t BytesRequiredForBitset(const size_t bits_count)
+inline constexpr std::size_t BytesRequiredForBitset(std::size_t bits_count)
 {
-    size_t result = bits_count / 8;
+    std::size_t result = bits_count / 8;
     if (bits_count % 8) ++result;
     return result;
 }
 
-template <size_t bits_required>
+template <std::size_t bits_required>
 using BiggestPartTypeWithNoWaste = BiggestPartTypeWithNoWaste_Bytes<BytesRequiredForBitset(bits_required)>;
 
 template <typename Part>
-inline constexpr size_t PartsCount(const size_t bits_count)
+inline constexpr std::size_t PartsCount(std::size_t bits_count)
 {
-    constexpr size_t part_size_bits = sizeof(Part) * 8;
-    size_t parts_count = bits_count / part_size_bits;
+    constexpr std::size_t part_size_bits = sizeof(Part) * 8;
+    std::size_t parts_count = bits_count / part_size_bits;
     if (bits_count % part_size_bits) ++parts_count;
     return parts_count;
 }
@@ -72,35 +74,35 @@ inline constexpr size_t PartsCount(const size_t bits_count)
 namespace edt
 {
 
-template <size_t bits_count, typename Part_>
+template <std::size_t bits_count, typename Part_>
 class FixedBitsetEx
 {
 public:
     using Part = Part_;
 
-    static constexpr size_t Size() noexcept { return bits_count; }
+    static constexpr std::size_t Size() noexcept { return bits_count; }
 
-    static constexpr size_t PartsCount() noexcept { return fixed_bitset_internals::PartsCount<Part>(Size()); }
+    static constexpr std::size_t PartsCount() noexcept { return fixed_bitset_internals::PartsCount<Part>(Size()); }
 
-    inline constexpr void Set(const size_t index, const bool value) noexcept
+    inline constexpr void Set(std::size_t index, bool value) noexcept
     {
         assert(index < Size());
         Adapter().Set(index, value);
     }
 
-    inline constexpr bool Get(const size_t index) const noexcept
+    inline constexpr bool Get(std::size_t index) const noexcept
     {
         assert(index < Size());
         return Adapter().Get(index);
     }
 
-    constexpr void SetRange(const size_t begin, const size_t end, const bool value) noexcept
+    constexpr void SetRange(std::size_t begin, std::size_t end, bool value) noexcept
     {
         assert(end <= Size());
         Adapter().SetRange(begin, end, value);
     }
 
-    constexpr void Fill(const bool value) noexcept { Adapter().SetRange(0, Size(), value); }
+    constexpr void Fill(bool value) noexcept { Adapter().SetRange(0, Size(), value); }
 
 private:
     constexpr auto Adapter() noexcept { return BitsetAdapter(std::span(parts_)); }
@@ -111,6 +113,6 @@ private:
     std::array<Part, PartsCount()> parts_{};
 };
 
-template <size_t bits_count>
+template <std::size_t bits_count>
 using FixedBitset = FixedBitsetEx<bits_count, fixed_bitset_internals::BiggestPartTypeWithNoWaste<bits_count>>;
 }  // namespace edt

@@ -1,22 +1,12 @@
 #pragma once
 
-#include "all_types_match_condition.hpp"
-
-namespace edt::detail
-{
-template <typename MainType>
-class IsPureSameTrait
-{
-public:
-    template <typename T>
-    using Trait = std::is_same<std::decay_t<MainType>, std::decay_t<T>>;
-};
-}  // namespace edt::detail
+#include <type_traits>
 
 namespace edt
 {
+// Every type decays to the same type: cv-qualifiers and references are ignored.
 template <typename Head, typename... Tail>
-class PureSame : public AllTypesMatchCondition<detail::IsPureSameTrait<Head>::template Trait, Tail...>
+class PureSame : public std::bool_constant<(std::is_same_v<std::decay_t<Head>, std::decay_t<Tail>> && ...)>
 {
 };
 

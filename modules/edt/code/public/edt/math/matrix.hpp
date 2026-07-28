@@ -7,6 +7,9 @@
 #include <cstdint>
 #include <ranges>
 
+#include "../float_aliases.hpp"
+#include "../int_aliases.hpp"
+
 namespace edt
 {
 
@@ -660,20 +663,20 @@ using Mat3 = Matrix<T, 3, 3>;
 template <typename T>
 using Mat4 = Matrix<T, 4, 4>;
 
-using Vec2f = Vec2<float>;
+using Vec2f = Vec2<f32>;
 using Vec2i = Vec2<int>;
-using Vec3f = Vec3<float>;
+using Vec3f = Vec3<f32>;
 using Vec3i = Vec3<int>;
-using Vec2u8 = Vec2<uint8_t>;
-using Vec2u32 = Vec2<uint32_t>;
-using Vec2i32 = Vec2<int32_t>;
-using Vec3u8 = Vec3<uint8_t>;
-using Vec4u8 = Vec4<uint8_t>;
-using Vec4f = Vec4<float>;
+using Vec2u8 = Vec2<u8>;
+using Vec2u32 = Vec2<u32>;
+using Vec2i32 = Vec2<i32>;
+using Vec3u8 = Vec3<u8>;
+using Vec4u8 = Vec4<u8>;
+using Vec4f = Vec4<f32>;
 using Vec4i = Vec4<int>;
-using Mat2f = Mat2<float>;
-using Mat3f = Mat3<float>;
-using Mat4f = Mat4<float>;
+using Mat2f = Mat2<f32>;
+using Mat3f = Mat3<f32>;
+using Mat4f = Mat4<f32>;
 
 }  // namespace lazy_matrix_aliases
 

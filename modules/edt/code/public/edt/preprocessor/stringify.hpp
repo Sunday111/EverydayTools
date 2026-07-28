@@ -1,4 +1,4 @@
 #pragma once
 
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
+#define EDT_STRINGIFY(x) #x
+#define EDT_TOSTRING(x) EDT_STRINGIFY(x)

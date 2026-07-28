@@ -1,18 +1,19 @@
 #pragma once
 
-#include <algorithm>
+#include <cstddef>
+#include <utility>
 
 namespace edt
 {
 template <typename T>
-void BubbleSort(T* arr, size_t count)
+void BubbleSort(T* arr, std::size_t count)
 {
     if (count > 1)
     {
-        const size_t lastIndex = count - 1;
-        for (size_t i = 0; i < lastIndex; ++i)
+        const std::size_t lastIndex = count - 1;
+        for (std::size_t i = 0; i < lastIndex; ++i)
         {
-            for (size_t j = 0; j < lastIndex - i; ++j)
+            for (std::size_t j = 0; j < lastIndex - i; ++j)
             {
                 T& a = arr[j];
                 T& b = arr[j + 1];

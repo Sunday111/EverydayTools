@@ -1,47 +1,35 @@
 #pragma once
 
+#include <concepts>
+#include <source_location>
 #include <stdexcept>
+#include <utility>
 
-template <typename Exception = std::runtime_error, typename TChar, typename F>
-decltype(auto) CallAndRethrow(const TChar* rethrowMessage, F&& f)
+namespace edt
+{
+template <typename Exception = std::runtime_error, std::invocable F>
+decltype(auto) CallAndRethrow(F&& f, std::source_location location = std::source_location::current())
 {
     try
     {
-        // Call passed functor and return it's result
-        // Need to use this static cast to handle void return value case
-        return static_cast<decltype(f.operator()())>(f());
+        return std::forward<F>(f)();
     }
     catch (...)
     {
-        // Wrap exception
-        std::throw_with_nested(Exception(rethrowMessage));
+        std::throw_with_nested(Exception(location.function_name()));
     }
 }
 
-namespace call_and_rethrow_helpers
+template <typename Exception = std::runtime_error, typename TChar, std::invocable F>
+decltype(auto) CallAndRethrow(const TChar* rethrow_message, F&& f)
 {
-// This class created to be used in 'CallAndRethrowM' macro.
-// It has overloaded template operator+ to accept functors.
-// Need it to avoid passing whole lambda text as macro argument
-// (because it leads to syntax errors sometimes)
-class Caller
-{
-public:
-    constexpr Caller(const char* name) : m_name(name) {}
-    template <typename Functor>
-    inline decltype(auto) operator+(Functor&& functor) const
+    try
     {
-        return CallAndRethrow(m_name, std::forward<Functor>(functor));
+        return std::forward<F>(f)();
     }
-
-private:
-    const char* const m_name = nullptr;
-};
-}  // namespace call_and_rethrow_helpers
-
-#ifdef _MSC_VER
-#define CallAndRethrowM call_and_rethrow_helpers::Caller(__FUNCTION__)
-#elif
-// Need some warning here?
-#define CallAndRethrowM call_and_rethrow_helpers::Caller(__func__)
-#endif
+    catch (...)
+    {
+        std::throw_with_nested(Exception(rethrow_message));
+    }
+}
+}  // namespace edt

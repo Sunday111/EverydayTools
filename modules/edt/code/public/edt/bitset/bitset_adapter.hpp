@@ -9,6 +9,7 @@
 #include <span>
 #include <type_traits>
 
+#include "../int_aliases.hpp"
 #include "edt/branchless/int_if.hpp"
 
 namespace edt
@@ -199,7 +200,7 @@ BitsetAdapter(std::span<T, E>) -> BitsetAdapter<T, E>;
 
 // Zero-cost abstraction: a static-extent view is exactly a pointer, whatever the
 // word count. (A dynamic-extent view necessarily also stores a runtime size.)
-static_assert(sizeof(BitsetAdapter<uint64_t>) == sizeof(void*));
-static_assert(sizeof(BitsetAdapter<uint64_t, 8>) == sizeof(void*));
+static_assert(sizeof(BitsetAdapter<u64>) == sizeof(void*));
+static_assert(sizeof(BitsetAdapter<u64, 8>) == sizeof(void*));
 
 }  // namespace edt

@@ -1,5 +1,6 @@
 #include "edt/branchless/int_if.hpp"
 
+#include <array>
 #include <cstdint>
 #include <limits>
 
@@ -21,7 +22,7 @@ template <typename T>
 void CheckSelectsCorrectOperand()
 {
     using L = std::numeric_limits<T>;
-    const T values[] = {T{0}, T{1}, static_cast<T>(-1), L::min(), L::max(), static_cast<T>(L::max() / 2)};
+    const std::array<T, 6> values{T{0}, T{1}, static_cast<T>(-1), L::min(), L::max(), static_cast<T>(L::max() / 2)};
     for (const T a : values)
     {
         for (const T b : values)

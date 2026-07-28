@@ -1,5 +1,6 @@
 #include "edt/branchless/swap_if.hpp"
 
+#include <array>
 #include <cstdint>
 #include <limits>
 
@@ -28,7 +29,7 @@ template <typename T>
 void CheckSwapsOnlyWhenConditionSet()
 {
     using L = std::numeric_limits<T>;
-    const T values[] = {T{0}, T{1}, static_cast<T>(-1), L::min(), L::max()};
+    const std::array<T, 5> values{T{0}, T{1}, static_cast<T>(-1), L::min(), L::max()};
     for (const T x : values)
     {
         for (const T y : values)

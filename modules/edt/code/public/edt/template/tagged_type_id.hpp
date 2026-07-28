@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstddef>
+#include <atomic>
 
 #include "tagged_identifier.hpp"
 
@@ -10,8 +10,8 @@ namespace edt
 template <typename Tag, typename Repr>
 inline TaggedIdentifier<Tag, Repr> MakeNextTypeId()
 {
-    static Repr next_type_id = 0;
-    return TaggedIdentifier<Tag, Repr>::FromValue(next_type_id++);
+    static std::atomic<Repr> next_type_id{0};
+    return TaggedIdentifier<Tag, Repr>::FromValue(next_type_id.fetch_add(1, std::memory_order_relaxed));
 }
 
 template <typename Tag, typename Repr, typename T>
