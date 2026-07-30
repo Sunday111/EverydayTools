@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 #include "worst_qualifiers.hpp"
 
 namespace edt
@@ -8,8 +10,10 @@ template <typename Head, typename... Tail>
 class WorstReference
 {
     using WQ = WorstQualifiers_t<Head, Tail...>;
-    static constexpr bool rValueReference = allTypesMatchCondition<std::is_rvalue_reference, Head, Tail...>;
-    static constexpr bool lValueReference = allTypesMatchCondition<std::is_lvalue_reference, Head, Tail...>;
+    static constexpr bool rValueReference =
+        (std::is_rvalue_reference_v<Head> && ... && std::is_rvalue_reference_v<Tail>);
+    static constexpr bool lValueReference =
+        (std::is_lvalue_reference_v<Head> && ... && std::is_lvalue_reference_v<Tail>);
     using LValueApplied = ApplyIf<lValueReference, std::add_lvalue_reference_t, WQ>;
 
 public:

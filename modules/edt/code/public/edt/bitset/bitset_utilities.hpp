@@ -1,8 +1,11 @@
 #pragma once
 
+#include <bit>
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
+#include "../int_aliases.hpp"
 #include "../size.hpp"
 #include "../template/values_list.hpp"
 #include "enum_bitset.hpp"
@@ -10,12 +13,12 @@
 namespace edt
 {
 template <typename T>
-constexpr T MakeFlagByIndex(const size_t index)
+constexpr T MakeFlagByIndex(std::size_t index)
 {
     return (T(1) << index);
 }
 
-template <typename T, size_t index>
+template <typename T, std::size_t index>
 constexpr T MakeFlagByIndex()
 {
     static_assert((index < SizeInBits<T>));
@@ -23,7 +26,7 @@ constexpr T MakeFlagByIndex()
 }
 
 template <typename T>
-constexpr bool FlagIsSet(const T flags, const T flag)
+constexpr bool FlagIsSet(T flags, T flag)
 {
     if constexpr (std::is_enum_v<T> && edt::enable_enum_bitset_v<T>)
     {
@@ -37,19 +40,17 @@ constexpr bool FlagIsSet(const T flags, const T flag)
 }
 
 template <typename T>
-constexpr size_t GetSetFlagsCount(const T flags)
+constexpr std::size_t GetSetFlagsCount(T flags)
 {
-    size_t r = 0;
-    for (size_t i = 0; i < SizeInBits<T>; ++i)
+    if constexpr (std::is_enum_v<T>)
     {
-        const T flagAtIndex = MakeFlagByIndex<T>(i);
-        if (FlagIsSet(flags, flagAtIndex))
-        {
-            ++r;
-        }
+        using U = std::make_unsigned_t<std::underlying_type_t<T>>;
+        return static_cast<std::size_t>(std::popcount(static_cast<U>(flags)));
     }
-
-    return r;
+    else
+    {
+        return static_cast<std::size_t>(std::popcount(static_cast<std::make_unsigned_t<T>>(flags)));
+    }
 }
 
 template <auto... values>
@@ -78,33 +79,33 @@ struct MakeFlagByIndexMapFunctor
     };
 };
 
-template <size_t bits_count>
+template <std::size_t bits_count>
 struct BitCountToType;
 
 template <>
 struct BitCountToType<8>
 {
-    using Type = std::uint8_t;
+    using Type = u8;
 };
 
 template <>
 struct BitCountToType<16>
 {
-    using Type = std::uint16_t;
+    using Type = u16;
 };
 
 template <>
 struct BitCountToType<32>
 {
-    using Type = std::uint32_t;
+    using Type = u32;
 };
 
 template <>
 struct BitCountToType<64>
 {
-    using Type = std::uint64_t;
+    using Type = u64;
 };
 
-template <size_t bits_count>
+template <std::size_t bits_count>
 using BitCountToTypeT = typename BitCountToType<bits_count>::Type;
 }  // namespace edt

@@ -1,5 +1,6 @@
 #include "edt/bitset/bitset_adapter.hpp"
 
+#include <array>
 #include <cstdint>
 
 #include "gtest/gtest.h"
@@ -112,8 +113,8 @@ TEST(BitsetAdapterTest, Fill)  // NOLINT
 TEST(BitsetAdapterTest, SetMaskedMatchesReference)  // NOLINT
 {
     using T = uint32_t;
-    const T masks[] = {0u, ~0u, 0xF0F0F0F0u, 0x1u, 0x80000000u, 0xDEADBEEFu};
-    const T inits[] = {0u, ~0u, 0x12345678u};
+    constexpr std::array<T, 6> masks{0u, ~0u, 0xF0F0F0F0u, 0x1u, 0x80000000u, 0xDEADBEEFu};
+    constexpr std::array<T, 3> inits{0u, ~0u, 0x12345678u};
     for (const T init : inits)
     {
         for (const T mask : masks)

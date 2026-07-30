@@ -1,11 +1,12 @@
 #pragma once
 
+#include <cassert>
+#include <utility>
+
 namespace edt
 {
 template <typename T>
-class Delegate
-{
-};
+class Delegate;
 
 template <typename R, typename... Args>
 class Delegate<R(Args...)>
@@ -21,8 +22,8 @@ public:
     template <FunctionType fn>
     void Bind()
     {
-        m_instance = nullptr;
-        m_function = [](void*, Args... args)
+        instance_ = nullptr;
+        function_ = [](void*, Args... args)
         {
             return static_cast<R>(fn(std::forward<Args>(args)...));
         };
@@ -31,8 +32,8 @@ public:
     template <typename T, MethodType<T> method>
     void Bind(T* instance)
     {
-        m_instance = instance;
-        m_function = [](void* object, Args... args)
+        instance_ = instance;
+        function_ = [](void* object, Args... args)
         {
             return static_cast<R>((static_cast<T*>(object)->*method)(std::forward<Args>(args)...));
         };
@@ -41,17 +42,33 @@ public:
     template <typename T>
     void Bind(T& functor)
     {
-        m_instance = &functor;
-        m_function = [](void* object, Args... args)
+        instance_ = &functor;
+        function_ = [](void* object, Args... args)
         {
             return static_cast<R>((*static_cast<T*>(object))(std::forward<Args>(args)...));
         };
     }
 
-    R Invoke(Args... args) const { return static_cast<R>(m_function(m_instance, std::forward<Args>(args)...)); }
+    void Reset() noexcept
+    {
+        instance_ = nullptr;
+        function_ = nullptr;
+    }
+
+    [[nodiscard]] bool IsBound() const noexcept { return function_ != nullptr; }
+
+    [[nodiscard]] explicit operator bool() const noexcept { return IsBound(); }
+
+    R Invoke(Args... args) const
+    {
+        assert(function_ != nullptr);  // NOLINT(cert-dcl03-c, misc-static-assert): runtime guard
+        return static_cast<R>(function_(instance_, std::forward<Args>(args)...));
+    }
+
+    R operator()(Args... args) const { return Invoke(std::forward<Args>(args)...); }
 
 private:
-    void* m_instance = nullptr;
-    InternalFunctionType m_function = nullptr;
+    void* instance_ = nullptr;
+    InternalFunctionType function_ = nullptr;
 };
 }  // namespace edt

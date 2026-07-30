@@ -1,6 +1,7 @@
 #pragma once
 
-#include "any_type_match_condition.hpp"
+#include <type_traits>
+
 #include "apply_if.hpp"
 #include "pure_same_types.hpp"
 
@@ -11,8 +12,8 @@ class WorstQualifiers
 {
 private:
     static_assert(pureSame<Head, Tail...>, "Invalid usage");
-    static constexpr bool hasConst = anyTypeMatchCondition<std::is_const, Head, Tail...>;
-    static constexpr bool hasVolatile = anyTypeMatchCondition<std::is_volatile, Head, Tail...>;
+    static constexpr bool hasConst = (std::is_const_v<Head> || ... || std::is_const_v<Tail>);
+    static constexpr bool hasVolatile = (std::is_volatile_v<Head> || ... || std::is_volatile_v<Tail>);
     using AppliedConst = ApplyIf<hasConst, std::add_const_t, Head>;
 
 public:

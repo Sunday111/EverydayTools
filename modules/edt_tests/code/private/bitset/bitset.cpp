@@ -132,6 +132,7 @@ TEST(BitsetAdapterTest, ForEach)  // NOLINT
 
     for (size_t i = 0; i != 1'000'000; ++i)
     {
+        // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores): read through `adapter`, which spans `bitset`
         bitset = value_distribution(generator);
         expected.clear();
         actual.clear();
@@ -163,6 +164,7 @@ TEST(BitIteratorTest, Test)  // NOLINT
 
     for (size_t i = 0; i != 1'000'000; ++i)
     {
+        // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores): read through `adapter`, which spans `bitset`
         bitset = value_distribution(generator);
         expected.clear();
         actual.clear();

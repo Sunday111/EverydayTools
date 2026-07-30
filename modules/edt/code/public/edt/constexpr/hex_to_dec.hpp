@@ -1,12 +1,15 @@
 #pragma once
 
-#include "to_lower.hpp"
+#include <cstdint>
+
+#include "../int_aliases.hpp"
+#include "../string/char_util.hpp"
 
 namespace edt
 {
-constexpr uint8_t HexToDec(const char symbol)
+constexpr u8 HexToDec(char symbol)
 {
     const char s = ToLower(symbol);
-    return static_cast<uint8_t>(s >= 'a' ? 10 + s - 'a' : s - '0');
+    return static_cast<u8>(s >= 'a' ? 10 + s - 'a' : s - '0');
 }
 }  // namespace edt

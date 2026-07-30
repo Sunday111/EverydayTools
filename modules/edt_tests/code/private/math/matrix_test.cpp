@@ -260,12 +260,14 @@ TEST(MatrixTest, CopyAndMovePreserveValues)
 {
     const Matrix<int, 2, 2> original{{1, 2, 3, 4}};
     Matrix<int, 2, 2> copied = original;
+    // NOLINTNEXTLINE(performance-move-const-arg): a move of a trivially-copyable type is exactly what is tested
     Matrix<int, 2, 2> moved = std::move(copied);
     EXPECT_EQ(moved, original);
 
     Matrix<int, 2, 2> copy_assigned;
     copy_assigned = original;
     Matrix<int, 2, 2> move_assigned;
+    // NOLINTNEXTLINE(performance-move-const-arg): a move of a trivially-copyable type is exactly what is tested
     move_assigned = std::move(copy_assigned);
     EXPECT_EQ(move_assigned, original);
     EXPECT_NE(move_assigned, (Matrix<int, 2, 2>{{4, 3, 2, 1}}));

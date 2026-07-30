@@ -1,142 +1,137 @@
 #pragma once
 
 #include <cassert>
-#include <type_traits>
+#include <compare>
+#include <concepts>
+#include <cstddef>
+#include <utility>
 
 namespace edt
 {
 template <class T, typename Traits>
 class IntrusivePtr
 {
-    template <typename U>
-    using can_convert_from = std::enable_if_t<std::is_convertible_v<U*, T*>>;
-
 public:
-    IntrusivePtr() : m_p(nullptr) {}
+    IntrusivePtr() noexcept = default;
 
-    IntrusivePtr(std::nullptr_t) : m_p(nullptr) {}
+    IntrusivePtr(std::nullptr_t) noexcept {}  // NOLINT(google-explicit-constructor): mirrors raw pointer syntax
 
-    IntrusivePtr(T* p) : m_p(p) { AddReference(); }
+    explicit IntrusivePtr(T* p) noexcept : p_(p) { AddReference(); }
 
-    IntrusivePtr(const IntrusivePtr& ip) { CopyFrom<false, false>(ip); }
+    IntrusivePtr(const IntrusivePtr& ip) noexcept { CopyFrom<false, false>(ip); }
 
-    IntrusivePtr(IntrusivePtr&& ip) { MoveFrom<false>(ip); }
+    IntrusivePtr(IntrusivePtr&& ip) noexcept { MoveFrom<false>(ip); }
 
-    template <typename U, typename Enable = can_convert_from<U>>
-    IntrusivePtr(const IntrusivePtr<U, Traits>& ip) : m_p(ip.m_p)
+    template <typename U>
+        requires std::convertible_to<U*, T*>
+    IntrusivePtr(const IntrusivePtr<U, Traits>& ip) noexcept  // NOLINT(google-explicit-constructor): upcast
+        : p_(ip.p_)
     {
         AddReference();
     }
 
-    template <typename U, typename Enable = can_convert_from<U>>
-    IntrusivePtr(IntrusivePtr<U, Traits>&& ip) : m_p(ip.m_p)
+    template <typename U>
+        requires std::convertible_to<U*, T*>
+    // NOLINTNEXTLINE(google-explicit-constructor, cppcoreguidelines-rvalue-reference-param-not-moved): upcast; the
+    // pointer is stolen below rather than through std::move
+    IntrusivePtr(IntrusivePtr<U, Traits>&& ip) noexcept : p_(ip.p_)
     {
-        ip.m_p = nullptr;
+        ip.p_ = nullptr;
     }
 
     ~IntrusivePtr() { ReleaseReference<false>(); }
 
-    void reset() { ReleaseReference<true>(); }
+    void reset() noexcept { ReleaseReference<true>(); }
 
-    IntrusivePtr& swap(IntrusivePtr& p)
-    {
-        auto tmp = m_p;
-        m_p = p.m_p;
-        p.m_p = tmp;
-        return *this;
-    }
+    void swap(IntrusivePtr& other) noexcept { std::swap(p_, other.p_); }
 
-    T* Get() const { return m_p; }
+    friend void swap(IntrusivePtr& a, IntrusivePtr& b) noexcept { a.swap(b); }
+
+    [[nodiscard]] T* Get() const noexcept { return p_; }
 
     template <typename U>
-    IntrusivePtr<U, Traits> StaticCast() const
+    [[nodiscard]] IntrusivePtr<U, Traits> StaticCast() const noexcept
     {
-        typename IntrusivePtr<U, Traits>::StaticCastTag tag;
-        return IntrusivePtr<U, Traits>(*this, tag);
+        return IntrusivePtr<U, Traits>(*this, typename IntrusivePtr<U, Traits>::StaticCastTag{});
     }
 
     template <typename U>
-    IntrusivePtr<U, Traits> DynamicCast() const
+    [[nodiscard]] IntrusivePtr<U, Traits> DynamicCast() const noexcept
     {
-        typename IntrusivePtr<U, Traits>::DynamicCastTag tag;
-        return IntrusivePtr<U, Traits>(*this, tag);
+        return IntrusivePtr<U, Traits>(*this, typename IntrusivePtr<U, Traits>::DynamicCastTag{});
     }
 
-    IntrusivePtr& operator=(const IntrusivePtr& ptr)
+    // NOLINTNEXTLINE(cert-oop54-cpp): CopyFrom<_, true> compares the pointers and returns early on self-assignment
+    IntrusivePtr& operator=(const IntrusivePtr& ptr) noexcept
     {
         CopyFrom<true, true>(ptr);
         return *this;
     }
 
-    template <typename U, typename Enable = can_convert_from<U>>
-    IntrusivePtr& operator=(const IntrusivePtr<U, Traits>& ptr)
+    template <typename U>
+        requires std::convertible_to<U*, T*>
+    IntrusivePtr& operator=(const IntrusivePtr<U, Traits>& ptr) noexcept
     {
         CopyFrom<true, true>(ptr);
         return *this;
     }
 
-    IntrusivePtr& operator=(IntrusivePtr&& ptr)
+    IntrusivePtr& operator=(IntrusivePtr&& ptr) noexcept
+    {
+        if (this != &ptr) MoveFrom<true>(ptr);
+        return *this;
+    }
+
+    template <typename U>
+        requires std::convertible_to<U*, T*>
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved): MoveFrom steals the pointer directly
+    IntrusivePtr& operator=(IntrusivePtr<U, Traits>&& ptr) noexcept
     {
         MoveFrom<true>(ptr);
         return *this;
     }
 
-    template <typename U, typename Enable = can_convert_from<U>>
-    IntrusivePtr& operator=(IntrusivePtr<U, Traits>&& ptr)
+    [[nodiscard]] bool operator==(std::nullptr_t) const noexcept { return p_ == nullptr; }
+
+    template <typename U>
+    [[nodiscard]] bool operator==(const IntrusivePtr<U, Traits>& p) const noexcept
     {
-        MoveFrom<true>(ptr);
-        return *this;
+        return p_ == p.Get();
     }
 
-    bool operator==(std::nullptr_t) const { return m_p == nullptr; }
-
-    bool operator!=(std::nullptr_t) const { return m_p != nullptr; }
-
-    template <typename U, typename Enable = can_convert_from<U>>
-    bool operator==(const IntrusivePtr<U, Traits>& p) const
+    template <typename U>
+    [[nodiscard]] std::strong_ordering operator<=>(const IntrusivePtr<U, Traits>& p) const noexcept
     {
-        return m_p == p.m_p;
+        return std::compare_three_way{}(p_, p.Get());
     }
 
-    template <typename U, typename Enable = can_convert_from<U>>
-    bool operator!=(const IntrusivePtr<U, Traits>& p)
+    T* operator->() const noexcept
     {
-        return m_p != p.m_p;
+        assert(p_ != nullptr);  // NOLINT(cert-dcl03-c, misc-static-assert): runtime guard
+        return p_;
     }
 
-    template <typename U, typename Enable = can_convert_from<U>>
-    bool operator<(const IntrusivePtr<U, Traits>& p) const
+    T& operator*() const noexcept
     {
-        return m_p < p.m_p;
+        assert(p_ != nullptr);  // NOLINT(cert-dcl03-c, misc-static-assert): runtime guard
+        return *p_;
     }
 
-    T* operator->() const
-    {
-        assert(m_p != nullptr);
-        return m_p;
-    }
-
-    T& operator*() const
-    {
-        assert(m_p != nullptr);
-        return *m_p;
-    }
-
-    operator bool() const { return m_p != nullptr; }
+    [[nodiscard]] explicit operator bool() const noexcept { return p_ != nullptr; }
 
     template <typename... Args>
-    static IntrusivePtr MakeInstance(Args&&... args)
+    [[nodiscard]] static IntrusivePtr MakeInstance(Args&&... args)
     {
         return IntrusivePtr(new T(std::forward<Args>(args)...));
     }
 
 protected:
     template <bool releasePrev, bool comparePointers, typename U>
-    void CopyFrom(const IntrusivePtr<U, Traits>& that)
+    void CopyFrom(const IntrusivePtr<U, Traits>& that) noexcept
     {
         if constexpr (comparePointers)
         {
-            if (m_p == that.m_p)
+            if (p_ == that.p_)
             {
                 return;
             }
@@ -146,38 +141,38 @@ protected:
         {
             ReleaseReference<false>();
         }
-        m_p = that.m_p;
+        p_ = that.p_;
         AddReference();
     }
 
     template <bool releasePrev, typename U>
-    void MoveFrom(IntrusivePtr<U, Traits>& that)
+    void MoveFrom(IntrusivePtr<U, Traits>& that) noexcept
     {
         if constexpr (releasePrev)
         {
             ReleaseReference<false>();
         }
-        m_p = that.m_p;
-        that.m_p = nullptr;
+        p_ = that.p_;
+        that.p_ = nullptr;
     }
 
-    inline void AddReference()
+    void AddReference() noexcept
     {
-        if (m_p != nullptr)
+        if (p_ != nullptr)
         {
-            Traits::AddReference(m_p);
+            Traits::AddReference(p_);
         }
     }
 
     template <bool set_to_null>
-    inline void ReleaseReference()
+    void ReleaseReference() noexcept
     {
-        if (m_p != nullptr)
+        if (p_ != nullptr)
         {
-            Traits::ReleaseReference(m_p);
+            Traits::ReleaseReference(p_);
             if constexpr (set_to_null)
             {
-                m_p = nullptr;
+                p_ = nullptr;
             }
         }
     }
@@ -194,32 +189,29 @@ private:
     };
 
     template <typename U>
-    IntrusivePtr(const IntrusivePtr<U, Traits>& ip, StaticCastTag) : m_p(static_cast<T*>(ip.m_p))
+    IntrusivePtr(const IntrusivePtr<U, Traits>& ip, StaticCastTag) noexcept : p_(static_cast<T*>(ip.p_))
     {
         AddReference();
     }
 
     template <typename U>
-    IntrusivePtr(const IntrusivePtr<U, Traits>& ip, DynamicCastTag) : m_p(dynamic_cast<T*>(ip.m_p))
+    IntrusivePtr(const IntrusivePtr<U, Traits>& ip, DynamicCastTag) noexcept : p_(dynamic_cast<T*>(ip.p_))
     {
         AddReference();
     }
 
-    T* m_p;
+    T* p_ = nullptr;
 };
-}  // namespace edt
 
-namespace std
-{
 template <typename U, typename T, typename Traits>
-edt::IntrusivePtr<U, typename Traits> static_pointer_cast(const edt::IntrusivePtr<T, typename Traits>& ip)
+[[nodiscard]] IntrusivePtr<U, Traits> static_pointer_cast(const IntrusivePtr<T, Traits>& ip) noexcept
 {
     return ip.template StaticCast<U>();
 }
 
 template <typename U, typename T, typename Traits>
-edt::IntrusivePtr<U, Traits> dynamic_pointer_cast(const edt::IntrusivePtr<T, Traits>& ip)
+[[nodiscard]] IntrusivePtr<U, Traits> dynamic_pointer_cast(const IntrusivePtr<T, Traits>& ip) noexcept
 {
     return ip.template DynamicCast<U>();
 }
-}  // namespace std
+}  // namespace edt

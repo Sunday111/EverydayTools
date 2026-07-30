@@ -1,65 +1,60 @@
 #pragma once
 
 #include <array>
+#include <compare>
+#include <cstddef>
 #include <cstdint>
+#include <format>
+#include <functional>
 #include <ostream>
 #include <string_view>
 
 #include "constexpr/hex_to_dec.hpp"
+#include "int_aliases.hpp"
 
 namespace edt
 {
-constexpr uint64_t MakeByte(size_t byteIndex, uint8_t byteValue)
+constexpr u64 MakeByte(std::size_t byte_index, u8 byte_value)
 {
-    return (static_cast<uint64_t>(byteValue) << (byteIndex * 8));
+    return (static_cast<u64>(byte_value) << (byte_index * 8));
 }
 
 class GUID
 {
 public:
-    friend constexpr bool operator==(const GUID& a, const GUID& b) { return a.part1 == b.part1 && a.part2 == b.part2; }
+    [[nodiscard]] friend constexpr bool operator==(const GUID&, const GUID&) = default;
+    [[nodiscard]] friend constexpr std::strong_ordering operator<=>(const GUID&, const GUID&) = default;
 
-    friend constexpr bool operator!=(const GUID& a, const GUID& b) { return !(a == b); }
+    static constexpr std::size_t usualStringLength = 36;
+    static constexpr std::size_t stringLengthWithBracers = usualStringLength + 2;
 
-    constexpr bool operator<(const GUID& another) const
-    {
-        if (part1 == another.part1)
-        {
-            return part2 < another.part2;
-        }
-
-        return part1 < another.part1;
-    }
-
-    static constexpr size_t usualStringLength = 36;
-    static constexpr size_t stringLengthWithBracers = usualStringLength + 2;
-
-    inline static constexpr GUID Create(const std::string_view& str)
+    [[nodiscard]] static constexpr GUID Create(std::string_view str)
     {
         return str.length() == usualStringLength ? Parse(str) : Parse(str.substr(1, usualStringLength));
     }
 
-    constexpr std::array<char, 36> ToCharArray() const
+    [[nodiscard]] constexpr std::array<char, usualStringLength> ToCharArray() const
     {
-        std::array<char, 36> result;
-        [&]<size_t... indices>(std::index_sequence<indices...>)
+        std::array<char, usualStringLength> result{};
+        [&]<std::size_t... indices>(std::index_sequence<indices...>)
         {
             ((result[indices] = GetChar(indices)), ...);
-        }(std::make_index_sequence<36>());
+        }(std::make_index_sequence<usualStringLength>());
         return result;
-    };
+    }
 
-    constexpr char GetChar(size_t index) const
+    [[nodiscard]] constexpr char GetChar(std::size_t index) const
     {
-        constexpr int8_t shifts[]{28, 24, 20, 16, 12, 8,  4,  0,  -1, 44, 40,  36, 32,  -1,  60,  56,  52,  48,
-                                  -1, 68, 64, 76, 72, -1, 84, 80, 92, 88, 100, 96, 108, 104, 116, 112, 124, 120};
-        int8_t shift = shifts[index];
+        constexpr std::array<i8, usualStringLength> shifts{28, 24, 20, 16, 12,  8,  4,   0,   -1,  44,  40,  36,
+                                                           32, -1, 60, 56, 52,  48, -1,  68,  64,  76,  72,  -1,
+                                                           84, 80, 92, 88, 100, 96, 108, 104, 116, 112, 124, 120};
+        i8 shift = shifts[index];
         if (shift < 0)
         {
             return '-';
         }
 
-        uint64_t v = part1;
+        u64 v = part1;
         if (shift >= 64)
         {
             v = part2;
@@ -71,65 +66,73 @@ public:
 
         if (v < 10)
         {
-            return '0' + static_cast<char>(v);
+            return static_cast<char>('0' + static_cast<char>(v));
         }
 
-        return 'A' - 10 + static_cast<char>(v);
+        return static_cast<char>('A' - 10 + static_cast<char>(v));
     }
 
 private:
-    inline static constexpr GUID Parse(const std::string_view str)
+    [[nodiscard]] static constexpr GUID Parse(std::string_view str)
     {
         const auto parsePart = [str](auto indexMap)
         {
             const auto parseBytes = [str, indexMap](const auto... indices)
             {
-                const auto parseByte = [str, indexMap](size_t index)
+                const auto parseByte = [str, indexMap](std::size_t index)
                 {
-                    const auto parseWord = [str](const size_t byteIndex)
+                    const auto parseWord = [str](std::size_t byteIndex)
                     {
-                        const uint8_t h = HexToDec(str[byteIndex]);
-                        const uint8_t l = HexToDec(str[byteIndex + 1]);
-                        return static_cast<uint8_t>((h << 4) | l);
+                        const u8 h = HexToDec(str[byteIndex]);
+                        const u8 l = HexToDec(str[byteIndex + 1]);
+                        return static_cast<u8>((h << 4) | l);
                     };
 
                     return MakeByte(index, parseWord(indexMap[index]));
                 };
 
-                return (parseByte(static_cast<size_t>(indices)) | ...);
+                return (parseByte(static_cast<std::size_t>(indices)) | ...);
             };
 
             return parseBytes(0, 1, 2, 3, 4, 5, 6, 7);
         };
 
         return GUID{
-            //                              0  1  2  3   4  5  6   7
-            parsePart(std::array<size_t, 8>{6, 4, 2, 0, 11, 9, 16, 14}),
-            parsePart(std::array<size_t, 8>{19, 21, 24, 26, 28, 30, 32, 34})};
+            //                                               0  1  2  3   4  5  6   7
+            .part1 = parsePart(std::array<std::size_t, 8>{6, 4, 2, 0, 11, 9, 16, 14}),
+            .part2 = parsePart(std::array<std::size_t, 8>{19, 21, 24, 26, 28, 30, 32, 34})};
     }
 
 public:
-    uint64_t part1 = 0;
-    uint64_t part2 = 0;
+    u64 part1 = 0;
+    u64 part2 = 0;
 };
+
+inline std::ostream& operator<<(std::ostream& stream, const GUID& guid)
+{
+    const auto chars = guid.ToCharArray();
+    return stream << std::string_view(chars.data(), chars.size());
+}
 }  // namespace edt
 
-namespace std
-{
 template <>
-struct hash<edt::GUID>
+struct std::hash<edt::GUID>
 {
-    [[nodiscard]] inline std::size_t operator()(const edt::GUID& k) const
+    [[nodiscard]] std::size_t operator()(const edt::GUID& k) const noexcept
     {
-        std::hash<uint64_t> hasher;
-        return hasher(k.part1) ^ hasher(k.part2);
+        const std::size_t h1 = std::hash<edt::u64>{}(k.part1);
+        const std::size_t h2 = std::hash<edt::u64>{}(k.part2);
+        return h1 ^ (h2 + 0x9e3779b97f4a7c15ULL + (h1 << 6) + (h1 >> 2));
     }
 };
-}  // namespace std
 
-inline std::ostream& operator<<(std::ostream& stream, const edt::GUID& guid)
+template <>
+struct std::formatter<edt::GUID> : std::formatter<std::string_view>
 {
-    const auto char_guid = guid.ToCharArray();
-    std::string_view view(char_guid.data(), char_guid.size());
-    return stream << view;
-}
+    template <typename FormatContext>
+    auto format(const edt::GUID& guid, FormatContext& ctx) const
+    {
+        const auto chars = guid.ToCharArray();
+        return std::formatter<std::string_view>::format(std::string_view(chars.data(), chars.size()), ctx);
+    }
+};

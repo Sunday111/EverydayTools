@@ -1,9 +1,12 @@
 #pragma once
 
 #include <concepts>
+#include <cstddef>
 #include <limits>
+#include <ranges>
 #include <tuple>
 
+#include "math.hpp"
 #include "matrix.hpp"
 
 namespace edt
@@ -13,15 +16,16 @@ template <std::integral T>
 class IntRange
 {
 public:
-    [[nodiscard]] constexpr bool Contains(const T& value) const noexcept { return InRange(value, begin, end); }
+    [[nodiscard]] constexpr bool Contains(const T& value) const noexcept { return Math::InRange(value, begin, end); }
 
     [[nodiscard]] constexpr T Extent() const { return end - begin; }
 
-    [[nodiscard]] constexpr std::tuple<IntRange, IntRange> Split(size_t left_side_size) const
+    [[nodiscard]] constexpr std::tuple<IntRange, IntRange> Split(std::size_t left_side_size) const
     {
+        const T split_point = begin + static_cast<T>(left_side_size);
         return {
-            {.begin = begin, .end = begin + left_side_size},
-            {.begin = begin + left_side_size, .end = end},
+            {.begin = begin, .end = split_point},
+            {.begin = split_point, .end = end},
         };
     }
 

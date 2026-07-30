@@ -16,13 +16,10 @@ constexpr void StaticForImpl(Function&& function, std::index_sequence<indices...
 }  // namespace detail
 
 template <std::size_t begin, std::size_t end, typename Function>
+    requires(begin <= end)
 constexpr void StaticFor(Function&& function)
 {
-    static_assert(begin <= end, "StaticFor begin must not exceed end");
-    if constexpr (begin <= end)
-    {
-        detail::StaticForImpl<begin>(std::forward<Function>(function), std::make_index_sequence<end - begin>{});
-    }
+    detail::StaticForImpl<begin>(std::forward<Function>(function), std::make_index_sequence<end - begin>{});
 }
 
 template <std::size_t count, typename Function>

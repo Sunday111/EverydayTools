@@ -1,5 +1,6 @@
 #pragma once
 
+#include <compare>
 #include <limits>
 
 namespace edt
@@ -16,24 +17,15 @@ private:
 
 public:
     constexpr TaggedIdentifier() noexcept = default;
-    constexpr TaggedIdentifier(const TaggedIdentifier&) noexcept = default;
-    constexpr TaggedIdentifier(TaggedIdentifier&&) noexcept = default;
-    constexpr TaggedIdentifier& operator=(const TaggedIdentifier&) noexcept = default;
-    constexpr TaggedIdentifier& operator=(TaggedIdentifier&&) noexcept = default;
 
-    static constexpr TaggedIdentifier FromValue(const Repr& repr) { return TaggedIdentifier(repr); }
+    static constexpr TaggedIdentifier FromValue(const Repr& repr) noexcept { return TaggedIdentifier(repr); }
 
-    constexpr const Repr& GetValue() const noexcept { return value_; }
+    [[nodiscard]] constexpr const Repr& GetValue() const noexcept { return value_; }
 
-    constexpr bool IsValid() const noexcept { return value_ != invalid_id; }
+    [[nodiscard]] constexpr bool IsValid() const noexcept { return value_ != invalid_id; }
 
-    constexpr bool operator==(const TaggedIdentifier& id) const noexcept { return value_ == id.value_; }
-
-    constexpr bool operator!=(const TaggedIdentifier& id) const noexcept { return value_ != id.value_; }
-
-    constexpr bool operator<(const TaggedIdentifier& id) const noexcept { return value_ < id.value_; }
-
-    constexpr bool operator>(const TaggedIdentifier& id) const noexcept { return value_ > id.value_; }
+    [[nodiscard]] friend constexpr bool operator==(const TaggedIdentifier&, const TaggedIdentifier&) = default;
+    [[nodiscard]] friend constexpr auto operator<=>(const TaggedIdentifier&, const TaggedIdentifier&) = default;
 
 private:
     Repr value_ = invalid_id;

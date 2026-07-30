@@ -1,32 +1,28 @@
 #pragma once
 
 #include <algorithm>
-#include <type_traits>
+#include <concepts>
+#include <limits>
+#include <utility>
 
 namespace edt
 {
-template <typename T>
-inline T Clamp(T min, T value, T max)
+template <std::integral Bounds, std::integral From>
+[[nodiscard]] constexpr From ClampToAnotherTypeBounds(From value) noexcept
 {
-    value = std::min(value, max);
-    value = std::max(value, min);
+    using B = std::numeric_limits<Bounds>;
+    using F = std::numeric_limits<From>;
+
+    if constexpr (std::cmp_less(F::lowest(), B::lowest()))
+    {
+        value = std::max(value, static_cast<From>(B::lowest()));
+    }
+
+    if constexpr (std::cmp_greater(F::max(), B::max()))
+    {
+        value = std::min(value, static_cast<From>(B::max()));
+    }
+
     return value;
-}
-
-template <typename T2, typename T1>
-inline T1 ClampToAnotherTypeBounds(T1 value)
-{
-    using L2 = std::numeric_limits<T2>;
-    constexpr auto max = static_cast<T1>(L2::max());
-
-    if constexpr (std::is_unsigned_v<T1> && std::is_signed_v<T2>)
-    {
-        return Clamp(T1(0), value, max);
-    }
-    else
-    {
-        constexpr auto min = static_cast<T1>(L2::lowest());
-        return Clamp(min, value, max);
-    }
 }
 }  // namespace edt
