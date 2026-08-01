@@ -145,3 +145,22 @@ using Actual = edt::TypesList_FilterT<Predicate, Arg>;
 static_assert(std::is_same_v<Expected, Actual>);
 }  // namespace D
 }  // namespace types_list_filter_test
+
+namespace
+{
+struct A;
+struct B;
+struct C;
+}  // namespace
+
+static_assert(edt::TypesList_IndexOfV<A, edt::TypesList<A, B, C>> == 0);
+static_assert(edt::TypesList_IndexOfV<B, edt::TypesList<A, B, C>> == 1);
+static_assert(edt::TypesList_IndexOfV<C, edt::TypesList<A, B, C>> == 2);
+static_assert(edt::TypesList_IndexOfV<C, edt::TypesList<C>> == 0);
+
+// Finds the first occurrence.
+static_assert(edt::TypesList_IndexOfV<B, edt::TypesList<A, B, B>> == 1);
+
+// Qualifiers are part of the type.
+static_assert(edt::TypesList_IndexOfV<const int, edt::TypesList<int, const int>> == 1);
+static_assert(edt::TypesList_IndexOfV<int&, edt::TypesList<int, int&&, int&>> == 2);

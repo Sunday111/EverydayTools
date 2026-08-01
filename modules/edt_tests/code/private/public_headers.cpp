@@ -34,6 +34,7 @@
 #include "edt/float_aliases.hpp"
 #include "edt/frame_rate_counter.hpp"
 #include "edt/functional/call_for_each_arg.hpp"
+#include "edt/functional/on_scope_leave.hpp"
 #include "edt/functional/wrap.hpp"
 #include "edt/guid.hpp"
 #include "edt/int_aliases.hpp"
@@ -41,7 +42,9 @@
 #include "edt/math/int_range.hpp"
 #include "edt/math/math.hpp"
 #include "edt/math/matrix.hpp"
+#include "edt/math/rotator.hpp"
 #include "edt/math/surface_points.hpp"
+#include "edt/math/transform.hpp"
 #include "edt/observable.hpp"
 #include "edt/pointer/intrusive_ptr.hpp"
 #include "edt/preprocessor/empty_bases.hpp"
@@ -51,7 +54,9 @@
 #include "edt/string/char_util.hpp"
 #include "edt/template/apply_if.hpp"
 #include "edt/template/fwd_decl.hpp"
+#include "edt/template/get_enum_underlying.hpp"
 #include "edt/template/is_specialization.hpp"
+#include "edt/template/member_offset.hpp"
 #include "edt/template/overload.hpp"
 #include "edt/template/pure_same_types.hpp"
 #include "edt/template/signature.hpp"
@@ -63,6 +68,7 @@
 #include "edt/template/values_list.hpp"
 #include "edt/template/worst_qualifiers.hpp"
 #include "edt/template/worst_reference.hpp"
+#include "edt/threading/batch_thread_pool.hpp"
 #include "edt/time/measure_time.hpp"
 #include "gtest/gtest.h"
 
@@ -91,6 +97,7 @@ constexpr auto kIncludedHeaders = std::to_array<std::string_view>({
     "float_aliases.hpp",
     "frame_rate_counter.hpp",
     "functional/call_for_each_arg.hpp",
+    "functional/on_scope_leave.hpp",
     "functional/wrap.hpp",
     "guid.hpp",
     "int_aliases.hpp",
@@ -98,7 +105,9 @@ constexpr auto kIncludedHeaders = std::to_array<std::string_view>({
     "math/int_range.hpp",
     "math/math.hpp",
     "math/matrix.hpp",
+    "math/rotator.hpp",
     "math/surface_points.hpp",
+    "math/transform.hpp",
     "observable.hpp",
     "pointer/intrusive_ptr.hpp",
     "preprocessor/empty_bases.hpp",
@@ -108,7 +117,9 @@ constexpr auto kIncludedHeaders = std::to_array<std::string_view>({
     "string/char_util.hpp",
     "template/apply_if.hpp",
     "template/fwd_decl.hpp",
+    "template/get_enum_underlying.hpp",
     "template/is_specialization.hpp",
+    "template/member_offset.hpp",
     "template/overload.hpp",
     "template/pure_same_types.hpp",
     "template/signature.hpp",
@@ -120,6 +131,7 @@ constexpr auto kIncludedHeaders = std::to_array<std::string_view>({
     "template/values_list.hpp",
     "template/worst_qualifiers.hpp",
     "template/worst_reference.hpp",
+    "threading/batch_thread_pool.hpp",
     "time/measure_time.hpp",
 });
 

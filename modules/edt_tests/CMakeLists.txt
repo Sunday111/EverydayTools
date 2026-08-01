@@ -30,6 +30,7 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/exception/throw_if_failed.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/frame_rate_counter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/functional/functional.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/functional/on_scope_leave.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/guid/guid.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/guid/guid_format.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/guid/guid_parse.cpp
@@ -37,6 +38,8 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/math/matrix_edge_cases.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/math/matrix_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/math/ranges.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/math/rotator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/math/transform.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/observable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/pointer/intrusive_ptr.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/public_headers.cpp
@@ -44,7 +47,9 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/size.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/string/char_util.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/apply_if.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/get_enum_underlying.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/is_specialization.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/member_offset.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/overload.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/pure_same_types.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/signature.cpp
@@ -56,6 +61,7 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/worst_qualifiers.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/worst_reference.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/test_tools.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/threading/batch_thread_pool.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/time/measure_time.cpp)
 add_executable(edt_tests ${module_source_files})
 set_generic_compiler_options(edt_tests PRIVATE)

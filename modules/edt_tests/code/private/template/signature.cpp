@@ -1,5 +1,7 @@
 #include "edt/template/signature.hpp"
 
+#include <type_traits>
+
 #ifndef SIGNATURE_TEST_METHOD
 #define SIGNATURE_TEST_METHOD(pre_qualifiers, name, qualifiers) \
     pre_qualifiers int name(float, double) qualifiers           \
@@ -93,3 +95,27 @@ SIGNATURE_TEST(const_volatile_lref_noexcept_method, true, true, true, false, tru
 SIGNATURE_TEST(const_volatile_rref_noexcept_method, true, true, true, false, false, true);
 
 #undef SIGNATURE_TEST
+namespace
+{
+struct DataMembers
+{
+    int number;
+    double* pointer;
+    int method(float);
+};
+}  // namespace
+
+static_assert(edt::Signature<decltype(&DataMembers::number)>::IsVariable());
+static_assert(!edt::Signature<decltype(&DataMembers::number)>::IsMethod());
+static_assert(std::is_same_v<edt::Signature<decltype(&DataMembers::number)>::Member, int>);
+static_assert(std::is_same_v<edt::Signature<decltype(&DataMembers::number)>::Class, DataMembers>);
+
+static_assert(std::is_same_v<edt::Signature<decltype(&DataMembers::pointer)>::Member, double*>);
+
+// A pointer to a method also matches the pointer-to-data-member pattern, so the method
+// specializations have to stay the more specialized match.
+static_assert(!edt::Signature<decltype(&DataMembers::method)>::IsVariable());
+static_assert(edt::Signature<decltype(&DataMembers::method)>::IsMethod());
+static_assert(std::is_same_v<edt::Signature<decltype(&DataMembers::method)>::Ret, int>);
+
+static_assert(!edt::Signature<decltype(&Foo::static_method)>::IsVariable());

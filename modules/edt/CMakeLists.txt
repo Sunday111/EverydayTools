@@ -23,6 +23,7 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/float_aliases.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/frame_rate_counter.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/functional/call_for_each_arg.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/functional/on_scope_leave.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/functional/wrap.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/guid.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/int_aliases.hpp
@@ -30,7 +31,9 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/math/int_range.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/math/math.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/math/matrix.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/math/rotator.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/math/surface_points.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/math/transform.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/observable.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/pointer/intrusive_ptr.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/preprocessor/empty_bases.hpp
@@ -40,7 +43,9 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/string/char_util.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/apply_if.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/fwd_decl.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/get_enum_underlying.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/is_specialization.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/member_offset.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/overload.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/pure_same_types.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/signature.hpp
@@ -52,6 +57,7 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/values_list.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/worst_qualifiers.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/worst_reference.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/threading/batch_thread_pool.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/time/measure_time.hpp)
 add_library(edt INTERFACE ${module_source_files})
 set_generic_compiler_options(edt INTERFACE)

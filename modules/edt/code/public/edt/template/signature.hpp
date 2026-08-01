@@ -19,6 +19,7 @@ struct Signature<Ret_ (*)(Args_...)>
     using Args = std::tuple<Args_...>;
     static constexpr size_t GetArgsCount() { return std::tuple_size_v<Args>; }
     static constexpr bool IsMethod() { return !Pure; }
+    static constexpr bool IsVariable() { return false; }
     static constexpr bool Const = false;
     static constexpr bool Noexcept = false;
     static constexpr bool Volatile = false;
@@ -34,12 +35,26 @@ struct Signature<Ret_ (*)(Args_...) noexcept> : Signature<Ret_ (*)(Args_...)>
     static constexpr bool Noexcept = true;
 };
 
+// pointer to data member. A pointer to a method matches this pattern too, with Member_
+// deduced as the function type, but every method specialization below is more specialized
+// and wins overload resolution.
+template <typename Member_, typename Class_>
+struct Signature<Member_ Class_::*>
+{
+    using Member = Member_;
+    using Class = Class_;
+    static constexpr bool IsMethod() { return false; }
+    static constexpr bool IsVariable() { return true; }
+};
+
 // method
 template <typename Ret_, typename Class_, typename... Args_>
 struct Signature<Ret_ (Class_::*)(Args_...)> : Signature<Ret_ (*)(Args_...)>
 {
     using Class = Class_;
     static constexpr bool Pure = false;
+    // Redeclared because the inherited definition reads the base's Pure, not this one.
+    static constexpr bool IsMethod() { return !Pure; }
 };
 
 #ifndef EDT_SIGNATURE_METHOD_SPECIALIZATION
