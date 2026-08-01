@@ -112,9 +112,15 @@ public:
 
     // Deducing this covers const/non-const (mainly)
     template <typename Self>
-    [[nodiscard]] constexpr auto&& operator()(this Self&& self, size_t row, size_t column)
+    [[nodiscard]] constexpr auto&& operator[](this Self&& self, size_t row, size_t column)
     {
         return std::forward<Self>(self).data_[row * num_columns + column];
+    }
+
+    template <typename Self>
+    [[nodiscard]] constexpr auto&& operator()(this Self&& self, size_t row, size_t column)
+    {
+        return std::forward<Self>(self)[row, column];
     }
     template <typename Self, typename PureSelf = std::decay_t<Self>>
         requires(PureSelf::IsVector() && PureSelf::Size() > 0)

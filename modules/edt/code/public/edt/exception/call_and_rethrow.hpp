@@ -1,6 +1,7 @@
 #pragma once
 
 #include <concepts>
+#include <exception>
 #include <source_location>
 #include <stdexcept>
 #include <utility>
