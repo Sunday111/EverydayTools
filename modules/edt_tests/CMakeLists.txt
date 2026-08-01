@@ -49,6 +49,7 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/apply_if.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/get_enum_underlying.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/is_specialization.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/member_offset.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/overload.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/pure_same_types.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/signature.cpp

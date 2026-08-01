@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <tuple>
 #include <type_traits>
 
@@ -78,4 +79,32 @@ constexpr auto TypesList_Filter(TypesList<Types...>)
 
 template <template <typename> typename Predicate, typename List>
 using TypesList_FilterT = decltype(TypesList_Filter<Predicate>(std::declval<List>()));
+
+namespace types_list_impl
+{
+template <typename T, typename... Types>
+struct TypesList_IndexOfImpl;
+
+template <typename T, typename... Tail>
+struct TypesList_IndexOfImpl<T, T, Tail...>
+{
+    static constexpr std::size_t Value = 0;
+};
+
+template <typename T, typename Head, typename... Tail>
+struct TypesList_IndexOfImpl<T, Head, Tail...>
+{
+    static constexpr std::size_t Value = 1 + TypesList_IndexOfImpl<T, Tail...>::Value;
+};
+}  // namespace types_list_impl
+
+// Position of the first T in the list. A type that is not in the list is a compile error.
+template <typename T, typename... Types>
+constexpr std::size_t TypesList_IndexOf(TypesList<Types...>)
+{
+    return types_list_impl::TypesList_IndexOfImpl<T, Types...>::Value;
+}
+
+template <typename T, typename List>
+constexpr std::size_t TypesList_IndexOfV = TypesList_IndexOf<T>(List{});
 }  // namespace edt

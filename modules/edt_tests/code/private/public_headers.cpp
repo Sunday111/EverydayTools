@@ -56,6 +56,7 @@
 #include "edt/template/fwd_decl.hpp"
 #include "edt/template/get_enum_underlying.hpp"
 #include "edt/template/is_specialization.hpp"
+#include "edt/template/member_offset.hpp"
 #include "edt/template/overload.hpp"
 #include "edt/template/pure_same_types.hpp"
 #include "edt/template/signature.hpp"
@@ -118,6 +119,7 @@ constexpr auto kIncludedHeaders = std::to_array<std::string_view>({
     "template/fwd_decl.hpp",
     "template/get_enum_underlying.hpp",
     "template/is_specialization.hpp",
+    "template/member_offset.hpp",
     "template/overload.hpp",
     "template/pure_same_types.hpp",
     "template/signature.hpp",

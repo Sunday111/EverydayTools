@@ -45,6 +45,7 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/fwd_decl.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/get_enum_underlying.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/is_specialization.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/member_offset.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/overload.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/pure_same_types.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/signature.hpp
