@@ -54,7 +54,6 @@
 #include "edt/string/char_util.hpp"
 #include "edt/template/apply_if.hpp"
 #include "edt/template/fwd_decl.hpp"
-#include "edt/template/get_enum_underlying.hpp"
 #include "edt/template/is_specialization.hpp"
 #include "edt/template/member_offset.hpp"
 #include "edt/template/overload.hpp"
@@ -117,7 +116,6 @@ constexpr auto kIncludedHeaders = std::to_array<std::string_view>({
     "string/char_util.hpp",
     "template/apply_if.hpp",
     "template/fwd_decl.hpp",
-    "template/get_enum_underlying.hpp",
     "template/is_specialization.hpp",
     "template/member_offset.hpp",
     "template/overload.hpp",

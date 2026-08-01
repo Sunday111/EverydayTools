@@ -8,6 +8,6 @@
         "run_target": "edt_tests"
     },
     "cpp": {
-        "standard": "20"
+        "standard": "23"
     }
 }
