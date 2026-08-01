@@ -25,10 +25,17 @@ public:
     std::optional<std::size_t> Next()
     {
         assert(bitset_);
+
+        // Shifting by the full width of the type is undefined, and num_scanned_ reaches it
+        // once the highest bit has been reported.
+        if (num_scanned_ >= kBitsCount) return std::nullopt;
+
         auto shifted = *bitset_;
         shifted >>= num_scanned_;
         num_scanned_ += static_cast<std::size_t>(std::countr_zero(shifted));
         if (num_scanned_ < kBitsCount) return num_scanned_++;
+
+        num_scanned_ = kBitsCount;
         return std::nullopt;
     }
 
