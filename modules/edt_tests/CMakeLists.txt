@@ -38,6 +38,8 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/math/matrix_edge_cases.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/math/matrix_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/math/ranges.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/math/rotator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/math/transform.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/observable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/pointer/intrusive_ptr.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/public_headers.cpp

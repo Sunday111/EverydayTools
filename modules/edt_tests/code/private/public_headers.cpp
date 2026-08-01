@@ -42,7 +42,9 @@
 #include "edt/math/int_range.hpp"
 #include "edt/math/math.hpp"
 #include "edt/math/matrix.hpp"
+#include "edt/math/rotator.hpp"
 #include "edt/math/surface_points.hpp"
+#include "edt/math/transform.hpp"
 #include "edt/observable.hpp"
 #include "edt/pointer/intrusive_ptr.hpp"
 #include "edt/preprocessor/empty_bases.hpp"
@@ -102,7 +104,9 @@ constexpr auto kIncludedHeaders = std::to_array<std::string_view>({
     "math/int_range.hpp",
     "math/math.hpp",
     "math/matrix.hpp",
+    "math/rotator.hpp",
     "math/surface_points.hpp",
+    "math/transform.hpp",
     "observable.hpp",
     "pointer/intrusive_ptr.hpp",
     "preprocessor/empty_bases.hpp",

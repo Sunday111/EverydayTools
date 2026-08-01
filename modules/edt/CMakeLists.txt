@@ -31,7 +31,9 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/math/int_range.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/math/math.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/math/matrix.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/math/rotator.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/math/surface_points.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/math/transform.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/observable.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/pointer/intrusive_ptr.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/preprocessor/empty_bases.hpp
