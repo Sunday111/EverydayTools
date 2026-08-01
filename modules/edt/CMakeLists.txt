@@ -23,6 +23,7 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/float_aliases.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/frame_rate_counter.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/functional/call_for_each_arg.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/functional/on_scope_leave.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/functional/wrap.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/guid.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/int_aliases.hpp
@@ -40,6 +41,7 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/string/char_util.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/apply_if.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/fwd_decl.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/get_enum_underlying.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/is_specialization.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/overload.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/pure_same_types.hpp

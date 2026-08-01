@@ -30,6 +30,7 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/exception/throw_if_failed.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/frame_rate_counter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/functional/functional.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/functional/on_scope_leave.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/guid/guid.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/guid/guid_format.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/guid/guid_parse.cpp
@@ -44,6 +45,7 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/size.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/string/char_util.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/apply_if.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/get_enum_underlying.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/is_specialization.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/overload.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/pure_same_types.cpp

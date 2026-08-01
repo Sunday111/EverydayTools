@@ -34,6 +34,7 @@
 #include "edt/float_aliases.hpp"
 #include "edt/frame_rate_counter.hpp"
 #include "edt/functional/call_for_each_arg.hpp"
+#include "edt/functional/on_scope_leave.hpp"
 #include "edt/functional/wrap.hpp"
 #include "edt/guid.hpp"
 #include "edt/int_aliases.hpp"
@@ -51,6 +52,7 @@
 #include "edt/string/char_util.hpp"
 #include "edt/template/apply_if.hpp"
 #include "edt/template/fwd_decl.hpp"
+#include "edt/template/get_enum_underlying.hpp"
 #include "edt/template/is_specialization.hpp"
 #include "edt/template/overload.hpp"
 #include "edt/template/pure_same_types.hpp"
@@ -91,6 +93,7 @@ constexpr auto kIncludedHeaders = std::to_array<std::string_view>({
     "float_aliases.hpp",
     "frame_rate_counter.hpp",
     "functional/call_for_each_arg.hpp",
+    "functional/on_scope_leave.hpp",
     "functional/wrap.hpp",
     "guid.hpp",
     "int_aliases.hpp",
@@ -108,6 +111,7 @@ constexpr auto kIncludedHeaders = std::to_array<std::string_view>({
     "string/char_util.hpp",
     "template/apply_if.hpp",
     "template/fwd_decl.hpp",
+    "template/get_enum_underlying.hpp",
     "template/is_specialization.hpp",
     "template/overload.hpp",
     "template/pure_same_types.hpp",
