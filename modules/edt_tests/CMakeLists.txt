@@ -2,33 +2,46 @@ cmake_minimum_required(VERSION 3.20)
 include(set_compiler_options)
 set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/algorithm/clamp.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/algorithm/clamp_exhaustive.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/algorithm/compare.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/algorithm/sort/bubble_sort.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/algorithm/sort/insertion_sort.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/algorithm/sort/sort_cases.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/aliases.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/bitset/bit_iterator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/bitset/bitset.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/bitset/bitset_adapter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/bitset/bitset_adapter_array.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/bitset/bitset_fuzz.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/bitset/bitset_utilities.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/bitset/dynamic_bitset.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/bitset/enum_bitset.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/bitset/fixed_bitset.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/bitset/fixed_bitset_constexpr.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/branchless/int_if.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/branchless/swap_if.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/callbacks_edge_cases.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/constexpr/hex_to_dec.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/delegate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/exception/call_and_rethrow.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/exception/checked_cast.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/exception/checked_cast_matrix.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/exception/print_exception.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/exception/throw_if_failed.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/frame_rate_counter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/functional/functional.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/guid/guid.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/guid/guid_format.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/guid/guid_parse.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/math/math_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/math/matrix_edge_cases.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/math/matrix_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/math/ranges.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/observable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/pointer/intrusive_ptr.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/public_headers.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/ranges/array_indices2d.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code/private/size.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/string/char_util.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/apply_if.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/private/template/is_specialization.cpp
