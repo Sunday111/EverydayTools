@@ -1,8 +1,16 @@
 name: tests
 
 on:
+  # A branch with an open pull request would otherwise be built twice: once for the
+  # push and once for the pull request.
   push:
+    branches: [main]
   pull_request:
+
+# Supersede the runs still going for older commits on the same ref.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   linux:
