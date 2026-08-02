@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
+#include <utility>
 
 #include "../int_aliases.hpp"
 #include "../size.hpp"
@@ -31,7 +32,7 @@ constexpr bool FlagIsSet(T flags, T flag)
     if constexpr (std::is_enum_v<T> && edt::enable_enum_bitset_v<T>)
     {
         using U = std::underlying_type_t<T>;
-        return (static_cast<U>(flags) & static_cast<U>(flag)) != U{0};
+        return (std::to_underlying(flags) & std::to_underlying(flag)) != U{0};
     }
     else
     {

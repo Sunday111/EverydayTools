@@ -110,12 +110,17 @@ public:
         return m;
     }
 
-#if __cplusplus >= 202302L
     // Deducing this covers const/non-const (mainly)
+    template <typename Self>
+    [[nodiscard]] constexpr auto&& operator[](this Self&& self, size_t row, size_t column)
+    {
+        return std::forward<Self>(self).data_[row * num_columns + column];
+    }
+
     template <typename Self>
     [[nodiscard]] constexpr auto&& operator()(this Self&& self, size_t row, size_t column)
     {
-        return std::forward<Self>(self).data_[row * num_columns + column];
+        return std::forward<Self>(self)[row, column];
     }
     template <typename Self, typename PureSelf = std::decay_t<Self>>
         requires(PureSelf::IsVector() && PureSelf::Size() > 0)
@@ -158,89 +163,6 @@ public:
     {
         return std::forward<Self>(self).data_[row * num_columns + column];
     }
-#else
-    [[nodiscard]] constexpr const T& operator[](const size_t index) const
-        requires(IsVector())
-    {
-        return data_[index];
-    }
-
-    [[nodiscard]] constexpr T& operator[](const size_t index)
-        requires(IsVector())
-    {
-        return data_[index];
-    }
-
-    [[nodiscard]] constexpr const T& operator()(size_t row, size_t column) const
-    {
-        return data_[row * num_columns + column];
-    }
-
-    [[nodiscard]] constexpr T& operator()(size_t row, size_t column) { return data_[row * num_columns + column]; }
-
-    template <size_t row, size_t column>
-        requires(row < num_rows && column < num_columns)
-    [[nodiscard]] constexpr T& At()
-    {
-        return data_[row * num_columns + column];
-    }
-
-    template <size_t row, size_t column>
-        requires(row < num_rows && column < num_columns)
-    [[nodiscard]] constexpr const T& At() const
-    {
-        return data_[row * num_columns + column];
-    }
-
-    [[nodiscard]] constexpr T& x()
-        requires(IsVector() && Size() > 0)
-    {
-        return this->operator[](0);
-    }
-
-    [[nodiscard]] constexpr const T& x() const
-        requires(IsVector() && Size() > 0)
-    {
-        return this->operator[](0);
-    }
-
-    [[nodiscard]] constexpr T& y()
-        requires(IsVector() && Size() > 1)
-    {
-        return this->operator[](1);
-    }
-
-    [[nodiscard]] constexpr const T& y() const
-        requires(IsVector() && Size() > 1)
-    {
-        return this->operator[](1);
-    }
-
-    [[nodiscard]] constexpr T& z()
-        requires(IsVector() && Size() > 2)
-    {
-        return this->operator[](2);
-    }
-
-    [[nodiscard]] constexpr const T& z() const
-        requires(IsVector() && Size() > 2)
-    {
-        return this->operator[](2);
-    }
-
-    [[nodiscard]] constexpr T& w()
-        requires(IsVector() && Size() > 3)
-    {
-        return this->operator[](3);
-    }
-
-    [[nodiscard]] constexpr const T& w() const
-        requires(IsVector() && Size() > 3)
-    {
-        return this->operator[](3);
-    }
-
-#endif
 
     template <std::convertible_to<T> U>
     [[nodiscard]] constexpr Matrix<U, num_rows, num_columns> Cast() const
@@ -596,8 +518,6 @@ public:
     [[nodiscard]] constexpr T Min() const { return *std::ranges::min_element(data_); }
     [[nodiscard]] constexpr T Max() const { return *std::ranges::max_element(data_); }
 
-#if __cplusplus >= 202302L
-
     template <typename Self>
         requires(std::is_lvalue_reference_v<Self>)
     [[nodiscard]] constexpr auto RefTuple(this Self&& self)
@@ -616,15 +536,6 @@ public:
             return std::make_tuple(std::forward<Self>(self).data_[indices]...);
         }(std::make_index_sequence<Size()>{});
     }
-#else
-    [[nodiscard]] constexpr auto Tuple() const
-    {
-        return [&]<size_t... indices>(std::index_sequence<indices...>)
-        {
-            return std::make_tuple(data_[indices]...);
-        }(std::make_index_sequence<Size()>{});
-    }
-#endif
 
     std::array<T, Size()> data_{};
 };

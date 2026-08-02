@@ -43,7 +43,6 @@ set(module_source_files
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/string/char_util.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/apply_if.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/fwd_decl.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/get_enum_underlying.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/is_specialization.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/member_offset.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/code/public/edt/template/overload.hpp

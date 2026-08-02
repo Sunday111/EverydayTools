@@ -118,7 +118,7 @@ inline std::ostream& operator<<(std::ostream& stream, const GUID& guid)
 template <>
 struct std::hash<edt::GUID>
 {
-    [[nodiscard]] std::size_t operator()(const edt::GUID& k) const noexcept
+    [[nodiscard]] static std::size_t operator()(const edt::GUID& k) noexcept
     {
         const std::size_t h1 = std::hash<edt::u64>{}(k.part1);
         const std::size_t h2 = std::hash<edt::u64>{}(k.part2);

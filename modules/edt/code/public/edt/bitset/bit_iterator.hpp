@@ -25,15 +25,20 @@ public:
     std::optional<std::size_t> Next()
     {
         assert(bitset_);
-        auto shifted = *bitset_;
-        shifted >>= num_scanned_;
-        num_scanned_ += static_cast<std::size_t>(std::countr_zero(shifted));
-        if (num_scanned_ < kBitsCount) return num_scanned_++;
-        return std::nullopt;
+
+        const Mask remaining = static_cast<Mask>(*bitset_ & static_cast<Mask>(~reported_));
+        if (remaining == kEmptyMask) return std::nullopt;
+
+        const auto index = static_cast<std::size_t>(std::countr_zero(remaining));
+        const auto bit = static_cast<Mask>(Mask{1} << index);
+        reported_ = static_cast<Mask>(bit | static_cast<Mask>(bit - 1));
+        return index;
     }
 
 private:
-    std::size_t num_scanned_ = 0;
+    // Every bit up to and including the one reported last. Masking them off leaves the bits
+    // still to visit, so an exhausted iterator simply keeps finding nothing.
+    Mask reported_ = kEmptyMask;
     T* bitset_ = nullptr;
 };
 
