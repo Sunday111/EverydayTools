@@ -12,6 +12,16 @@ jobs:
       # its registry.json. The checked-out project supplies the edt
       # package itself, so the code under test is what gets built.
       YAE_REPOS: ${{ github.workspace }}/.yae-repos
+      # gcc 13 cannot parse an explicit object parameter and the preinstalled clang
+      # rejects the constrained operator templates in enum_bitset.hpp. CMake picks the
+      # compiler up from CC/CXX and the flags from CXXFLAGS/LDFLAGS.
+      CLANG_VERSION: "22"
+      CC: clang-22
+      CXX: clang++-22
+      # libstdc++ 14 rejects the BatchThreadPool argument to std::jthread at C++23.
+      # libc++ is what edt's consumers build against anyway.
+      CXXFLAGS: -stdlib=libc++
+      LDFLAGS: -stdlib=libc++
     steps:
       - name: Check out edt
         uses: actions/checkout@v4
@@ -31,6 +41,14 @@ jobs:
       # explicitly so the workflow does not depend on the runner image contents.
       - name: Install Ninja
         run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Install Clang
+        run: |
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh "$CLANG_VERSION"
+          sudo apt-get install -y "libc++-$CLANG_VERSION-dev" "libc++abi-$CLANG_VERSION-dev"
+          "clang++-$CLANG_VERSION" --version
 
       # Options must precede the target: `yae run` forwards everything after the
       # run target to the executable (argparse REMAINDER), so flags placed after
